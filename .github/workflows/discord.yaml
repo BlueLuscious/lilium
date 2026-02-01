@@ -1,0 +1,39 @@
+name: Lilium Discord Notifications
+
+on:
+  push:
+    branches:
+      - develop
+      - "feature/**"
+      - "bugfix/**"
+      - "fix/**"
+      - "enhancement/**"
+  pull_request:
+    branches:
+      - master
+      - develop
+
+jobs:
+  notify-discord:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Send Discord Notification
+        uses: Ilshidur/action-discord@master
+        env:
+          LILIUM_DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
+        with:
+          args: |
+            🚀 **Actor:** ${{ github.actor }}
+            📦 **Repo:** ${{ github.repository }}
+
+            ${{ github.event_name == 'push' && format('🟢 Push en `{0}`\nMensaje: {1}', github.ref, github.event.head_commit.message) || '' }}
+
+            ${{ github.event_name == 'pull_request' && format('🔵 PR #{0}: {1}\n{2}', github.event.pull_request.number, github.event.pull_request.title, github.event.pull_request.body) || '' }}
+
+            🔗 **Commit:** ${{ github.sha }}
+            🔎 [Ver cambios](${{ github.event.pull_request.html_url || github.event.head_commit.url }})
+            
