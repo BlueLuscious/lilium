@@ -24,7 +24,7 @@ jobs:
       - name: Send Discord Notification
         uses: Ilshidur/action-discord@master
         env:
-          LILIUM_DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
+          DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
         with:
           args: |
             🚀 **Actor:** ${{ github.actor }}
