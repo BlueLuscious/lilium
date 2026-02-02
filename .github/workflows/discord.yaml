@@ -29,12 +29,12 @@ jobs:
       # ─────────────────────────────
       - name: Push notification
         if: github.event_name == 'push' && github.event.created == false
-        uses: Ilshidur/action-discord@master
         env:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
-        with:
-          args: |
-            {
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d '{
               "embeds": [
                 {
                   "title": "🟢 New push",
@@ -52,7 +52,7 @@ jobs:
                       "inline": true
                     },
                     {
-                      "name": "💬 Commit Message",
+                      "name": "💬 Commit message",
                       "value": "${{ github.event.head_commit.message }}"
                     },
                     {
@@ -65,19 +65,20 @@ jobs:
                   }
                 }
               ]
-            }
+            }' \
+            "$DISCORD_WEBHOOK"
 
       # ─────────────────────────────
       # BRANCH CREATED
       # ─────────────────────────────
       - name: Branch created
         if: github.event_name == 'push' && github.event.created == true
-        uses: Ilshidur/action-discord@master
         env:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
-        with:
-          args: |
-            {
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d '{
               "embeds": [
                 {
                   "title": "🌱 Branch created",
@@ -100,24 +101,26 @@ jobs:
                   }
                 }
               ]
-            }
+            }' \
+            "$DISCORD_WEBHOOK"
 
       # ─────────────────────────────
       # BRANCH DELETED
       # ─────────────────────────────
       - name: Branch deleted
         if: github.event_name == 'delete' && github.event.ref_type == 'branch'
-        uses: Ilshidur/action-discord@master
         env:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
-        with:
-          args: |
-            {
+
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d '{
               "embeds": [
                 {
                   "title": "🌱 Branch deleted",
                   "description": "**${{ github.repository }}**",
-                  "color": 15158332,
+                  "color": 15105570,
                   "fields": [
                     {
                       "name": "🌿 Branch",
@@ -135,19 +138,20 @@ jobs:
                   }
                 }
               ]
-            }
+            }' \
+            "$DISCORD_WEBHOOK"
 
       # ─────────────────────────────
       # PULL REQUEST
       # ─────────────────────────────
       - name: Pull Request notification
         if: github.event_name == 'pull_request'
-        uses: Ilshidur/action-discord@master
         env:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
-        with:
-          args: |
-            {
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d '{
               "embeds": [
                 {
                   "title": "🔵 Pull Request #${{ github.event.pull_request.number }}",
@@ -167,7 +171,7 @@ jobs:
                     },
                     {
                       "name": "📝 Description",
-                      "value": "${{ github.event.pull_request.body || '_No description provided_' }}"
+                      "value": "${{ github.event.pull_request.body || "_No description provided_" }}"
                     }
                   ],
                   "footer": {
@@ -175,4 +179,5 @@ jobs:
                   }
                 }
               ]
-            }
+            }' \
+            "$DISCORD_WEBHOOK"
