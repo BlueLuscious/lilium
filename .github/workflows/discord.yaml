@@ -34,16 +34,38 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
         with:
           args: |
-            🟢 **Push**
-            👤 **Actor:** ${{ github.actor }}
-            🌿 **Branch:** `${{ github.ref_name }}`
-            📦 **Repo:** ${{ github.repository }}
-
-            💬 **Mensaje:**  
-            > ${{ github.event.head_commit.message }}
-
-            🔗 **Commit:** `${{ github.sha }}`
-            🔎 [Ver cambios](${{ github.event.head_commit.url }})
+            {
+              "embeds": [
+                {
+                  "title": "🟢 New push",
+                  "description": "**${{ github.repository }}**",
+                  "color": 3066993,
+                  "fields": [
+                    {
+                      "name": "👤 Author",
+                      "value": "${{ github.actor }}",
+                      "inline": true
+                    },
+                    {
+                      "name": "🌿 Branch",
+                      "value": "${{ github.ref_name }}",
+                      "inline": true
+                    },
+                    {
+                      "name": "💬 Commit Message",
+                      "value": "${{ github.event.head_commit.message }}"
+                    },
+                    {
+                      "name": "🔗 Commit",
+                      "value": "[View changes](${{ github.event.head_commit.url }})"
+                    }
+                  ],
+                  "footer": {
+                    "text": "Lilium · GitHub Actions"
+                  }
+                }
+              ]
+            }
 
       # ─────────────────────────────
       # BRANCH CREATED
@@ -55,10 +77,30 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
         with:
           args: |
-            🌱 **Nueva branch creada**
-            👤 **Actor:** ${{ github.actor }}
-            🌿 **Branch:** `${{ github.ref_name }}`
-            📦 **Repo:** ${{ github.repository }}
+            {
+              "embeds": [
+                {
+                  "title": "🌱 Branch created",
+                  "description": "**${{ github.repository }}**",
+                  "color": 15105570,
+                  "fields": [
+                    {
+                      "name": "🌿 Branch",
+                      "value": "${{ github.ref_name }}",
+                      "inline": true
+                    },
+                    {
+                      "name": "👤 Author",
+                      "value": "${{ github.actor }}",
+                      "inline": true
+                    }
+                  ],
+                  "footer": {
+                    "text": "Lilium · Branch lifecycle"
+                  }
+                }
+              ]
+            }
 
       # ─────────────────────────────
       # BRANCH DELETED
@@ -70,10 +112,30 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
         with:
           args: |
-            🧹 **Branch eliminada**
-            👤 **Actor:** ${{ github.actor }}
-            🌿 **Branch:** `${{ github.event.ref }}`
-            📦 **Repo:** ${{ github.repository }}
+            {
+              "embeds": [
+                {
+                  "title": "🌱 Branch deleted",
+                  "description": "**${{ github.repository }}**",
+                  "color": 15158332,
+                  "fields": [
+                    {
+                      "name": "🌿 Branch",
+                      "value": "${{ github.ref_name }}",
+                      "inline": true
+                    },
+                    {
+                      "name": "👤 Author",
+                      "value": "${{ github.actor }}",
+                      "inline": true
+                    }
+                  ],
+                  "footer": {
+                    "text": "Lilium · Branch lifecycle"
+                  }
+                }
+              ]
+            }
 
       # ─────────────────────────────
       # PULL REQUEST
@@ -85,13 +147,32 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
         with:
           args: |
-            🔵 **Pull Request**
-            👤 **Actor:** ${{ github.actor }}
-            📦 **Repo:** ${{ github.repository }}
-
-            🧩 **PR #${{ github.event.pull_request.number }}**
-            **${{ github.event.pull_request.title }}**
-
-            📝 ${{ github.event.pull_request.body || '_(sin descripción)_' }}
-
-            🔎 [Ver Pull Request](${{ github.event.pull_request.html_url }})
+            {
+              "embeds": [
+                {
+                  "title": "🔵 Pull Request #${{ github.event.pull_request.number }}",
+                  "url": "${{ github.event.pull_request.html_url }}",
+                  "description": "**${{ github.event.pull_request.title }}**",
+                  "color": 3447003,
+                  "fields": [
+                    {
+                      "name": "👤 Author",
+                      "value": "${{ github.actor }}",
+                      "inline": true
+                    },
+                    {
+                      "name": "🌿 Base → Head",
+                      "value": "`${{ github.event.pull_request.base.ref }}` ← `${{ github.event.pull_request.head.ref }}`",
+                      "inline": true
+                    },
+                    {
+                      "name": "📝 Description",
+                      "value": "${{ github.event.pull_request.body || '_No description provided_' }}"
+                    }
+                  ],
+                  "footer": {
+                    "text": "Lilium · Pull Requests"
+                  }
+                }
+              ]
+            }
