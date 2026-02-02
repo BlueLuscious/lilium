@@ -8,10 +8,13 @@ on:
       - "bugfix/**"
       - "fix/**"
       - "enhancement/**"
+
   pull_request:
     branches:
       - master
       - develop
+
+  delete: # branch deleted
 
 jobs:
   notify-discord:
@@ -21,19 +24,74 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Send Discord Notification
+      # ─────────────────────────────
+      # PUSH (commit real, no branch)
+      # ─────────────────────────────
+      - name: Push notification
+        if: github.event_name == 'push' && github.event.created == false
         uses: Ilshidur/action-discord@master
         env:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
         with:
           args: |
-            🚀 **Actor:** ${{ github.actor }}
+            🟢 **Push**
+            👤 **Actor:** ${{ github.actor }}
+            🌿 **Branch:** `${{ github.ref_name }}`
             📦 **Repo:** ${{ github.repository }}
 
-            ${{ github.event_name == 'push' && format('🟢 Push en `{0}`\nMensaje: {1}', github.ref, github.event.head_commit.message) || '' }}
+            💬 **Mensaje:**  
+            > ${{ github.event.head_commit.message }}
 
-            ${{ github.event_name == 'pull_request' && format('🔵 PR #{0}: {1}\n{2}', github.event.pull_request.number, github.event.pull_request.title, github.event.pull_request.body) || '' }}
+            🔗 **Commit:** `${{ github.sha }}`
+            🔎 [Ver cambios](${{ github.event.head_commit.url }})
 
-            🔗 **Commit:** ${{ github.sha }}
-            🔎 [Ver cambios](${{ github.event.pull_request.html_url || github.event.head_commit.url }})
-            
+      # ─────────────────────────────
+      # BRANCH CREATED
+      # ─────────────────────────────
+      - name: Branch created
+        if: github.event_name == 'push' && github.event.created == true
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
+        with:
+          args: |
+            🌱 **Nueva branch creada**
+            👤 **Actor:** ${{ github.actor }}
+            🌿 **Branch:** `${{ github.ref_name }}`
+            📦 **Repo:** ${{ github.repository }}
+
+      # ─────────────────────────────
+      # BRANCH DELETED
+      # ─────────────────────────────
+      - name: Branch deleted
+        if: github.event_name == 'delete' && github.event.ref_type == 'branch'
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
+        with:
+          args: |
+            🧹 **Branch eliminada**
+            👤 **Actor:** ${{ github.actor }}
+            🌿 **Branch:** `${{ github.event.ref }}`
+            📦 **Repo:** ${{ github.repository }}
+
+      # ─────────────────────────────
+      # PULL REQUEST
+      # ─────────────────────────────
+      - name: Pull Request notification
+        if: github.event_name == 'pull_request'
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
+        with:
+          args: |
+            🔵 **Pull Request**
+            👤 **Actor:** ${{ github.actor }}
+            📦 **Repo:** ${{ github.repository }}
+
+            🧩 **PR #${{ github.event.pull_request.number }}**
+            **${{ github.event.pull_request.title }}**
+
+            📝 ${{ github.event.pull_request.body || '_(sin descripción)_' }}
+
+            🔎 [Ver Pull Request](${{ github.event.pull_request.html_url }})
