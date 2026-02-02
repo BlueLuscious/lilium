@@ -171,7 +171,7 @@ jobs:
                     },
                     {
                       "name": "📝 Description",
-                      "value": "${{ github.event.pull_request.body || "_No description provided_" }}"
+                      "value": "${{ github.event.pull_request.body || '_No description provided_' }}"
                     }
                   ],
                   "footer": {
