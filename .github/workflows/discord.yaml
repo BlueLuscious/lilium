@@ -36,7 +36,7 @@ jobs:
           curl -X POST \
             -H "Content-Type: application/json" \
             -d "{
-              \"content\": \"${{ github.event.head_commit.url }}\"
+              \"content\": \"<${{ github.event.head_commit.url }}>\"
             }" \
             "$DISCORD_WEBHOOK"
 
