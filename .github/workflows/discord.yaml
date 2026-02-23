@@ -33,12 +33,43 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
         run: |
-          curl -X POST \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"content\": \"${{ github.event.head_commit.url }}\"
-            }" \
-            "$DISCORD_WEBHOOK"
+          BRANCH="${{ github.ref_name }}"
+
+          if [[ "$BRANCH" == "master" ]]; then
+            ENVIRONMENT="Production"
+            COLOUR=15158332
+          elif [[ "$BRANCH" == "develop" ]]; then
+            ENVIRONMENT="Development"
+            COLOUR=3066993
+          else
+            ENVIRONMENT="Local"
+            COLOUR=15844367
+          fi
+
+          jq -n \
+            --arg branch "$BRANCH" \
+            --arg env "$ENVIRONMENT" \
+            --arg url "${{ github.event.head_commit.url }}" \
+            --argjson colour $COLOUR \
+            '{
+              content: $url,
+              embeds: [
+                {
+                  title: "🟢 Push detected",
+                  color: $colour,
+                  fields: [
+                    { name: "🌿 Branch", value: $branch, inline: true },
+                    { name: "⚙ Environment", value: $env, inline: true }
+                  ],
+                  footer: { text: "Lilium · Commit Event" }
+                }
+              ]
+            }' \
+          | curl -s -o /dev/null -w "%{http_code}" \
+              -H "Content-Type: application/json" \
+              -X POST \
+              -d @- \
+              "$DISCORD_WEBHOOK"
 
       # ─────────────────────────────
       # BRANCH CREATED
@@ -62,7 +93,7 @@ jobs:
                     { name: "🌿 Branch", value: $branch, inline: true },
                     { name: "👤 Author", value: $author, inline: true }
                   ],
-                  footer: { text: "Lilium · Branch lifecycle" }
+                  footer: { text: "Lilium · Branch Lifecycle" }
                 }
               ]
             }' \
@@ -94,7 +125,7 @@ jobs:
                     { name: "🌿 Branch", value: $branch, inline: true },
                     { name: "👤 Author", value: $author, inline: true }
                   ],
-                  footer: { text: "Lilium · Branch lifecycle" }
+                  footer: { text: "Lilium · Branch Lifecycle" }
                 }
               ]
             }' \
@@ -112,36 +143,24 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
         run: |
-          BODY="${{ github.event.pull_request.body }}"
-          if [ -z "$BODY" ]; then
-            BODY="No description provided."
-          fi
-
           jq -n \
-            --arg repo "${{ github.repository }}" \
-            --arg author "${{ github.actor }}" \
-            --arg title "${{ github.event.pull_request.title }}" \
-            --arg number "${{ github.event.pull_request.number }}" \
             --arg base "${{ github.event.pull_request.base.ref }}" \
             --arg head "${{ github.event.pull_request.head.ref }}" \
-            --arg body "$BODY" \
             --arg url "${{ github.event.pull_request.html_url }}" \
             '{
-              embeds: [
-                {
-                  title: ("🔵 Pull Request #" + $number),
-                  url: $url,
-                  description: ("**" + $title + "**"),
-                  color: 3447003,
-                  fields: [
-                    { name: "👤 Author", value: $author, inline: true },
-                    { name: "🌿 Base → Head", value: ($base + " ← " + $head), inline: true },
-                    { name: "📝 Description", value: $body }
-                  ],
-                  footer: { text: "Lilium · Pull Requests" }
-                }
-              ]
-            }' \
+                content: $url,
+                embeds: [
+                  {
+                    title: "🔵 Pull Request Activity",
+                    color: 3447003,
+                    fields: [
+                      { name: "🌿 Base → Head", value: ($base + " ← " + $head), inline: true },
+                      { name: "🚦 Target", value: $base, inline: true }
+                    ],
+                    footer: { text: "Lilium · Pull Request Event" }
+                  }
+                ]
+              }' \
           | curl -s -o /dev/null -w "%{http_code}" \
               -H "Content-Type: application/json" \
               -X POST \
