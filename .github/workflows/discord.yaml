@@ -52,7 +52,7 @@ jobs:
             --arg url "${{ github.event.head_commit.url }}" \
             --argjson colour $COLOUR \
             '{
-              content: $url,
+              content: ("🔗 " + $url),
               embeds: [
                 {
                   title: "🟢 Push detected",
