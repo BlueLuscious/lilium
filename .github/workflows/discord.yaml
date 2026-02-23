@@ -33,35 +33,12 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
         run: |
-          MESSAGE="${{ github.event.head_commit.message }}"
-
-          jq -n \
-            --arg repo "${{ github.repository }}" \
-            --arg author "${{ github.actor }}" \
-            --arg branch "${{ github.ref_name }}" \
-            --arg message "$MESSAGE" \
-            --arg url "${{ github.event.head_commit.url }}" \
-            '{
-              embeds: [
-                {
-                  title: "🟢 New push",
-                  description: ("**" + $repo + "**"),
-                  color: 3066993,
-                  fields: [
-                    { name: "👤 Author", value: $author, inline: true },
-                    { name: "🌿 Branch", value: $branch, inline: true },
-                    { name: "💬 Commit message", value: $message },
-                    { name: "🔗 Commit", value: ("[View changes](" + $url + ")") }
-                  ],
-                  footer: { text: "Lilium · GitHub Actions" }
-                }
-              ]
-            }' \
-          | curl -s -o /dev/null -w "%{http_code}" \
-              -H "Content-Type: application/json" \
-              -X POST \
-              -d @- \
-              "$DISCORD_WEBHOOK"
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"content\": \"${{ github.event.head_commit.url }}\"
+            }" \
+            "$DISCORD_WEBHOOK"
 
       # ─────────────────────────────
       # BRANCH CREATED
