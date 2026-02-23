@@ -3,6 +3,7 @@ name: Lilium Discord Notifications
 on:
   push:
     branches:
+      - master
       - develop
       - "feature/**"
       - "bugfix/**"
@@ -30,16 +31,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ─────────────────────────────────────
+      # ─────────────────────────────────────────────
       # PUSH (commit)
-      # ─────────────────────────────────────
+      # ─────────────────────────────────────────────
       - name: Push notification
         if: github.event_name == 'push' && github.event.created == false
         env:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
         run: |
           BRANCH="${{ github.ref_name }}"
-
           if [[ "$BRANCH" == "master" ]]; then
             ENVIRONMENT="Production"
             COLOUR=15158332
@@ -80,9 +80,9 @@ jobs:
               -d @- \
               "$DISCORD_WEBHOOK"
 
-      # ─────────────────────────────────────
+      # ─────────────────────────────────────────────
       # BRANCH CREATED
-      # ─────────────────────────────────────
+      # ─────────────────────────────────────────────
       - name: Branch created
         if: github.event_name == 'push' && github.event.created == true
         env:
@@ -113,9 +113,9 @@ jobs:
               -d @- \
               "$DISCORD_WEBHOOK"
 
-      # ─────────────────────────────────────
+      # ─────────────────────────────────────────────
       # BRANCH DELETED
-      # ─────────────────────────────────────
+      # ─────────────────────────────────────────────
       - name: Branch deleted
         if: github.event_name == 'delete' && github.event.ref_type == 'branch'
         env:
@@ -146,9 +146,9 @@ jobs:
               -d @- \
               "$DISCORD_WEBHOOK"
 
-      # ─────────────────────────────────────
-      # PULL REQUEST
-      # ─────────────────────────────────────
+      # ─────────────────────────────────────────────
+      # PULL REQUEST (Opened, Reopened, Sync)
+      # ─────────────────────────────────────────────
       - name: Pull Request notification
         if: github.event_name == 'pull_request' &&
           (github.event.action == 'opened' ||
@@ -184,74 +184,46 @@ jobs:
               "$DISCORD_WEBHOOK"
 
       # ─────────────────────────────────────
-      # PULL REQUEST MERGED
+      # PULL REQUEST CLOSED (Merged or Rejected)
       # ─────────────────────────────────────
-      - name: Pull Request merged
-        if: github.event_name == 'pull_request' &&
-          github.event.action == 'closed' &&
-          github.event.pull_request.merged == true
+      - name: Pull Request Closed Notification
+        if: github.event_name == 'pull_request' && github.event.action == 'closed'
         env:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
         run: |
-          jq -n \
-            --arg repo "${{ github.repository }}" \
-            --arg base "${{ github.event.pull_request.base.ref }}" \
-            --arg head "${{ github.event.pull_request.head.ref }}" \
-            --arg number "${{ github.event.pull_request.number }}" \
-            --arg author "${{ github.actor }}" \
-            --argjson colour 5763719 \
-            '{
-              embeds: [
-                {
-                  title: "🟣 Pull Request Merged",
-                  description: ("🌿 `\($head)` → 🚀 `\($base)`),
-                  color: $colour,
-                  fields: [
-                    { name: "🔢 PR", value: ("#" + $number), inline: true },
-                    { name: "👤 Merged by", value: "`\($author)`", inline: true }
-                  ],
-                  footer: { text: "Lilium · Pull Request Merge Event" }
-                }
-              ]
-            }' \
-          | curl -s -o /dev/null -w "%{http_code}" \
-              -H "Content-Type: application/json" \
-              -X POST \
-              -d @- \
-              "$DISCORD_WEBHOOK"
+          MERGED="${{ github.event.pull_request.merged }}"
+          if [ "$MERGED" = "true" ]; then
+            TITLE="🟣 Pull Request Merged"
+            COLOUR=5763719
+            ICON="🚀"
+          else
+            TITLE="🔴 Pull Request Closed"
+            COLOUR=15158332
+            ICON="🚦"
+          fi
 
-      # ─────────────────────────────────────────────
-      # PULL REQUEST CLOSED WITHOUT MERGED
-      # ─────────────────────────────────────────────
-      - name: Pull Request closed without merge
-        if: github.event_name == 'pull_request' &&
-          github.event.action == 'closed' &&
-          github.event.pull_request.merged == false
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
-        run: |
           jq -n \
-            --arg repo "${{ github.repository }}" \
+            --arg title "$TITLE" \
             --arg base "${{ github.event.pull_request.base.ref }}" \
             --arg head "${{ github.event.pull_request.head.ref }}" \
             --arg number "${{ github.event.pull_request.number }}" \
             --arg author "${{ github.actor }}" \
-            --argjson colour 15158332 \
+            --arg icon "$ICON" \
+            --argjson colour $COLOUR \
             '{
               embeds: [
                 {
-                  title: "🔴 Pull Request Closed",
-                  description: ("🌿 `\($head)` → 🚦 `\($base)`"),
+                  title: $title,
+                  description: ("🌿 `\($head)` → " + $icon + " `\($base)`"),
                   color: $colour,
                   fields: [
                     { name: "🔢 PR", value: ("#" + $number), inline: true },
-                    { name: "👤 Closed by", value: "`\($author)`", inline: true }
+                    { name: "👤 User", value: "`\($author)`", inline: true }
                   ],
-                  footer: { text: "Lilium · Pull Request Closed Event" }
+                  footer: { text: "Lilium · Pull Request Lifecycle" }
                 }
               ]
-            }' \
-          | curl -s -o /dev/null -w "%{http_code}" \
+            }' curl -s -o /dev/null -w "%{http_code}" \
               -H "Content-Type: application/json" \
               -X POST \
               -d @- \
