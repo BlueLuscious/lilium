@@ -33,7 +33,7 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
         run: |
-          echo ${{ github.event.head_commit.message }}
+          echo "${{ github.event.head_commit.message }}"
           curl -X POST \
             -H "Content-Type: application/json" \
             -d '{
