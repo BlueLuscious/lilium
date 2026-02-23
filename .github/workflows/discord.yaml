@@ -150,7 +150,10 @@ jobs:
       # PULL REQUEST
       # ─────────────────────────────────────
       - name: Pull Request notification
-        if: github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened')
+        if: github.event_name == 'pull_request' &&
+          (github.event.action == 'opened' ||
+          github.event.action == 'reopened' ||
+          github.event.action == 'synchronize')
         env:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
         run: |
@@ -184,7 +187,9 @@ jobs:
       # PULL REQUEST MERGED
       # ─────────────────────────────────────
       - name: Pull Request merged
-        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+        if: github.event_name == 'pull_request' &&
+          github.event.action == 'closed' &&
+          github.event.pull_request.merged == true
         env:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
         run: |
@@ -219,7 +224,9 @@ jobs:
       # PULL REQUEST CLOSED WITHOUT MERGED
       # ─────────────────────────────────────────────
       - name: Pull Request closed without merge
-        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == false
+        if: github.event_name == 'pull_request' &&
+          github.event.action == 'closed' &&
+          github.event.pull_request.merged == false
         env:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
         run: |
