@@ -61,7 +61,7 @@ jobs:
                   fields: [
                     { name: "🌿 Branch", value: "`" + $branch + "`", inline: true },
                     { name: "⚙ Environment", value: "`" + $env + "`", inline: true }
-                  ]
+                  ],
                   "image": {
                     "url": ("https://opengraph.githubassets.com/" + $sha + "/" + $repo + "/commit/" + $sha)
                   },
