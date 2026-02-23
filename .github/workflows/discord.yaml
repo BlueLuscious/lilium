@@ -47,8 +47,10 @@ jobs:
           fi
 
           jq -n \
+            --arg repo "${{ github.repository }}" \
             --arg branch "$BRANCH" \
             --arg env "$ENVIRONMENT" \
+            --arg sha "${{ github.sha }}" \
             --arg url "${{ github.event.head_commit.url }}" \
             --argjson colour $COLOUR \
             '{
@@ -60,10 +62,12 @@ jobs:
                     { name: "🌿 Branch", value: $branch, inline: true },
                     { name: "⚙ Environment", value: $env, inline: true }
                   ],
+                  "image": {
+                    "url": ("https://opengraph.githubassets.com/" + $sha + "/" + $repo + "/commit/" + $sha)
+                  },
                   footer: { text: "Lilium · Commit Event" }
                 }
-              ],
-              content: $url,
+              ]
             }' \
           | curl -s -o /dev/null -w "%{http_code}" \
               -H "Content-Type: application/json" \
@@ -83,12 +87,13 @@ jobs:
             --arg repo "${{ github.repository }}" \
             --arg author "${{ github.actor }}" \
             --arg branch "${{ github.ref_name }}" \
+            --argjson colour 15105570 \
             '{
               embeds: [
                 {
                   title: "🌱 Branch created",
                   description: ("**" + $repo + "**"),
-                  color: 15105570,
+                  color: $colour,
                   fields: [
                     { name: "🌿 Branch", value: $branch, inline: true },
                     { name: "👤 Author", value: $author, inline: true }
@@ -115,12 +120,13 @@ jobs:
             --arg repo "${{ github.repository }}" \
             --arg author "${{ github.actor }}" \
             --arg branch "${{ github.event.ref }}" \
+            --argjson colour 15158332 \
             '{
               embeds: [
                 {
                   title: "🧹 Branch deleted",
                   description: ("**" + $repo + "**"),
-                  color: 15158332,
+                  color: $colour,
                   fields: [
                     { name: "🌿 Branch", value: $branch, inline: true },
                     { name: "👤 Author", value: $author, inline: true }
@@ -144,23 +150,28 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
         run: |
           jq -n \
+            --arg repo "${{ github.repository }}" \
             --arg base "${{ github.event.pull_request.base.ref }}" \
             --arg head "${{ github.event.pull_request.head.ref }}" \
-            --arg url "${{ github.event.pull_request.html_url }}" \
+            --arg number "${{ github.event.pull_request.number }}" \
+            --arg sha "${{ github.sha }}" \
+            --argjson colour 3447003 \
             '{
-                content: $url,
-                embeds: [
-                  {
-                    title: "🔵 Pull Request Activity",
-                    color: 3447003,
-                    fields: [
-                      { name: "🌿 Base → Head", value: ($base + " ← " + $head), inline: true },
-                      { name: "🚦 Target", value: $base, inline: true }
-                    ],
-                    footer: { text: "Lilium · Pull Request Event" }
-                  }
-                ]
-              }' \
+              embeds: [
+                {
+                  title: ("🔵 Pull Request #" + $number),
+                  color: $colour,
+                  fields: [
+                    { name: "🌿 Base → Head", value: ($base + " ← " + $head), inline: true },
+                    { name: "🚦 Target", value: $base, inline: true }
+                  ],
+                  image: {
+                    url: ("https://opengraph.githubassets.com/" + $sha + "/" + $repo + "/pull/" + $number)
+                  },
+                  footer: { text: "Lilium · Pull Request Event" }
+                }
+              ]
+            }' \
           | curl -s -o /dev/null -w "%{http_code}" \
               -H "Content-Type: application/json" \
               -X POST \
