@@ -53,17 +53,6 @@ jobs:
             --argjson colour $COLOUR \
             '{
               content: ("🔗 " + $url),
-              embeds: [
-                {
-                  title: "🟢 Push detected",
-                  color: $colour,
-                  fields: [
-                    { name: "🌿 Branch", value: $branch, inline: true },
-                    { name: "⚙ Environment", value: $env, inline: true }
-                  ],
-                  footer: { text: "Lilium · Commit Event" }
-                }
-              ]
             }' \
           | curl -s -o /dev/null -w "%{http_code}" \
               -H "Content-Type: application/json" \
