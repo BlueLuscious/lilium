@@ -71,33 +71,29 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
         run: |
-          curl -X POST \
-            -H "Content-Type: application/json" \
-            -d '{
-              "embeds": [
+          jq -n \
+            --arg repo "${{ github.repository }}" \
+            --arg author "${{ github.actor }}" \
+            --arg branch "${{ github.ref_name }}" \
+            '{
+              embeds: [
                 {
-                  "title": "🌱 Branch created",
-                  "description": "**${{ github.repository }}**",
-                  "color": 15105570,
-                  "fields": [
-                    {
-                      "name": "🌿 Branch",
-                      "value": "${{ github.ref_name }}",
-                      "inline": true
-                    },
-                    {
-                      "name": "👤 Author",
-                      "value": "${{ github.actor }}",
-                      "inline": true
-                    }
+                  title: "🌱 Branch created",
+                  description: ("**" + $repo + "**"),
+                  color: 15105570,
+                  fields: [
+                    { name: "🌿 Branch", value: $branch, inline: true },
+                    { name: "👤 Author", value: $author, inline: true }
                   ],
-                  "footer": {
-                    "text": "Lilium · Branch lifecycle"
-                  }
+                  footer: { text: "Lilium · Branch lifecycle" }
                 }
               ]
             }' \
-            "$DISCORD_WEBHOOK"
+          | curl -s -o /dev/null -w "%{http_code}" \
+              -H "Content-Type: application/json" \
+              -X POST \
+              -d @- \
+              "$DISCORD_WEBHOOK"
 
       # ─────────────────────────────
       # BRANCH DELETED
@@ -106,35 +102,30 @@ jobs:
         if: github.event_name == 'delete' && github.event.ref_type == 'branch'
         env:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
-
         run: |
-          curl -X POST \
-            -H "Content-Type: application/json" \
-            -d '{
-              "embeds": [
+          jq -n \
+            --arg repo "${{ github.repository }}" \
+            --arg author "${{ github.actor }}" \
+            --arg branch "${{ github.event.ref }}" \
+            '{
+              embeds: [
                 {
-                  "title": "🌱 Branch deleted",
-                  "description": "**${{ github.repository }}**",
-                  "color": 15105570,
-                  "fields": [
-                    {
-                      "name": "🌿 Branch",
-                      "value": "${{ github.ref_name }}",
-                      "inline": true
-                    },
-                    {
-                      "name": "👤 Author",
-                      "value": "${{ github.actor }}",
-                      "inline": true
-                    }
+                  title: "🧹 Branch deleted",
+                  description: ("**" + $repo + "**"),
+                  color: 15158332,
+                  fields: [
+                    { name: "🌿 Branch", value: $branch, inline: true },
+                    { name: "👤 Author", value: $author, inline: true }
                   ],
-                  "footer": {
-                    "text": "Lilium · Branch lifecycle"
-                  }
+                  footer: { text: "Lilium · Branch lifecycle" }
                 }
               ]
             }' \
-            "$DISCORD_WEBHOOK"
+          | curl -s -o /dev/null -w "%{http_code}" \
+              -H "Content-Type: application/json" \
+              -X POST \
+              -d @- \
+              "$DISCORD_WEBHOOK"
 
       # ─────────────────────────────
       # PULL REQUEST
