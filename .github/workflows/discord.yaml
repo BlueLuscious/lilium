@@ -223,8 +223,9 @@ jobs:
                   footer: { text: "Lilium · Pull Request Lifecycle" }
                 }
               ]
-            }' curl -s -o /dev/null -w "%{http_code}" \
-              -H "Content-Type: application/json" \
-              -X POST \
-              -d @- \
-              "$DISCORD_WEBHOOK"
+            }' \
+          | curl -s -o /dev/null -w "%{http_code}" \
+            -H "Content-Type: application/json" \
+            -X POST \
+            -d @- \
+            "$DISCORD_WEBHOOK"
