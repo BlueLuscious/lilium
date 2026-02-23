@@ -8,6 +8,7 @@ on:
       - "bugfix/**"
       - "fix/**"
       - "enhancement/**"
+      - "test/**"
 
   pull_request:
     branches:
