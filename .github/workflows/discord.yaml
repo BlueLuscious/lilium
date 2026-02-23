@@ -63,7 +63,7 @@ jobs:
                   footer: { text: "Lilium · Commit Event" }
                 }
               ],
-              content: ("🔗 " + $url)
+              content: $url,
             }' \
           | curl -s -o /dev/null -w "%{http_code}" \
               -H "Content-Type: application/json" \
