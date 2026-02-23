@@ -33,42 +33,35 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
         run: |
-          echo "${{ github.event.head_commit.message }}"
-          curl -X POST \
-            -H "Content-Type: application/json" \
-            -d '{
-              "embeds": [
+          MESSAGE="${{ github.event.head_commit.message }}"
+
+          jq -n \
+            --arg repo "${{ github.repository }}" \
+            --arg author "${{ github.actor }}" \
+            --arg branch "${{ github.ref_name }}" \
+            --arg message "$MESSAGE" \
+            --arg url "${{ github.event.head_commit.url }}" \
+            '{
+              embeds: [
                 {
-                  "title": "🟢 New push",
-                  "description": "**${{ github.repository }}**",
-                  "color": 3066993,
-                  "fields": [
-                    {
-                      "name": "👤 Author",
-                      "value": "${{ github.actor }}",
-                      "inline": true
-                    },
-                    {
-                      "name": "🌿 Branch",
-                      "value": "${{ github.ref_name }}",
-                      "inline": true
-                    },
-                    {
-                      "name": "💬 Commit message",
-                      "value": "${{ github.event.head_commit.message }}"
-                    },
-                    {
-                      "name": "🔗 Commit",
-                      "value": "[View changes](${{ github.event.head_commit.url }})"
-                    }
+                  title: "🟢 New push",
+                  description: ("**" + $repo + "**"),
+                  color: 3066993,
+                  fields: [
+                    { name: "👤 Author", value: $author, inline: true },
+                    { name: "🌿 Branch", value: $branch, inline: true },
+                    { name: "💬 Commit message", value: $message },
+                    { name: "🔗 Commit", value: ("[View changes](" + $url + ")") }
                   ],
-                  "footer": {
-                    "text": "Lilium · GitHub Actions"
-                  }
+                  footer: { text: "Lilium · GitHub Actions" }
                 }
               ]
             }' \
-            "$DISCORD_WEBHOOK"
+          | curl -s -o /dev/null -w "%{http_code}" \
+              -H "Content-Type: application/json" \
+              -X POST \
+              -d @- \
+              "$DISCORD_WEBHOOK"
 
       # ─────────────────────────────
       # BRANCH CREATED
@@ -151,35 +144,38 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
         run: |
-          curl -X POST \
-            -H "Content-Type: application/json" \
-            -d '{
-              "embeds": [
+          BODY="${{ github.event.pull_request.body }}"
+          if [ -z "$BODY" ]; then
+            BODY="No description provided."
+          fi
+
+          jq -n \
+            --arg repo "${{ github.repository }}" \
+            --arg author "${{ github.actor }}" \
+            --arg title "${{ github.event.pull_request.title }}" \
+            --arg number "${{ github.event.pull_request.number }}" \
+            --arg base "${{ github.event.pull_request.base.ref }}" \
+            --arg head "${{ github.event.pull_request.head.ref }}" \
+            --arg body "$BODY" \
+            --arg url "${{ github.event.pull_request.html_url }}" \
+            '{
+              embeds: [
                 {
-                  "title": "🔵 Pull Request #${{ github.event.pull_request.number }}",
-                  "url": "${{ github.event.pull_request.html_url }}",
-                  "description": "**${{ github.event.pull_request.title }}**",
-                  "color": 3447003,
-                  "fields": [
-                    {
-                      "name": "👤 Author",
-                      "value": "${{ github.actor }}",
-                      "inline": true
-                    },
-                    {
-                      "name": "🌿 Base → Head",
-                      "value": "`${{ github.event.pull_request.base.ref }}` ← `${{ github.event.pull_request.head.ref }}`",
-                      "inline": true
-                    },
-                    {
-                      "name": "📝 Description",
-                      "value": "${{ github.event.pull_request.body || '_No description provided_' }}"
-                    }
+                  title: ("🔵 Pull Request #" + $number),
+                  url: $url,
+                  description: ("**" + $title + "**"),
+                  color: 3447003,
+                  fields: [
+                    { name: "👤 Author", value: $author, inline: true },
+                    { name: "🌿 Base → Head", value: ($base + " ← " + $head), inline: true },
+                    { name: "📝 Description", value: $body }
                   ],
-                  "footer": {
-                    "text": "Lilium · Pull Requests"
-                  }
+                  footer: { text: "Lilium · Pull Requests" }
                 }
               ]
             }' \
-            "$DISCORD_WEBHOOK"
+          | curl -s -o /dev/null -w "%{http_code}" \
+              -H "Content-Type: application/json" \
+              -X POST \
+              -d @- \
+              "$DISCORD_WEBHOOK"
