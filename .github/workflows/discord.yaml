@@ -14,6 +14,11 @@ on:
     branches:
       - master
       - develop
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - closed
 
   delete: # branch deleted
 
@@ -25,9 +30,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ─────────────────────────────
-      # PUSH (commit real, no branch)
-      # ─────────────────────────────
+      # ─────────────────────────────────────
+      # PUSH (commit)
+      # ─────────────────────────────────────
       - name: Push notification
         if: github.event_name == 'push' && github.event.created == false
         env:
@@ -56,7 +61,7 @@ jobs:
             '{
               embeds: [
                 {
-                  title: "🟢 Push detected",
+                  title: "🟢 New commit",
                   color: $colour,
                   fields: [
                     { name: "🌿 Branch", value: "`\($branch)`", inline: true },
@@ -75,9 +80,9 @@ jobs:
               -d @- \
               "$DISCORD_WEBHOOK"
 
-      # ─────────────────────────────
+      # ─────────────────────────────────────
       # BRANCH CREATED
-      # ─────────────────────────────
+      # ─────────────────────────────────────
       - name: Branch created
         if: github.event_name == 'push' && github.event.created == true
         env:
@@ -108,9 +113,9 @@ jobs:
               -d @- \
               "$DISCORD_WEBHOOK"
 
-      # ─────────────────────────────
+      # ─────────────────────────────────────
       # BRANCH DELETED
-      # ─────────────────────────────
+      # ─────────────────────────────────────
       - name: Branch deleted
         if: github.event_name == 'delete' && github.event.ref_type == 'branch'
         env:
@@ -141,11 +146,11 @@ jobs:
               -d @- \
               "$DISCORD_WEBHOOK"
 
-      # ─────────────────────────────
+      # ─────────────────────────────────────
       # PULL REQUEST
-      # ─────────────────────────────
+      # ─────────────────────────────────────
       - name: Pull Request notification
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened')
         env:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
         run: |
@@ -166,6 +171,76 @@ jobs:
                     url: ("https://opengraph.githubassets.com/" + $sha + "/" + $repo + "/pull/" + $number)
                   },
                   footer: { text: "Lilium · Pull Request Event" }
+                }
+              ]
+            }' \
+          | curl -s -o /dev/null -w "%{http_code}" \
+              -H "Content-Type: application/json" \
+              -X POST \
+              -d @- \
+              "$DISCORD_WEBHOOK"
+
+      # ─────────────────────────────────────
+      # PULL REQUEST MERGED
+      # ─────────────────────────────────────
+      - name: Pull Request merged
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
+        run: |
+          jq -n \
+            --arg repo "${{ github.repository }}" \
+            --arg base "${{ github.event.pull_request.base.ref }}" \
+            --arg head "${{ github.event.pull_request.head.ref }}" \
+            --arg number "${{ github.event.pull_request.number }}" \
+            --arg author "${{ github.actor }}" \
+            --argjson colour 5763719 \
+            '{
+              embeds: [
+                {
+                  title: "🟣 Pull Request Merged",
+                  description: ("🌿 `\($head)` → 🚀 `\($base)`),
+                  color: $colour,
+                  fields: [
+                    { name: "🔢 PR", value: ("#" + $number), inline: true },
+                    { name: "👤 Merged by", value: "`\($author)`", inline: true }
+                  ],
+                  footer: { text: "Lilium · Pull Request Merge Event" }
+                }
+              ]
+            }' \
+          | curl -s -o /dev/null -w "%{http_code}" \
+              -H "Content-Type: application/json" \
+              -X POST \
+              -d @- \
+              "$DISCORD_WEBHOOK"
+
+      # ─────────────────────────────────────────────
+      # PULL REQUEST CLOSED WITHOUT MERGED
+      # ─────────────────────────────────────────────
+      - name: Pull Request closed without merge
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == false
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
+        run: |
+          jq -n \
+            --arg repo "${{ github.repository }}" \
+            --arg base "${{ github.event.pull_request.base.ref }}" \
+            --arg head "${{ github.event.pull_request.head.ref }}" \
+            --arg number "${{ github.event.pull_request.number }}" \
+            --arg author "${{ github.actor }}" \
+            --argjson colour 15158332 \
+            '{
+              embeds: [
+                {
+                  title: "🔴 Pull Request Closed",
+                  description: ("🌿 `\($head)` → 🚦 `\($base)`"),
+                  color: $colour,
+                  fields: [
+                    { name: "🔢 PR", value: ("#" + $number), inline: true },
+                    { name: "👤 Closed by", value: "`\($author)`", inline: true }
+                  ],
+                  footer: { text: "Lilium · Pull Request Closed Event" }
                 }
               ]
             }' \
