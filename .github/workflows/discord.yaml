@@ -59,8 +59,8 @@ jobs:
                   title: "🟢 Push detected",
                   color: $colour,
                   fields: [
-                    { name: "🌿 Branch", value: "`" + $branch + "`", inline: true },
-                    { name: "⚙ Environment", value: "`" + $env + "`", inline: true }
+                    { name: "🌿 Branch", value: "`\($branch)`", inline: true },
+                    { name: "⚙ Environment", value: "`\($env)`", inline: true }
                   ],
                   "image": {
                     "url": ("https://opengraph.githubassets.com/" + $sha + "/" + $repo + "/commit/" + $sha)
@@ -95,8 +95,8 @@ jobs:
                   description: ("**" + $repo + "**"),
                   color: $colour,
                   fields: [
-                    { name: "🌿 Branch", value: "`" + $branch + "`", inline: true },
-                    { name: "👤 Author", value: "`" + $author + "`", inline: true }
+                    { name: "🌿 Branch", value: "`\($branch)`", inline: true },
+                    { name: "👤 Author", value: "`\($author)`", inline: true }
                   ],
                   footer: { text: "Lilium · Branch Lifecycle" }
                 }
@@ -128,8 +128,8 @@ jobs:
                   description: ("**" + $repo + "**"),
                   color: $colour,
                   fields: [
-                    { name: "🌿 Branch", value: "`" + $branch + "`", inline: true },
-                    { name: "👤 Author", value: "`" + $author + "`", inline: true }
+                    { name: "🌿 Branch", value: "`\($branch)`", inline: true },
+                    { name: "👤 Author", value: "`\($author)`", inline: true }
                   ],
                   footer: { text: "Lilium · Branch Lifecycle" }
                 }
@@ -161,7 +161,7 @@ jobs:
                 {
                   title: ("🔵 Pull Request #" + $number),
                   color: $colour,
-                  description: ("🌿 `" + $head + "` → 🚦 `" + $base + "`"),
+                  description: "🌿 `\($head)` → 🚦 `\($base)`",
                   image: {
                     url: ("https://opengraph.githubassets.com/" + $sha + "/" + $repo + "/pull/" + $number)
                   },
