@@ -154,7 +154,7 @@ jobs:
             --arg base "${{ github.event.pull_request.base.ref }}" \
             --arg head "${{ github.event.pull_request.head.ref }}" \
             --arg number "${{ github.event.pull_request.number }}" \
-            --arg sha "${{ github.sha }}" \
+            --arg sha "${{ github.event.pull_request.head.sha }}" \
             --argjson colour 3447003 \
             '{
               embeds: [
