@@ -52,7 +52,18 @@ jobs:
             --arg url "${{ github.event.head_commit.url }}" \
             --argjson colour $COLOUR \
             '{
-              content: ("🔗 " + $url),
+              embeds: [
+                {
+                  title: "🟢 Push detected",
+                  color: $colour,
+                  fields: [
+                    { name: "🌿 Branch", value: $branch, inline: true },
+                    { name: "⚙ Environment", value: $env, inline: true }
+                  ],
+                  footer: { text: "Lilium · Commit Event" }
+                }
+              ],
+              content: ("🔗 " + $url)
             }' \
           | curl -s -o /dev/null -w "%{http_code}" \
               -H "Content-Type: application/json" \
