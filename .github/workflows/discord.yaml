@@ -56,7 +56,6 @@ jobs:
             --arg branch "$BRANCH" \
             --arg env "$ENVIRONMENT" \
             --arg sha "${{ github.sha }}" \
-            --arg url "${{ github.event.head_commit.url }}" \
             --argjson colour $COLOUR \
             '{
               embeds: [
@@ -150,14 +149,15 @@ jobs:
       # PULL REQUEST (Opened, Reopened, Sync)
       # ─────────────────────────────────────────────
       - name: Pull Request notification
-        if: github.event_name == 'pull_request' &&
-          (github.event.action == 'opened' ||
-          github.event.action == 'reopened' ||
-          github.event.action == 'synchronize')
+        if: github.event_name == 'pull_request' && github.event.action != 'closed'
         env:
           DISCORD_WEBHOOK: ${{ secrets.LILIUM_DISCORD_WEBHOOK }}
         run: |
+          REPO="${{ github.repository }}"
+          BASE="${{ github.event.pull_request.base.ref }}"
+          HEAD="${{ github.event.pull_request.head.ref }}"
           NUMBER="${{ github.event.pull_request.number }}"
+          SHA="${{ github.event.pull_request.head.sha }}"
           ACTION="${{ github.event.action }}"
           if [ "$ACTION" = "opened" ]; then
             TITLE="🔵 Pull Request #$NUMBER Opened"
@@ -171,11 +171,11 @@ jobs:
           fi
 
           jq -n \
-            --arg repo "${{ github.repository }}" \
-            --arg base "${{ github.event.pull_request.base.ref }}" \
-            --arg head "${{ github.event.pull_request.head.ref }}" \
+            --arg repo "$REPO" \
+            --arg base "$BASE" \
+            --arg head "$HEAD" \
             --arg number "$NUMBER" \
-            --arg sha "${{ github.event.pull_request.head.sha }}" \
+            --arg sha "$SHA" \
             --arg title "$TITLE" \
             --argjson colour 3447003 \
             '{
