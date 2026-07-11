@@ -9,10 +9,12 @@
     "packages/*"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build:core": "pnpm --filter @lilium/core run build",
+    "watch:core": "pnpm --filter @lilium/core run watch"
   },
   "keywords": [],
   "devDependencies": {
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
 }
