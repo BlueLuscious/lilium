@@ -70,7 +70,7 @@ Nested batches share their outer boundary. Exiting an inner batch never flushes 
 
 Batch operations are strictly synchronous and return no value. If an operation throws, accepted writes remain committed, batch depth and tracking context are restored, the runtime performs the same flush bookkeeping required by a successful exit, and the original error is rethrown. A caught inner-batch error does not force a flush while an outer batch remains active.
 
-Batching does not promise a microtask boundary. Exiting the outermost batch makes pending work eligible for the runtime scheduler's next deterministic flush.
+Batching does not introduce a microtask boundary. Exiting the outermost batch synchronously flushes pending work before returning or propagating the batch callback error.
 
 ## Transactions
 
@@ -98,16 +98,18 @@ Context lookup itself is not reactive. Applications provide reactive objects whe
 
 See the core [Context](../packages/core/context/index.md) feature documentation.
 
-## Proposed update phases
+## Scheduler execution
 
-1. **Write**: one or more reactive values are changed.
-2. **Invalidate**: dependent computations and bindings are marked stale.
-3. **Compute**: stale computed values required by consumers are refreshed.
-4. **Render**: affected renderer bindings update their host nodes.
-5. **Effect**: affected user effects execute after visible updates.
-6. **Cleanup**: replaced executions and disposed scopes release resources.
+Writes and dependency invalidation happen synchronously before scheduling. The scheduler then drains two executable phases per cycle:
 
-The exact sync and async boundaries remain open. The required guarantee is that phase ordering is deterministic and documented.
+1. **Render**: affected renderer bindings update host nodes.
+2. **Effect**: affected user effects execute after visible updates.
+
+Computed values are lazy and refresh when a render or effect job reads them. Cleanup runs inline before effect reevaluation or through ownership disposal, not in a global queue.
+
+Flushes are synchronous and automatic outside batching. FIFO queues deduplicate jobs by object identity. Work targeting an active or completed phase moves to the next cycle, preventing recursive phase execution. A flush is limited to 100 cycles to detect unbounded reactive loops.
+
+See the core [Scheduler](../packages/core/scheduler/index.md) feature documentation.
 
 ## Template model
 
@@ -125,7 +127,5 @@ The foundation must define how errors move through owner and component boundarie
 
 ## Open decisions
 
-- Synchronous or deferred default rendering.
 - Renderer cleanup timing relative to host node removal.
-- Cycle detection and maximum propagation depth.
 - Error boundary ownership and recovery semantics.

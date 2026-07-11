@@ -10,7 +10,7 @@ Status: **Redesign Draft**
 | --- | --- |
 | [`reactivity`](reactivity/index.md) | Signals, computed values, effects, dependency tracking, and batching. |
 | [`ownership`](ownership/index.md) | Resource scopes, parent-child ownership, cleanup, and recursive disposal. |
-| `scheduler` | Deterministic propagation phases, queues, deduplication, and reentry control. |
+| [`scheduler`](scheduler/index.md) | Deterministic render/effect phases, queues, deduplication, and reentry control. |
 | [`context`](context/index.md) | Portable typed identities and values resolved through ownership. |
 | `inspection` | Read-only instrumentation contracts for tests and future tooling. |
 

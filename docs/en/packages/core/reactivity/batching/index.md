@@ -6,7 +6,7 @@ Batching groups synchronous writes into one scheduling boundary without staging 
 
 ## Execution
 
-`ReactiveRuntime.batch(operation)` increments the runtime's batch depth, executes the operation, and restores the previous depth in a guaranteed finalization step. Pending work becomes eligible to flush only after the outermost scheduling boundary exits.
+`ReactiveRuntime.batch(operation)` increments the runtime's batch depth, executes the operation, and restores the previous depth in a guaranteed finalization step. The outermost boundary synchronously flushes pending work before returning.
 
 ```text
 outer batch
@@ -15,7 +15,7 @@ outer batch
     write B
   inner exit: no flush
   write C
-outer exit: pending work becomes flushable
+outer exit: synchronously flush pending work
 ```
 
 ## Visibility
@@ -29,6 +29,8 @@ A consumer invalidated multiple times has at most one pending execution for the 
 ## Errors
 
 Throwing does not roll back writes. Runtime bookkeeping and nesting depth are restored before the original error is rethrown. If an outer batch catches an inner error, the outer scheduling boundary remains active.
+
+When an uncaught error exits the outermost batch, pending work is flushed after bookkeeping and before the original callback error is rethrown. Interaction with an additional unhandled flush error is finalized by the ownership error model.
 
 ## Transaction boundary
 
