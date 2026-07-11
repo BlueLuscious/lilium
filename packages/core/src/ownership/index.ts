@@ -1,2 +1,11 @@
-export type { Scope } from "./contracts/index.js";
-export type { ScopeCleanupType, ScopeFunctionType } from "./types/index.js";
+export type {
+    ErrorBoundary,
+    ErrorBoundaryEvent,
+    Scope,
+} from "./contracts/index.js";
+export type {
+    ErrorBoundaryDecisionType,
+    ErrorBoundaryFunctionType,
+    ScopeCleanupType,
+    ScopeFunctionType,
+} from "./types/index.js";

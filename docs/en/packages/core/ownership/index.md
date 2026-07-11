@@ -7,6 +7,7 @@ Ownership provides deterministic lifetime boundaries for reactive resources, fut
 ## Compositions
 
 - [Scope](scope/index.md) defines explicit parent-child ownership and recursive disposal.
+- [Error Boundary](error-boundary/index.md) defines nearest-owner error handling and propagation.
 
 ## Runtime relationship
 
@@ -17,6 +18,5 @@ Ownership state and stacks are internal. Public objects expose explicit creation
 ## Deferred concepts
 
 - Internal ownership manager and ledger contracts.
-- Ownership error boundaries.
 - Component and renderer ownership integration.
 - Read-only ownership inspection.

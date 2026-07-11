@@ -6,6 +6,8 @@
 
 `ReactiveRuntime.scope()` creates an inactive root scope owned directly by the runtime. It does not implicitly attach to another active scope. `scope.child()` explicitly creates a child attached to that scope.
 
+`scope.boundary(handler)` creates a specialized child scope that handles failures from its owned subtree.
+
 Portable context definitions may register one provider on a newly created scope before its first execution. Provider topology becomes immutable when `run()` starts.
 
 ## Execution
@@ -26,4 +28,4 @@ Disposal while the scope is actively running is rejected. After disposal, `run()
 
 All registered disposal operations are attempted even when one fails. Cleanup errors are delivered through the ownership error policy; without a boundary, one error is rethrown directly and multiple errors are reported as an `AggregateError` after disposal completes.
 
-See [`ScopeFunctionType`](scope-function.md), [`ScopeCleanupType`](scope-cleanup.md), [`ReactiveRuntime`](../../reactivity/reactive-runtime.md), and [Context](../../context/index.md).
+See [`ScopeFunctionType`](scope-function.md), [`ScopeCleanupType`](scope-cleanup.md), [Error Boundary](../error-boundary/index.md), [`ReactiveRuntime`](../../reactivity/reactive-runtime.md), and [Context](../../context/index.md).

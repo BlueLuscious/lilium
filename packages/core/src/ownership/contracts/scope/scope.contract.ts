@@ -1,5 +1,7 @@
+import type { ErrorBoundaryFunctionType } from "../../types/error-boundary/error-boundary-function.type.js";
 import type { ScopeCleanupType } from "../../types/scope/scope-cleanup.type.js";
 import type { ScopeFunctionType } from "../../types/scope/scope-function.type.js";
+import type { ErrorBoundary } from "../error-boundary/error-boundary.contract.js";
 
 /**
  * @description Explicit ownership boundary for resources, child scopes, and cleanups.
@@ -7,6 +9,13 @@ import type { ScopeFunctionType } from "../../types/scope/scope-function.type.js
  * created while it is active are registered in one deterministic ownership stack.
  */
 export interface Scope {
+    /**
+     * @description Creates a child scope with an immutable synchronous error handler.
+     * @param handler - Operation that decides whether each owned failure is handled.
+     * @returns A child error boundary owned by this scope.
+     */
+    boundary(handler: ErrorBoundaryFunctionType): ErrorBoundary;
+
     /**
      * @description Creates a child scope owned by this scope.
      * @returns A new inactive child scope.

@@ -34,7 +34,7 @@ Cancellation removes pending appearances idempotently but does not interrupt a c
 
 ## Cycle detection
 
-One outer flush may process at most 100 scheduler cycles. Reaching the limit reports a reactive-cycle error and aborts remaining pending work. The concrete error contract and ownership-boundary routing are finalized with the error model.
+One outer flush may process at most 100 scheduler cycles. Reaching the limit reports a reactive-cycle error and aborts remaining pending work through the ownership error-boundary model.
 
 ## Ownership execution
 
@@ -42,4 +42,6 @@ Before a job executes, the runtime restores the owner associated with that consu
 
 ## Errors
 
-Handled job errors may allow the scheduler to continue. The exact behavior for unhandled errors, remaining queues, and multiple errors is deferred to the ownership error-boundary design.
+Handled job errors allow the scheduler to continue with remaining work. An unhandled job error aborts the active flush, discards all remaining pending jobs, and propagates to the synchronous caller.
+
+Reaching the cycle limit aborts and clears pending work before reporting the cycle error through the owner of the job that exceeded the limit. If no boundary handles it, the flush caller receives the error.

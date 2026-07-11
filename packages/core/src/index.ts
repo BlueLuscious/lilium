@@ -1,7 +1,13 @@
 export type { Context } from "./context/contracts/index.js";
 
-export type { Scope } from "./ownership/contracts/index.js";
 export type {
+    ErrorBoundary,
+    ErrorBoundaryEvent,
+    Scope,
+} from "./ownership/contracts/index.js";
+export type {
+    ErrorBoundaryDecisionType,
+    ErrorBoundaryFunctionType,
     ScopeCleanupType,
     ScopeFunctionType,
 } from "./ownership/types/index.js";

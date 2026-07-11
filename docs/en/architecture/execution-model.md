@@ -123,9 +123,16 @@ Unmounting an application disposes its root scope. Disposal recursively removes 
 
 ## Error boundaries
 
-The foundation must define how errors move through owner and component boundaries. Error recovery behavior is still open and must be specified before runtime implementation.
+An `ErrorBoundary` is a specialized child scope with an immutable synchronous handler. Owned failures propagate to the nearest boundary and then toward parent owners. The handler returns `"handled"` to stop propagation or `"propagate"` to preserve the original error.
+
+Handlers execute untracked. Reactive writes are allowed and obey scheduler reentry, while creation of new owned resources is rejected during recovery. A handler failure is aggregated with the original error before parent propagation.
+
+Boundaries protect owned scope execution, scheduled jobs, lifecycle cleanup, disposal, and future component or renderer work. Direct imperative operations continue throwing synchronously unless invoked inside protected owned execution.
+
+Handled scheduler job errors allow the flush to continue. An unhandled scheduled error aborts the flush, discards remaining pending jobs, and propagates to the synchronous caller. Disposal attempts every ledger entry and aggregates only errors that no boundary handled.
+
+See the ownership [Error Boundary](../packages/core/ownership/error-boundary/index.md) documentation.
 
 ## Open decisions
 
 - Renderer cleanup timing relative to host node removal.
-- Error boundary ownership and recovery semantics.
