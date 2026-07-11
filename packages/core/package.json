@@ -9,6 +9,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
+    "test": "pnpm run test:types",
+    "test:types": "tsc -p tsconfig.test.json",
     "watch": "tsc -w"
   },
   "keywords": []

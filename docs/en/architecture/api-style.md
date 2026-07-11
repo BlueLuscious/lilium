@@ -47,9 +47,18 @@ Mutable collections and graph nodes must not be exposed directly. Inspection API
 
 Composable functions may be added where they improve authoring ergonomics, but they delegate to the object model and do not define separate semantics. The object API remains the canonical extension and lifecycle model.
 
+## Accepted reactive value API
+
+Reactive values use explicit object methods:
+
+- `get()` performs a tracked read.
+- `set(value)` replaces the current value and returns nothing.
+- `update(updater)` derives the next value from the latest value and returns nothing.
+
+Signals are created by a `ReactiveRuntime`; their concrete implementation classes are not public construction points. A mutable `Signal<T>` is assignable to a `ReadonlySignal<T>` so consumers can receive read access without write access.
+
 ## Open decisions
 
-- Whether reactive values use properties such as `signal.value` or methods such as `signal.get()` and `signal.set(value)`.
 - Whether users construct runtime objects directly or through static factories.
 - Whether an `Application` receives an existing runtime or creates an isolated runtime by default.
 - Which objects are public extension points and which are opaque handles.

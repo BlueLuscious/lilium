@@ -8,7 +8,7 @@ Status: **Redesign Draft**
 
 | Feature | Responsibility |
 | --- | --- |
-| `reactivity` | Signals, computed values, effects, dependency tracking, and batching. |
+| [`reactivity`](reactivity/index.md) | Signals, computed values, effects, dependency tracking, and batching. |
 | `ownership` | Resource scopes, parent-child ownership, cleanup, and recursive disposal. |
 | `scheduler` | Deterministic propagation phases, queues, deduplication, and reentry control. |
 | `context` | Typed contextual values resolved through ownership. |
