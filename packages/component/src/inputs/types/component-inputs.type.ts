@@ -1,4 +1,5 @@
 import type { ReadonlySignal } from "@lilium/core";
+import type { TComponentInputValue } from "./internal/component-input-value.type.js";
 
 /**
  * @description Read-only reactive input object received by headless component setup.
@@ -7,5 +8,7 @@ import type { ReadonlySignal } from "@lilium/core";
  * @typeParam Inputs - Declarative input value shape of the component.
  */
 export type ComponentInputsType<Inputs extends object> = {
-    readonly [Key in keyof Inputs]-?: ReadonlySignal<Inputs[Key]>;
+    readonly [Key in keyof Inputs]-?: ReadonlySignal<
+        TComponentInputValue<Inputs, Key>
+    >;
 };

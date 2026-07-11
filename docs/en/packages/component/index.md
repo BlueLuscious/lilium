@@ -12,6 +12,7 @@ The package contains no templates, visual slots, renderer operations, DOM APIs, 
 - [Setup](setup/index.md) defines one-time initialization and its runtime/scope context.
 - [Inputs](inputs/index.md) maps declarative input values to read-only reactive signals.
 - [Controller](controller/index.md) defines the read-only object exposed by setup.
+- [Instance](instance/index.md) defines the public handle and its internal input lifecycle.
 
 ## Package relationship
 
@@ -22,7 +23,6 @@ The future `.lily` compiler may emit headless component definitions, template de
 ## Deferred concepts
 
 - Public `defineComponent()` API.
-- Mutable internal component instance.
 - Component creation and disposal engine.
-- Component lifecycle beyond ownership setup and cleanup.
+- Host and template lifecycle beyond ownership setup and cleanup.
 - Template composition and visual slots.

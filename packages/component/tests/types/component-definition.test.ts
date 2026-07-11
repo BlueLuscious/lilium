@@ -27,6 +27,9 @@ declare const inputs: ComponentInputsType<CounterInputsType>;
 const initial: number = inputs.initial.get();
 const label: string | undefined = inputs.label.get();
 
+// @ts-expect-error Optional input signal values preserve undefined.
+const requiredLabel: string = inputs.label.get();
+
 const setup: CounterSetupFunctionType = (currentContext, currentInputs) => {
     const count = currentContext.runtime.signal(currentInputs.initial.get());
 
@@ -67,3 +70,4 @@ void controller;
 void initial;
 void label;
 void missingLabel;
+void requiredLabel;

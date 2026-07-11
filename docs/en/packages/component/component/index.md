@@ -16,4 +16,4 @@ It contains one `setup` operation and no presentation. A definition may be expor
 
 Setup executes exactly once per component instance inside a dedicated ownership scope. It is synchronous and cannot return a Promise. Failure follows the component scope's nearest ownership error boundary.
 
-See [Setup](../setup/index.md), [Inputs](../inputs/index.md), and [Controller](../controller/index.md).
+See [Setup](../setup/index.md), [Inputs](../inputs/index.md), [Controller](../controller/index.md), and [Instance](../instance/index.md).
