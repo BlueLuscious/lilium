@@ -15,9 +15,9 @@ The ownership scope remains private. Exposing it would let consumers attach arbi
 
 ## Internal lifecycle
 
-`IComponentInstanceLifecycle<Inputs, Controller>` extends the public instance only inside the component engine. Its `updateInputs(values)` operation receives a complete normalized snapshot and updates every mutable input signal in one reactive batch.
+`IComponentInstanceLifecycle<Inputs, Controller>` extends the public instance only inside the component engine. Its `updateInputs(values)` operation receives a complete [`ComponentInputValuesType`](../inputs/index.md) snapshot and updates every mutable input signal in one reactive batch.
 
-`TComponentInputValues<Inputs>` makes every input key required while preserving `undefined` in optional value types. For example, `{ label?: string }` becomes `{ readonly label: string | undefined }`. This gives input removal an explicit representation and prevents an omitted key from ambiguously meaning either "unchanged" or "cleared".
+For example, `{ label?: string }` becomes `{ readonly label: string | undefined }`. This gives input removal an explicit representation and prevents an omitted key from ambiguously meaning either "unchanged" or "cleared".
 
 The internal lifecycle follows these rules:
 
@@ -28,6 +28,6 @@ The internal lifecycle follows these rules:
 5. Apply each complete input snapshot in one reactive batch.
 6. Dispose the component scope when the instance or its owning scope is disposed.
 
-If setup fails, creation disposes the incomplete scope and does not expose an instance. Error handling follows the nearest ownership error boundary. Calling the internal update operation after disposal is an invalid lifecycle transition and must throw when runtime behavior is implemented.
+If setup fails, creation disposes the incomplete scope and does not expose an instance. A handled failure makes `ComponentRuntime.create()` return `undefined`; an unhandled failure propagates to its synchronous caller. Calling the internal update operation after disposal is an invalid lifecycle transition and must throw when runtime behavior is implemented.
 
 This contract does not define template mounting or host attachment. Those lifecycles belong to future template and renderer packages.

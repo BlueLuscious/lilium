@@ -1,5 +1,5 @@
 import type { ComponentInstance } from "../component-instance.contract.js";
-import type { TComponentInputValues } from "../../types/internal/component-input-values.type.js";
+import type { ComponentInputValuesType } from "../../../inputs/types/component-input-values.type.js";
 
 /**
  * @description Internal mutable lifecycle surface of one initialized component instance.
@@ -19,5 +19,5 @@ export interface IComponentInstanceLifecycle<
      * @param values - Complete next input values, including optional keys as `undefined`.
      * @returns Nothing.
      */
-    updateInputs(values: TComponentInputValues<Inputs>): void;
+    updateInputs(values: ComponentInputValuesType<Inputs>): void;
 }

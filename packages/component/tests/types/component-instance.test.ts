@@ -1,5 +1,8 @@
 import type { ReadonlySignal } from "@lilium/core";
-import type { ComponentInstance } from "../../src/index.js";
+import type {
+    ComponentInputValuesType,
+    ComponentInstance,
+} from "../../src/index.js";
 import type { IComponentInstanceLifecycle } from "../../src/instance/contracts/internal/component-instance-lifecycle.contract.js";
 
 type ExampleInputsType = {
@@ -28,6 +31,12 @@ instance.controller.reset();
 instance.dispose();
 lifecycle.updateInputs({ count: 1, label: undefined });
 
+const nextInputs: ComponentInputValuesType<ExampleInputsType> = {
+    count: 2,
+    label: "next",
+};
+lifecycle.updateInputs(nextInputs);
+
 // @ts-expect-error Public instances cannot mutate their input lifecycle.
 instance.updateInputs({ count: 1, label: undefined });
 
@@ -43,3 +52,4 @@ instance.controller = { reset() {} };
 void count;
 void disposed;
 void label;
+void nextInputs;
