@@ -1,2 +1,10 @@
-export type { ReadonlySignal, Signal } from "./reactivity/contracts/index.js";
-export type { SignalUpdaterType } from "./reactivity/types/index.js";
+export type {
+    ReactiveRuntime,
+    ReadonlySignal,
+    Signal,
+} from "./reactivity/contracts/index.js";
+export type {
+    SignalEqualityType,
+    SignalOptionsType,
+    SignalUpdaterType,
+} from "./reactivity/types/index.js";

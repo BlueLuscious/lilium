@@ -8,6 +8,14 @@ A component definition is immutable and reusable. Mounting it creates a componen
 
 Component state changes do not execute the whole component again. They invalidate only consumers that tracked the changed state.
 
+## Signal writes
+
+A signal is an explicit shallow reactive cell. It observes calls to `set()` and `update()` but does not intercept mutations inside stored objects.
+
+Every write produces a candidate value and compares it with the current value. The default equality function is `Object.is`; signal creation may provide a custom equality function. When values compare as equal, the runtime preserves the current value and does not invalidate dependents. When equality evaluation throws, the write is cancelled and the previous value remains stored.
+
+Equality evaluation does not participate in dependency tracking. Deep reactive proxies, if introduced later, are a separate abstraction built on the reactive graph and do not alter signal semantics.
+
 ## Proposed update phases
 
 1. **Write**: one or more reactive values are changed.
