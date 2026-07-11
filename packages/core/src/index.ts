@@ -1,3 +1,8 @@
+export type {
+    ContextApi,
+    RuntimeApi,
+} from "./api/contracts/index.js";
+
 export type { Context } from "./context/contracts/index.js";
 
 export type {

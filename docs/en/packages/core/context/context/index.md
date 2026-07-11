@@ -4,7 +4,7 @@
 
 ## Definition
 
-The future public API will create a context either without a default or with one immutable default value. Creating a definition does not require a `ReactiveRuntime`, allowing libraries to export contexts as package-level objects.
+The public [`Context.create()` API](../../api/index.md) creates a context either without a default or with one immutable default value. Creating a definition does not require a `ReactiveRuntime`, allowing libraries to export contexts as package-level objects.
 
 An explicit provider containing `undefined` is still a found provider when `T` permits `undefined`; provider presence is not determined by truthiness or value equality.
 
