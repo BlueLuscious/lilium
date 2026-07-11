@@ -22,11 +22,20 @@ The first approved API slice defines mutable and read-only signal objects. It de
 
 `Signal<T>` extends `ReadonlySignal<T>` and accepts `SignalUpdaterType<T>` in its `update()` method. `ReactiveRuntime.signal()` creates signal objects using an optional `SignalOptionsType<T>`, which references `SignalEqualityType<T>`.
 
+The internal [dependency tracking](dependency-tracking.md) contracts connect future signal runtime objects to reactive consumers without exposing graph collections through the public API.
+
+## Internal contracts and types
+
+- [`IReactiveSource`](contracts/internal/reactive-source.md) identifies a trackable value.
+- [`IReactiveConsumer`](contracts/internal/reactive-consumer.md) receives invalidation.
+- [`IReactiveTracker`](contracts/internal/reactive-tracker.md) owns collection and graph connections.
+- [`IReactiveRuntimeContext`](contracts/internal/reactive-runtime-context.md) bridges runtime implementations to their tracker.
+- [`TReactiveComputation<T>`](types/internal/reactive-computation.md) represents tracked and untracked operations.
+
 ## Deferred concepts
 
 - Computed values.
 - Effects and effect cleanup.
-- Dependency graph internals.
 - Batching and transactions.
 - Ownership integration.
 - Deep reactive proxies as a separate future abstraction.

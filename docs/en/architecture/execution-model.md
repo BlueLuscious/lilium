@@ -16,6 +16,18 @@ Every write produces a candidate value and compares it with the current value. T
 
 Equality evaluation does not participate in dependency tracking. Deep reactive proxies, if introduced later, are a separate abstraction built on the reactive graph and do not alter signal semantics.
 
+## Dependency tracking
+
+Reactive dependency collection is runtime-isolated and transactional. A source read outside an active consumer returns its value without creating an edge. A read inside a consumer collection registers one edge between that source and consumer, regardless of how many times the source is read.
+
+Each successful consumer execution atomically replaces its previous dependency set with the sources observed during that execution. If execution throws, newly collected edges are discarded, previous dependencies remain connected, the parent tracking context is restored, and the original error is rethrown.
+
+Nested consumers form a stack. Completing, failing, or running an untracked operation always restores the previous active consumer. A tracked read across different `ReactiveRuntime` instances is rejected rather than silently creating a dependency between isolated graphs.
+
+Dependency collection only records graph edges. Invalidation marks consumers stale or delegates to their scheduling policy; it does not require immediate execution. Disposing a consumer disconnects all of its edges idempotently.
+
+See the core [Dependency Tracking](../packages/core/reactivity/dependency-tracking.md) feature documentation.
+
 ## Proposed update phases
 
 1. **Write**: one or more reactive values are changed.
