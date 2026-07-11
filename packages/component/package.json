@@ -1,0 +1,20 @@
+{
+  "name": "@lilium/component",
+  "version": "0.1.0",
+  "description": "Headless component definitions and setup contracts for Lilium.",
+  "author": "BlueLuscious",
+  "license": "ISC",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "pnpm run test:types",
+    "test:types": "tsc -p tsconfig.test.json",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@lilium/core": "workspace:*"
+  },
+  "keywords": []
+}

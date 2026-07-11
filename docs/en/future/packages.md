@@ -4,7 +4,7 @@ This document records packages that do not currently exist. Moving a package int
 
 ## Proposed foundation
 
-- `@lilium/template`: component and target-independent template object model.
+- `@lilium/template`: target-independent template, binding, and component-template composition model.
 - `@lilium/renderer`: universal renderer and host protocol.
 - `@lilium/renderer-dom`: browser implementation.
 - `@lilium/compiler`: `.lily` parser, analysis, and code generation.

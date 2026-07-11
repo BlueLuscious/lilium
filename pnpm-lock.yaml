@@ -15,6 +15,12 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  packages/component:
+    dependencies:
+      '@lilium/core':
+        specifier: workspace:*
+        version: link:../core
+
   packages/core: {}
 
 packages:

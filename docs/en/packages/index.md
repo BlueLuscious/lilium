@@ -4,6 +4,7 @@ This section documents packages that currently exist under `packages/`. Package 
 
 ## Current packages
 
-- [`@lilium/core`](core/index.md): the current foundation package. Its existing contracts are scheduled for replacement after the new architecture is approved.
+- [`@lilium/core`](core/index.md): target-independent reactivity, ownership, context, and scheduling contracts.
+- [`@lilium/component`](component/index.md): portable headless component definitions built on core contracts.
 
 Packages must not receive documentation in this section before their repository package exists. Planned packages are tracked in [Future Packages](../future/packages.md).

@@ -14,7 +14,7 @@ Status: **Redesign Draft**
 | [`context`](context/index.md) | Portable typed identities and values resolved through ownership. |
 | `inspection` | Read-only instrumentation contracts for tests and future tooling. |
 
-Component and template definitions are currently proposed for a separate `@lilium/template` package so that reusable UI libraries can depend on a stable object protocol without importing a renderer.
+Headless component definitions live in `@lilium/component`, while visual definitions and component-template composition belong to the future `@lilium/template`. Core remains independent from both protocols.
 
 ## Proposed source structure
 

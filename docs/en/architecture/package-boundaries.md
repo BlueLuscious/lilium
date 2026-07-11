@@ -7,30 +7,40 @@ Status: **Draft**
 | Package | Responsibility | Dependencies |
 | --- | --- | --- |
 | `@lilium/core` | Reactivity, ownership, scheduling, and context. | None. |
-| `@lilium/template` | Component definitions, template definitions, and binding contracts. | `@lilium/core`. |
-| `@lilium/renderer` | Universal template execution and host renderer protocol. | `@lilium/core`, `@lilium/template`. |
+| `@lilium/component` | Headless component definitions, reactive inputs, setup, and controllers. | `@lilium/core`. |
+| `@lilium/template` | Template definitions, bindings, and component-template composition. | `@lilium/core`, `@lilium/component`. |
+| `@lilium/renderer` | Universal component/template execution and host renderer protocol. | `@lilium/core`, `@lilium/component`, `@lilium/template`. |
 | `@lilium/renderer-dom` | DOM host, events, attributes, mounting, and JSX integration. | `@lilium/renderer`. |
 | `@lilium/compiler` | Parses `.lily` files and emits code targeting the template ABI. | Build-time contracts only. |
 | `@lilium/renderer-console` | Reference adapter used to validate renderer independence. | `@lilium/renderer`. |
 
 Only packages that physically exist under `packages/` receive package documentation under `docs/en/packages/`. Planned packages remain documented here and in [Future Packages](../future/packages.md) until they are created.
 
+## Why components are separate
+
+Headless behavior has a lifecycle and reuse boundary independent of visual structure. An external UI library can publish component definitions without requiring templates, DOM behavior, or renderer internals.
+
+`ComponentDefinition` owns setup behavior, reactive inputs, and a public controller. It never contains an optional template field. This preserves the dependency direction from presentation toward behavior.
+
 ## Why templates are separate
 
-An external UI component library should be able to publish immutable component and template definitions without depending on DOM behavior or renderer internals. A separate template package provides that stable, lightweight protocol.
+The template package defines target-independent visual structure, reactive bindings, and composition with a headless component. A default presentation is a separate templated-component object, not mutable or optional state on the headless definition.
+
+Libraries may export a headless component, one or more templates, and ready-to-render component-template compositions independently.
 
 ## Dependency direction
 
 ```text
-core <- template <- renderer <- renderer-dom
-                   ^
-                   |
-            renderer-console
+component        --> core
+template         --> core, component
+renderer         --> core, component, template
+renderer-dom     --> renderer
+renderer-console --> renderer
 
-compiler --emits--> template ABI
+compiler --emits--> component and template ABIs
 ```
 
-Dependencies must not point upward or sideways around these boundaries. In particular, `core` must not import template, renderer, compiler, or DOM concepts.
+Dependencies must not point upward around these boundaries. In particular, `core` must not import component, template, renderer, compiler, or DOM concepts, and `component` must not import template or renderer concepts.
 
 ## Package root policy
 
@@ -38,7 +48,6 @@ Each package root is a distribution boundary, not a feature. Source code remains
 
 ## Open decisions
 
-- Whether `@lilium/template` warrants a package from the first implementation or begins as an isolated feature in `@lilium/renderer`.
 - Whether `@lilium/compiler` is included in the first runnable MVP or immediately follows the programmatic-template MVP.
 - Whether `@lilium/renderer-console` is published or remains a private conformance fixture.
 - Whether a facade package named `lilium` should eventually compose the browser defaults.
