@@ -11,7 +11,7 @@ Status: **Redesign Draft**
 | [`reactivity`](reactivity/index.md) | Signals, computed values, effects, dependency tracking, and batching. |
 | [`ownership`](ownership/index.md) | Resource scopes, parent-child ownership, cleanup, and recursive disposal. |
 | `scheduler` | Deterministic propagation phases, queues, deduplication, and reentry control. |
-| `context` | Typed contextual values resolved through ownership. |
+| [`context`](context/index.md) | Portable typed identities and values resolved through ownership. |
 | `inspection` | Read-only instrumentation contracts for tests and future tooling. |
 
 Component and template definitions are currently proposed for a separate `@lilium/template` package so that reusable UI libraries can depend on a stable object protocol without importing a renderer.

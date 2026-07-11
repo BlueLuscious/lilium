@@ -1,3 +1,5 @@
+export type { Context } from "./context/contracts/index.js";
+
 export type { Scope } from "./ownership/contracts/index.js";
 export type {
     ScopeCleanupType,
