@@ -10,6 +10,8 @@ Creation requires [`ComponentCreateOptionsType`](#componentcreateoptionstypeinpu
 
 The component runtime does not own or dispose the reactive runtime supplied when its future API object is created.
 
+Programmatic consumers obtain this object through [`Component.createRuntime()`](../api/index.md).
+
 ## `ComponentCreateOptionsType<Inputs>`
 
 Creation options contain:

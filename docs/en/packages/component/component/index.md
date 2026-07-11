@@ -4,6 +4,8 @@
 
 It contains one `setup` operation and no presentation. A definition may be exported by a UI library, instantiated by multiple runtimes, tested without a renderer, and later composed with one or more templates.
 
+Programmatic definitions are declared through the future [`Component.define()` API](../api/index.md). The definition itself captures no runtime and remains the stable ABI that a future `.lily` compiler may emit.
+
 ## Inputs
 
 `Inputs` is the declarative object shape accepted by the component. Setup receives its transformed `ComponentInputsType<Inputs>`, where every key is a `ReadonlySignal`. Optional properties remain present as signals whose values include `undefined`.

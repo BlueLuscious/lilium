@@ -8,6 +8,7 @@ The package contains no templates, visual slots, renderer operations, DOM APIs, 
 
 ## Features
 
+- [API](api/index.md) defines the object-oriented package entry point.
 - [Component](component/index.md) defines immutable reusable headless definitions.
 - [Setup](setup/index.md) defines one-time initialization and its runtime/scope context.
 - [Inputs](inputs/index.md) maps declarative input values to read-only reactive signals.
@@ -23,7 +24,7 @@ The future `.lily` compiler may emit headless component definitions, template de
 
 ## Deferred concepts
 
-- Public `defineComponent()` API.
+- Concrete `Component` API object.
 - Concrete component runtime and creation engine.
 - Host and template lifecycle beyond ownership setup and cleanup.
 - Template composition and visual slots.
