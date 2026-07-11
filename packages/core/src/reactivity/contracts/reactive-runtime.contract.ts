@@ -1,12 +1,14 @@
 import type { ComputedFunctionType } from "../types/computed-function.type.js";
+import type { EffectFunctionType } from "../types/effect-function.type.js";
 import type { SignalOptionsType } from "../types/signal-options.type.js";
 import type { Computed } from "./computed.contract.js";
+import type { Effect } from "./effect.contract.js";
 import type { Signal } from "./signal.contract.js";
 
 /**
  * @description Public object contract for creating and coordinating reactive resources.
- * @remarks This initial contract only exposes signal creation. Additional resources
- * are added after their execution semantics and ownership rules are approved.
+ * @remarks Resources are added only after their execution semantics and ownership
+ * rules are approved; concrete runtime implementation remains internal.
  */
 export interface ReactiveRuntime {
     /**
@@ -16,6 +18,13 @@ export interface ReactiveRuntime {
      * @returns A read-only computed object connected to this runtime.
      */
     computed<T>(computation: ComputedFunctionType<T>): Computed<T>;
+
+    /**
+     * @description Creates a tracked synchronous side effect scheduled in the effect phase.
+     * @param effect - Synchronous operation executed with an execution-scoped cleanup object.
+     * @returns A disposable effect object connected to this runtime.
+     */
+    effect(effect: EffectFunctionType): Effect;
 
     /**
      * @description Creates a mutable signal owned by this reactive runtime.

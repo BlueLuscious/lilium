@@ -42,6 +42,24 @@ Internally, a computed participates in both graph roles: it consumes the sources
 
 Eager derivation is intentionally not a `mode` of `Computed`. If a concrete use case requires eager cached derivation, it will be designed as a separate semantic abstraction with its own scheduling and error guarantees.
 
+## Effects
+
+An `Effect` is an identity-bearing disposable object for synchronous reactive side effects. Creating one registers its callback for the scheduler's effect phase; the object does not expose manual execution.
+
+Effect callbacks receive an execution-scoped `EffectExecution` object. Its `cleanup()` method registers one or more synchronous cleanups. Cleanups run without dependency tracking in last-in-first-out order before reevaluation and during disposal. Each registration executes at most once, and retaining an execution object for later registration is invalid.
+
+Effect execution transactionally collects dynamic dependencies. Multiple invalidations before a flush schedule at most one execution. A write performed by the active effect may schedule a later cycle but never reenters the same effect execution. The scheduler detects unbounded reactive cycles.
+
+Before reevaluation, resources from the previous successful execution are cleaned. If the next callback fails, candidate dependencies are rolled back, cleanups registered by the failed attempt are released, and the effect remains connected to its previous committed dependencies for a later retry.
+
+Errors are delivered to the nearest ownership error boundary. Without a boundary, the active flush propagates the error to its caller. Cleanup errors do not prevent remaining cleanups from running.
+
+Effect callbacks and cleanups are strictly synchronous. Asynchronous work requires a future abstraction with explicit cancellation, staleness, and concurrency semantics.
+
+Disposal is idempotent: it cancels pending execution, disconnects dependencies, runs remaining cleanups, and prevents future invalidation. Effects belong to the active ownership scope when one exists.
+
+Renderer bindings are internal consumers scheduled in the render phase, not public effects. Therefore user effects observe host updates after renderer bindings have completed.
+
 ## Proposed update phases
 
 1. **Write**: one or more reactive values are changed.
@@ -70,8 +88,6 @@ The foundation must define how errors move through owner and component boundarie
 ## Open decisions
 
 - Synchronous or deferred default rendering.
-- Lazy or eager computed evaluation.
-- Render effects as a distinct computation category.
-- Cleanup timing relative to reruns and DOM removal.
+- Renderer cleanup timing relative to host node removal.
 - Cycle detection and maximum propagation depth.
 - Error boundary ownership and recovery semantics.

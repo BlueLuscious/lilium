@@ -47,3 +47,7 @@ Sources and consumers expose runtime identity and behavior but not mutable depen
 ## Computed participation
 
 A computed value acts as a consumer while evaluating its computation and as a source when another consumer reads its cached value. These two graph roles remain nominally distinct even when one runtime object implements both contracts.
+
+## Effect participation
+
+An effect acts only as a consumer. Successful execution commits its dynamic dependencies. Failed execution preserves its previous committed dependencies and releases resources registered by the failed attempt before reporting the error.
