@@ -15,4 +15,6 @@ Mutating an object returned by `get()` is not observable by the signal. A future
 
 Concrete signal implementation classes are runtime details and are not part of this public contract.
 
+A signal belongs to the active scope when created during [`Scope.run()`](../../ownership/scope/index.md) and otherwise belongs directly to its reactive runtime. Disposing that owner permanently closes the signal.
+
 See [`ReadonlySignal<T>`](readonly-signal.md), [`SignalEqualityType<T>`](signal-equality.md), [`SignalOptionsType<T>`](signal-options.md), [`SignalUpdaterType<T>`](signal-updater.md), and [`ReactiveRuntime`](../reactive-runtime.md).

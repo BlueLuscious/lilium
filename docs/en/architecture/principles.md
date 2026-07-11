@@ -22,7 +22,7 @@ See [API Style](api-style.md).
 
 ### Explicit ownership
 
-Every owned resource belongs to a scope. Disposing a scope recursively disposes computations, effects, component instances, renderer bindings, and registered cleanups.
+Every resource belongs either to the runtime root owner or to an explicit scope. Disposing an owner recursively disposes computations, effects, component instances, renderer bindings, child scopes, and registered cleanups.
 
 ### Deterministic propagation
 

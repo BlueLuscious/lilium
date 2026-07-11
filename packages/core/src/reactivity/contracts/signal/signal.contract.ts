@@ -3,8 +3,8 @@ import type { ReadonlySignal } from "./readonly-signal.contract.js";
 
 /**
  * @description Mutable reactive value with explicit read and write operations.
- * @remarks Signals are created and owned by a reactive runtime. Their concrete
- * runtime implementation is not part of the public contract.
+ * @remarks Signals are created by a reactive runtime and owned by its root or
+ * the active scope. Their concrete implementation is not part of the public contract.
  * @typeParam T - Value stored by the signal.
  */
 export interface Signal<T> extends ReadonlySignal<T> {

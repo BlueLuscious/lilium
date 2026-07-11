@@ -76,6 +76,18 @@ Batching does not promise a microtask boundary. Exiting the outermost batch make
 
 Batching is not a transaction. A transaction would require staged values, isolation, explicit commit or rollback, computed cache rollback, and nested savepoint semantics. Lilium does not expose a `Transaction` contract until a concrete use case justifies those guarantees.
 
+## Ownership scopes
+
+`ReactiveRuntime` is the root owner and lifecycle boundary. `runtime.scope()` creates an explicit root scope, and `scope.child()` creates an explicit parent-child relationship. A scope becomes active only during its synchronous `run()` operation.
+
+Reactive resources created with an active scope belong to that scope; resources created without one belong directly to the runtime. Scope execution forms a runtime-isolated stack and restores the previous owner in a guaranteed finalization step. Throwing from a scoped operation does not roll back resources already registered.
+
+Each owner stores resources, child scopes, and cleanups in one registration-ordered ledger. Disposal processes the ledger in last-in-first-out order, attempts every entry even after errors, disconnects graph dependencies, and prevents disposed resources from participating in future reactive work.
+
+Scope and runtime disposal are idempotent. Disposing an actively executing scope is rejected. Operations other than repeated disposal are rejected after an owner closes.
+
+See the core [Ownership](../packages/core/ownership/index.md) feature documentation.
+
 ## Proposed update phases
 
 1. **Write**: one or more reactive values are changed.
@@ -95,7 +107,7 @@ The template representation is an implementation boundary, not necessarily a pub
 
 ## Disposal
 
-Unmounting an application disposes its root scope. Disposal recursively removes renderer bindings, effects, computations, component instances, host nodes, and registered cleanups. Repeated disposal must be safe.
+Unmounting an application disposes its root scope. Disposal recursively removes renderer bindings, effects, computations, component instances, host nodes, and registered cleanups according to the ownership ledger. Repeated disposal is safe.
 
 ## Error boundaries
 

@@ -1,3 +1,4 @@
+import type { Scope } from "../../ownership/contracts/scope/scope.contract.js";
 import type { BatchFunctionType } from "../types/batching/batch-function.type.js";
 import type { ComputedFunctionType } from "../types/computed/computed-function.type.js";
 import type { EffectFunctionType } from "../types/effect/effect-function.type.js";
@@ -30,11 +31,24 @@ export interface ReactiveRuntime {
     computed<T>(computation: ComputedFunctionType<T>): Computed<T>;
 
     /**
+     * @description Recursively disposes every resource owned by this runtime.
+     * @remarks Disposal is idempotent and permanently closes the runtime.
+     * @returns Nothing.
+     */
+    dispose(): void;
+
+    /**
      * @description Creates a tracked synchronous side effect scheduled in the effect phase.
      * @param effect - Synchronous operation executed with an execution-scoped cleanup object.
      * @returns A disposable effect object connected to this runtime.
      */
     effect(effect: EffectFunctionType): Effect;
+
+    /**
+     * @description Creates an inactive root scope owned directly by this runtime.
+     * @returns A root scope that can own reactive resources and child scopes.
+     */
+    scope(): Scope;
 
     /**
      * @description Creates a mutable signal owned by this reactive runtime.

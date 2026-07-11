@@ -1,3 +1,9 @@
+export type { Scope } from "./ownership/contracts/index.js";
+export type {
+    ScopeCleanupType,
+    ScopeFunctionType,
+} from "./ownership/types/index.js";
+
 export type {
     Computed,
     Effect,
