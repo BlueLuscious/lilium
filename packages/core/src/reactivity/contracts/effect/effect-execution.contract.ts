@@ -1,4 +1,4 @@
-import type { EffectCleanupType } from "../types/effect-cleanup.type.js";
+import type { EffectCleanupType } from "../../types/effect/effect-cleanup.type.js";
 
 /**
  * @description Execution-scoped object used to register effect cleanup operations.

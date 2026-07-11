@@ -4,4 +4,4 @@
 
 Object identity of the context defines graph isolation: a source and consumer can connect only when they reference the same context.
 
-See [`IReactiveTracker`](reactive-tracker.md) and [Dependency Tracking](../../dependency-tracking.md).
+See [`IReactiveTracker`](reactive-tracker.md) and [Dependency Tracking](index.md).

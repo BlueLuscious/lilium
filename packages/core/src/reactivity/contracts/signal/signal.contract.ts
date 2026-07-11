@@ -1,4 +1,4 @@
-import type { SignalUpdaterType } from "../types/signal-updater.type.js";
+import type { SignalUpdaterType } from "../../types/signal/signal-updater.type.js";
 import type { ReadonlySignal } from "./readonly-signal.contract.js";
 
 /**

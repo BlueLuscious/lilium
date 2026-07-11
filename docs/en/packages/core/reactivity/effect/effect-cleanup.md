@@ -4,4 +4,4 @@
 
 It returns `undefined`, which rejects async cleanup callbacks and accidental return values at the type boundary. Cleanup operations execute without dependency tracking in last-in-first-out order.
 
-See [`EffectExecution`](../contracts/effect-execution.md).
+See [`EffectExecution`](effect-execution.md).

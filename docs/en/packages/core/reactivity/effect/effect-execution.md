@@ -6,4 +6,4 @@ Multiple cleanups are supported and execute in last-in-first-out order before re
 
 The object is valid only during its callback. Retaining it and attempting to register cleanups afterward is invalid.
 
-See [`Effect`](effect.md) and [`EffectCleanupType`](../types/effect-cleanup.md).
+See [`Effect`](index.md) and [`EffectCleanupType`](effect-cleanup.md).

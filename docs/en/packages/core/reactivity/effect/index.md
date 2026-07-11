@@ -8,4 +8,4 @@ It cannot execute manually. Creation schedules its callback in the runtime effec
 
 Reactive writes are allowed during execution but cannot reenter the running effect. They schedule a later propagation cycle subject to cycle detection.
 
-See [`EffectExecution`](effect-execution.md), [`EffectFunctionType`](../types/effect-function.md), and [Dependency Tracking](../dependency-tracking.md).
+See [`EffectExecution`](effect-execution.md), [`EffectFunctionType`](effect-function.md), [`EffectCleanupType`](effect-cleanup.md), and [Dependency Tracking](../tracking/index.md).

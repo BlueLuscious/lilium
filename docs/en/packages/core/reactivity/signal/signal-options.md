@@ -1,6 +1,6 @@
 # `SignalOptionsType<T>`
 
-`SignalOptionsType<T>` is the immutable configuration accepted by [`ReactiveRuntime.signal()`](../contracts/reactive-runtime.md).
+`SignalOptionsType<T>` is the immutable configuration accepted by [`ReactiveRuntime.signal()`](../reactive-runtime.md).
 
 Its optional `equals` member accepts a [`SignalEqualityType<T>`](signal-equality.md). Omitting it selects `Object.is` as the runtime default.
 

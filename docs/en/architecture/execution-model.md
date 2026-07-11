@@ -26,7 +26,7 @@ Nested consumers form a stack. Completing, failing, or running an untracked oper
 
 Dependency collection only records graph edges. Invalidation marks consumers stale or delegates to their scheduling policy; it does not require immediate execution. Disposing a consumer disconnects all of its edges idempotently.
 
-See the core [Dependency Tracking](../packages/core/reactivity/dependency-tracking.md) feature documentation.
+See the core [Dependency Tracking](../packages/core/reactivity/tracking/index.md) feature documentation.
 
 ## Computed values
 

@@ -1,10 +1,10 @@
-import type { BatchFunctionType } from "../types/batch-function.type.js";
-import type { ComputedFunctionType } from "../types/computed-function.type.js";
-import type { EffectFunctionType } from "../types/effect-function.type.js";
-import type { SignalOptionsType } from "../types/signal-options.type.js";
-import type { Computed } from "./computed.contract.js";
-import type { Effect } from "./effect.contract.js";
-import type { Signal } from "./signal.contract.js";
+import type { BatchFunctionType } from "../types/batching/batch-function.type.js";
+import type { ComputedFunctionType } from "../types/computed/computed-function.type.js";
+import type { EffectFunctionType } from "../types/effect/effect-function.type.js";
+import type { SignalOptionsType } from "../types/signal/signal-options.type.js";
+import type { Computed } from "./computed/computed.contract.js";
+import type { Effect } from "./effect/effect.contract.js";
+import type { Signal } from "./signal/signal.contract.js";
 
 /**
  * @description Public object contract for creating and coordinating reactive resources.

@@ -1,6 +1,6 @@
 # `Computed<T>`
 
-`Computed<T>` is a lazy memoized reactive value derived from other reactive sources. It extends [`ReadonlySignal<T>`](readonly-signal.md) and exposes only `get()`.
+`Computed<T>` is a lazy memoized reactive value derived from other reactive sources. It extends [`ReadonlySignal<T>`](../signal/readonly-signal.md) and exposes only `get()`.
 
 The first read evaluates and caches its computation. Clean reads reuse the cache. Dependency invalidation marks the computed stale, and the next read reevaluates it once.
 
@@ -10,4 +10,4 @@ A computed is both an internal reactive consumer and source. Its computation mus
 
 Eager derivation is not an evaluation mode of this contract. It may become a separate abstraction if a concrete scheduling use case requires it.
 
-See [`ComputedFunctionType<T>`](../types/computed-function.md), [`ReactiveRuntime`](reactive-runtime.md), and [Dependency Tracking](../dependency-tracking.md).
+See [`ComputedFunctionType<T>`](computed-function.md), [`ReactiveRuntime`](../reactive-runtime.md), and [Dependency Tracking](../tracking/index.md).

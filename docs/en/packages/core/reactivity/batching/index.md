@@ -32,6 +32,6 @@ Throwing does not roll back writes. Runtime bookkeeping and nesting depth are re
 
 ## Transaction boundary
 
-A batch is not an atomic transaction. See the architecture [Execution Model](../../../architecture/execution-model.md) for the required guarantees a future transaction would need.
+A batch is not an atomic transaction. See the architecture [Execution Model](../../../../architecture/execution-model.md) for the required guarantees a future transaction would need.
 
-See [`BatchFunctionType`](types/batch-function.md) and [`ReactiveRuntime`](contracts/reactive-runtime.md).
+See [`BatchFunctionType`](batch-function.md) and [`ReactiveRuntime`](../reactive-runtime.md).

@@ -1,4 +1,4 @@
-import type { TReactiveComputation } from "../../types/internal/reactive-computation.type.js";
+import type { TReactiveComputation } from "../../../types/internal/tracking/reactive-computation.type.js";
 import type { IReactiveConsumer } from "./reactive-consumer.contract.js";
 import type { IReactiveSource } from "./reactive-source.contract.js";
 

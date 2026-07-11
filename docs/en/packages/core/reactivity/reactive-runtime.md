@@ -6,4 +6,4 @@ Its current surface creates mutable signals through `signal(initialValue, option
 
 The contract does not determine how a runtime object itself is constructed. That remains an API-level decision.
 
-See [`Signal<T>`](signal.md), [`SignalOptionsType<T>`](../types/signal-options.md), [`Computed<T>`](computed.md), [`Effect`](effect.md), and [Batching](../batching.md).
+See [Signal](signal/index.md), [Computed](computed/index.md), [Effect](effect/index.md), and [Batching](batching/index.md).

@@ -1,4 +1,4 @@
-import type { EffectExecution } from "../contracts/effect-execution.contract.js";
+import type { EffectExecution } from "../../contracts/effect/effect-execution.contract.js";
 
 /**
  * @description Synchronous tracked operation executed during the scheduler effect phase.

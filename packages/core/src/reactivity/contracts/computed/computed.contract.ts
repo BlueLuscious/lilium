@@ -1,4 +1,4 @@
-import type { ReadonlySignal } from "./readonly-signal.contract.js";
+import type { ReadonlySignal } from "../signal/readonly-signal.contract.js";
 
 /**
  * @description Lazy memoized reactive value derived from other reactive sources.

@@ -6,4 +6,4 @@ Its `get()` method returns the current value. Once the runtime exists, calling `
 
 `Signal<T>` extends this contract, allowing mutable signals to be passed safely to APIs that require read-only access.
 
-See [`Signal<T>`](signal.md) and [`SignalUpdaterType<T>`](../types/signal-updater.md).
+See [`Signal<T>`](index.md) and [`SignalUpdaterType<T>`](signal-updater.md).

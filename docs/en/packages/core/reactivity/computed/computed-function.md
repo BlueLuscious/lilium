@@ -6,4 +6,4 @@ Executing it inside a computed collection records every source read as a dynamic
 
 The function must not perform external side effects or reactive writes. Those behaviors belong to effects and explicit mutations.
 
-See [`Computed<T>`](../contracts/computed.md) and [Dependency Tracking](../dependency-tracking.md).
+See [`Computed<T>`](index.md) and [Dependency Tracking](../tracking/index.md).

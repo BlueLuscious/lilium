@@ -1,1 +1,1 @@
-export type { TReactiveComputation } from "./reactive-computation.type.js";
+export type { TReactiveComputation } from "./tracking/reactive-computation.type.js";
