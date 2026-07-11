@@ -7,6 +7,7 @@ export type {
     Signal,
 } from "./contracts/index.js";
 export type {
+    BatchFunctionType,
     ComputedFunctionType,
     EffectCleanupType,
     EffectFunctionType,

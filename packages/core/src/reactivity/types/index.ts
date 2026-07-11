@@ -1,3 +1,4 @@
+export type { BatchFunctionType } from "./batch-function.type.js";
 export type { ComputedFunctionType } from "./computed-function.type.js";
 export type { EffectCleanupType } from "./effect-cleanup.type.js";
 export type { EffectFunctionType } from "./effect-function.type.js";

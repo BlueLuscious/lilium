@@ -60,6 +60,22 @@ Disposal is idempotent: it cancels pending execution, disconnects dependencies, 
 
 Renderer bindings are internal consumers scheduled in the render phase, not public effects. Therefore user effects observe host updates after renderer bindings have completed.
 
+## Batching
+
+`ReactiveRuntime.batch(operation)` creates a synchronous scheduling boundary around one or more reactive writes. It is an operation on the runtime rather than an identity-bearing object because it has no independent lifecycle, configuration, or disposal.
+
+Writes inside a batch are applied immediately. Signal equality runs per write, and reads observe the latest accepted value. Dependency invalidation also occurs immediately so an explicitly read stale computed can reevaluate consistently inside the batch. Scheduled computed work, renderer bindings, and effects do not execute until the outermost active scheduling boundary exits.
+
+Nested batches share their outer boundary. Exiting an inner batch never flushes independently. Multiple invalidations deduplicate pending consumers, but batching does not implement net-change rollback: writing a value and later restoring its original value may still leave consumers pending from the first accepted write.
+
+Batch operations are strictly synchronous and return no value. If an operation throws, accepted writes remain committed, batch depth and tracking context are restored, the runtime performs the same flush bookkeeping required by a successful exit, and the original error is rethrown. A caught inner-batch error does not force a flush while an outer batch remains active.
+
+Batching does not promise a microtask boundary. Exiting the outermost batch makes pending work eligible for the runtime scheduler's next deterministic flush.
+
+## Transactions
+
+Batching is not a transaction. A transaction would require staged values, isolation, explicit commit or rollback, computed cache rollback, and nested savepoint semantics. Lilium does not expose a `Transaction` contract until a concrete use case justifies those guarantees.
+
 ## Proposed update phases
 
 1. **Write**: one or more reactive values are changed.

@@ -17,6 +17,7 @@ The first approved API slice defines mutable and read-only signal objects. It de
 
 ## Public types
 
+- [`BatchFunctionType`](types/batch-function.md) groups synchronous writes.
 - [`ComputedFunctionType<T>`](types/computed-function.md) derives a computed value.
 - [`EffectCleanupType`](types/effect-cleanup.md) releases effect execution resources.
 - [`EffectFunctionType`](types/effect-function.md) defines a synchronous effect callback.
@@ -26,7 +27,7 @@ The first approved API slice defines mutable and read-only signal objects. It de
 
 ## Relationships
 
-`Signal<T>` and `Computed<T>` extend `ReadonlySignal<T>`. A signal accepts `SignalUpdaterType<T>` in its `update()` method, while a computed evaluates a `ComputedFunctionType<T>`. An `Effect` evaluates an `EffectFunctionType` with an `EffectExecution` object that accepts `EffectCleanupType` callbacks. `ReactiveRuntime` creates all three reactive objects.
+`Signal<T>` and `Computed<T>` extend `ReadonlySignal<T>`. A signal accepts `SignalUpdaterType<T>` in its `update()` method, while a computed evaluates a `ComputedFunctionType<T>`. An `Effect` evaluates an `EffectFunctionType` with an `EffectExecution` object that accepts `EffectCleanupType` callbacks. `ReactiveRuntime` creates all three reactive objects and groups writes through `BatchFunctionType` operations.
 
 The internal [dependency tracking](dependency-tracking.md) contracts connect future signal runtime objects to reactive consumers without exposing graph collections through the public API.
 
@@ -40,7 +41,7 @@ The internal [dependency tracking](dependency-tracking.md) contracts connect fut
 
 ## Deferred concepts
 
-- Batching and transactions.
 - Ownership integration.
 - Deep reactive proxies as a separate future abstraction.
 - Asynchronous `AsyncEffect`, `Task`, and `Resource` abstractions.
+- Atomic transactions with commit and rollback semantics.

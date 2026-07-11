@@ -1,3 +1,4 @@
+import type { BatchFunctionType } from "../types/batch-function.type.js";
 import type { ComputedFunctionType } from "../types/computed-function.type.js";
 import type { EffectFunctionType } from "../types/effect-function.type.js";
 import type { SignalOptionsType } from "../types/signal-options.type.js";
@@ -11,6 +12,15 @@ import type { Signal } from "./signal.contract.js";
  * rules are approved; concrete runtime implementation remains internal.
  */
 export interface ReactiveRuntime {
+    /**
+     * @description Groups synchronous reactive writes into one scheduling boundary.
+     * @remarks Writes remain immediately readable and are not rolled back when the
+     * operation throws. Nested batches flush only after the outermost boundary exits.
+     * @param operation - Synchronous operation containing the grouped writes.
+     * @returns Nothing.
+     */
+    batch(operation: BatchFunctionType): void;
+
     /**
      * @description Creates a lazy memoized value derived from reactive sources.
      * @typeParam T - Type of value produced by the computation.

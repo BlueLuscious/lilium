@@ -7,6 +7,7 @@ export type {
     Signal,
 } from "./reactivity/contracts/index.js";
 export type {
+    BatchFunctionType,
     ComputedFunctionType,
     EffectCleanupType,
     EffectFunctionType,
