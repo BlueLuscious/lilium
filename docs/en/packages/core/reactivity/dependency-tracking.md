@@ -43,3 +43,7 @@ Disconnecting a consumer removes all graph edges it owns. Repeated disconnection
 ## Representation boundary
 
 Sources and consumers expose runtime identity and behavior but not mutable dependency collections. Sets, maps, edge objects, and collection algorithms remain runtime implementation details.
+
+## Computed participation
+
+A computed value acts as a consumer while evaluating its computation and as a source when another consumer reads its cached value. These two graph roles remain nominally distinct even when one runtime object implements both contracts.

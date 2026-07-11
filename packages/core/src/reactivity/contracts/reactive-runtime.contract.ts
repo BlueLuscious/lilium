@@ -1,4 +1,6 @@
+import type { ComputedFunctionType } from "../types/computed-function.type.js";
 import type { SignalOptionsType } from "../types/signal-options.type.js";
+import type { Computed } from "./computed.contract.js";
 import type { Signal } from "./signal.contract.js";
 
 /**
@@ -7,6 +9,14 @@ import type { Signal } from "./signal.contract.js";
  * are added after their execution semantics and ownership rules are approved.
  */
 export interface ReactiveRuntime {
+    /**
+     * @description Creates a lazy memoized value derived from reactive sources.
+     * @typeParam T - Type of value produced by the computation.
+     * @param computation - Pure operation that derives the computed value.
+     * @returns A read-only computed object connected to this runtime.
+     */
+    computed<T>(computation: ComputedFunctionType<T>): Computed<T>;
+
     /**
      * @description Creates a mutable signal owned by this reactive runtime.
      * @typeParam T - Type of value stored by the signal.

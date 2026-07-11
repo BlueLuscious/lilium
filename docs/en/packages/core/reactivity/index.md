@@ -8,19 +8,21 @@ The first approved API slice defines mutable and read-only signal objects. It de
 
 ## Public contracts
 
+- [`Computed<T>`](contracts/computed.md) exposes a lazy memoized derived value.
 - [`ReactiveRuntime`](contracts/reactive-runtime.md) creates and coordinates reactive resources.
 - [`ReadonlySignal<T>`](contracts/readonly-signal.md) exposes tracked reads without mutation.
 - [`Signal<T>`](contracts/signal.md) adds explicit writes and updates.
 
 ## Public types
 
+- [`ComputedFunctionType<T>`](types/computed-function.md) derives a computed value.
 - [`SignalEqualityType<T>`](types/signal-equality.md) determines whether a write is observable.
 - [`SignalOptionsType<T>`](types/signal-options.md) configures signal creation.
 - [`SignalUpdaterType<T>`](types/signal-updater.md) derives a signal's next value from its latest value.
 
 ## Relationships
 
-`Signal<T>` extends `ReadonlySignal<T>` and accepts `SignalUpdaterType<T>` in its `update()` method. `ReactiveRuntime.signal()` creates signal objects using an optional `SignalOptionsType<T>`, which references `SignalEqualityType<T>`.
+`Signal<T>` and `Computed<T>` extend `ReadonlySignal<T>`. A signal accepts `SignalUpdaterType<T>` in its `update()` method, while a computed evaluates a `ComputedFunctionType<T>`. `ReactiveRuntime` creates both objects.
 
 The internal [dependency tracking](dependency-tracking.md) contracts connect future signal runtime objects to reactive consumers without exposing graph collections through the public API.
 
@@ -34,7 +36,6 @@ The internal [dependency tracking](dependency-tracking.md) contracts connect fut
 
 ## Deferred concepts
 
-- Computed values.
 - Effects and effect cleanup.
 - Batching and transactions.
 - Ownership integration.

@@ -28,6 +28,20 @@ Dependency collection only records graph edges. Invalidation marks consumers sta
 
 See the core [Dependency Tracking](../packages/core/reactivity/dependency-tracking.md) feature documentation.
 
+## Computed values
+
+A `Computed<T>` is intrinsically lazy, memoized, and read-only. It has no evaluation mode, setter, manual refresh operation, or eager configuration.
+
+The first `get()` evaluates its computation, transactionally collects dependencies, caches the result, and returns it. Additional reads return the cached result while the computed remains clean. Dependency invalidation marks it stale without immediately evaluating it; the next `get()` performs one reevaluation regardless of how many invalidations occurred.
+
+A successful reevaluation replaces the cached result and commits its new dynamic dependencies. `Object.is` defines whether the candidate result is observably equal to the cached result; an equal candidate preserves the existing cached value. If evaluation throws, dependency collection rolls back, the previous cache remains available internally, the computed remains stale, and the error is rethrown to the caller. A later `get()` may retry.
+
+Computed functions must be pure: they derive and return a value but do not perform external side effects or reactive writes. Effects represent reactive side effects. Recursive evaluation of the same computed value is a cycle and must throw rather than recurse indefinitely.
+
+Internally, a computed participates in both graph roles: it consumes the sources read by its computation and acts as a source for consumers that call its `get()` method.
+
+Eager derivation is intentionally not a `mode` of `Computed`. If a concrete use case requires eager cached derivation, it will be designed as a separate semantic abstraction with its own scheduling and error guarantees.
+
 ## Proposed update phases
 
 1. **Write**: one or more reactive values are changed.
