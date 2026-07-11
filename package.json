@@ -11,6 +11,7 @@
   "scripts": {
     "build:component": "pnpm --filter @lilium/component... run build",
     "build:core": "pnpm --filter @lilium/core run build",
+    "check:architecture": "node scripts/check-architecture.mjs",
     "watch:component": "pnpm --filter @lilium/component run watch",
     "watch:core": "pnpm --filter @lilium/core run watch"
   },
