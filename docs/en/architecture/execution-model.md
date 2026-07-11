@@ -1,12 +1,14 @@
 # Execution Model
 
-Status: **Draft**
+Status: **Core and component foundation accepted**
 
 ## Component creation
 
-A component definition is immutable and reusable. Mounting it creates a component instance inside an ownership scope. The instance initializes its setup logic once, instantiates its template, and registers dynamic bindings as reactive consumers.
+A component definition is immutable and reusable. Creating it through a `ComponentRuntime` creates a headless component instance inside an ownership scope and initializes its setup logic exactly once.
 
 Component state changes do not execute the whole component again. They invalidate only consumers that tracked the changed state.
+
+Template instantiation and mounting are separate future compositions. They consume a successfully initialized headless instance but do not change its setup or ownership semantics.
 
 ## Signal writes
 
@@ -111,15 +113,17 @@ Flushes are synchronous and automatic outside batching. FIFO queues deduplicate 
 
 See the core [Scheduler](../packages/core/scheduler/index.md) feature documentation.
 
-## Template model
+## Future template model
 
-A template contains stable structure plus dynamic binding declarations. A binding reads reactive values and applies its latest result through renderer operations. This enables fine-grained updates without diffing complete trees.
+A future template contains stable structure plus dynamic binding declarations. A binding reads reactive values and applies its latest result through renderer operations. This enables fine-grained updates without diffing complete trees.
 
-The template representation is an implementation boundary, not necessarily a public serializable format. A stable compiled component ABI must be defined before the `.lily` compiler is implemented.
+The template representation, renderer protocol, cleanup timing, and compiled ABI are intentionally deferred to their own foundation epic. They are not prerequisites for Core or headless Component runtime implementation.
 
 ## Disposal
 
-Unmounting an application disposes its root scope. Disposal recursively removes renderer bindings, effects, computations, component instances, host nodes, and registered cleanups according to the ownership ledger. Repeated disposal is safe.
+Disposing a reactive runtime recursively disposes its root resources, scopes, effects, computations, component instances, and registered cleanups according to the ownership ledger. Repeated disposal is safe.
+
+A future mounted application will additionally own renderer bindings and host nodes through its root scope.
 
 ## Error boundaries
 
@@ -132,7 +136,3 @@ Boundaries protect owned scope execution, scheduled jobs, lifecycle cleanup, dis
 Handled scheduler job errors allow the flush to continue. An unhandled scheduled error aborts the flush, discards remaining pending jobs, and propagates to the synchronous caller. Disposal attempts every ledger entry and aggregates only errors that no boundary handled.
 
 See the ownership [Error Boundary](../packages/core/ownership/error-boundary/index.md) documentation.
-
-## Open decisions
-
-- Renderer cleanup timing relative to host node removal.

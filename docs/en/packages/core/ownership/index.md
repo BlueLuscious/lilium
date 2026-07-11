@@ -1,6 +1,6 @@
 # Ownership
 
-Status: **In design**
+Status: **Foundation accepted**
 
 Ownership provides deterministic lifetime boundaries for reactive resources, future component instances, renderer bindings, contextual values, and user cleanups.
 
@@ -15,8 +15,11 @@ A `ReactiveRuntime` is the root owner for its resources and root scopes. A scope
 
 Ownership state and stacks are internal. Public objects expose explicit creation, execution, cleanup registration, and disposal without mutable child or resource collections.
 
-## Deferred concepts
+## Runtime work
 
 - Internal ownership manager and ledger contracts.
 - Component and renderer ownership integration.
+
+## Deferred concepts
+
 - Read-only ownership inspection.

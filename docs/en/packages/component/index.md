@@ -1,6 +1,6 @@
 # `@lilium/component`
 
-Status: **In design**
+Status: **Foundation accepted**
 
 `@lilium/component` defines portable headless component behavior. It depends on `@lilium/core` for reactive inputs, runtime creation, ownership, context resolution, scheduling, and error boundaries.
 

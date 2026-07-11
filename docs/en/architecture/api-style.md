@@ -1,6 +1,6 @@
 # API Style
 
-Status: **Draft**
+Status: **Foundation accepted**
 
 ## Decision rule
 
@@ -20,7 +20,7 @@ Functions are used for:
 - One-shot operations.
 - Optional convenience wrappers around the canonical object API.
 
-## Proposed public objects
+## Foundation public objects
 
 | Object | Responsibility |
 | --- | --- |
@@ -30,12 +30,13 @@ Functions are used for:
 | `Computed<T>` | Exposes a derived reactive value. |
 | `Effect` | Represents a disposable side effect. |
 | `Context<T>` | Identifies an owned contextual value. |
-| `ComponentDefinition<P>` | Immutable reusable component definition. |
-| `TemplateDefinition` | Immutable target-independent template and binding description. |
-| `Renderer` | Instantiates templates using a host implementation. |
-| `Application` | Owns a mounted root, root scope, renderer, and disposal boundary. |
+| `ComponentDefinition<Inputs, Controller>` | Immutable reusable headless component definition. |
+| `ComponentInstance<Inputs, Controller>` | Owns one initialized headless component occurrence. |
+| `ComponentRuntime` | Creates component instances in one reactive runtime. |
 
-These names are proposals. Their responsibilities must be approved before signatures are created.
+The immutable `Runtime`, `Context`, and `Component` facade objects are the canonical construction boundaries. Their API contracts are accepted; concrete values are exported only with their runtime implementations.
+
+`TemplateDefinition`, `Renderer`, and `Application` remain future package concepts. `Application` requires mounted-root and renderer semantics and therefore does not belong to `@lilium/core`.
 
 ## Encapsulation
 
@@ -57,8 +58,11 @@ Reactive values use explicit object methods:
 
 Signals are created by a `ReactiveRuntime`; their concrete implementation classes are not public construction points. A mutable `Signal<T>` is assignable to a `ReadonlySignal<T>` so consumers can receive read access without write access.
 
-## Open decisions
+## Construction decisions
 
-- Whether users construct runtime objects directly or through static factories.
-- Whether an `Application` receives an existing runtime or creates an isolated runtime by default.
-- Which objects are public extension points and which are opaque handles.
+- Consumers create opaque runtime objects through immutable object facades, not public implementation constructors.
+- `Runtime.create()` creates an isolated `ReactiveRuntime`.
+- `Context.create()` creates portable context identities.
+- `Component.define()` and `Component.createRuntime()` define and execute headless components.
+- Convenience composables are deferred until concrete authoring repetition justifies them.
+- Public contracts are extension protocols only when third-party implementation is intentional; otherwise concrete implementations remain opaque.

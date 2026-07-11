@@ -1,6 +1,6 @@
 # Architecture Principles
 
-Status: **Draft**
+Status: **Foundation accepted**
 
 ## Framework identity
 

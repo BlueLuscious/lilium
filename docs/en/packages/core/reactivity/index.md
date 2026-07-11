@@ -1,10 +1,8 @@
 # Reactivity
 
-Status: **In design**
+Status: **Foundation accepted**
 
-The reactivity feature provides target-independent reactive values and will later own dependency tracking, computed values, effects, and batching.
-
-The first approved API slice defines mutable and read-only signal objects. It deliberately excludes runtime graph contracts until propagation and ownership semantics are accepted.
+The reactivity feature provides target-independent reactive values and owns dependency tracking, computed values, effects, and batching semantics.
 
 ## Compositions
 
@@ -24,7 +22,6 @@ Signals and computed values share the read-only reactive interface. Computed val
 
 ## Deferred concepts
 
-- Ownership integration.
 - Deep reactive proxies as a separate future abstraction.
 - Asynchronous `AsyncEffect`, `Task`, and `Resource` abstractions.
 - Atomic transactions with commit and rollback semantics.

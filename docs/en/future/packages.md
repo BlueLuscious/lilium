@@ -19,4 +19,13 @@ This document records packages that do not currently exist. Moving a package int
 - `@lilium/compiler-vite`: Vite integration for `.lily` files.
 - `lilium`: optional browser-oriented facade package.
 
+## Deferred foundation decisions
+
+- Define the target-independent template instantiation and dynamic binding ABI.
+- Define the universal renderer host boundary and cleanup ordering.
+- Decide whether `@lilium/renderer-console` is publishable or only a conformance fixture.
+- Define compiler output ownership between component and template packages.
+- Choose the minimum `.lily` compiler milestone.
+- Decide whether the browser defaults require a facade package.
+
 Package creation is driven by a real dependency boundary, not by feature count alone.

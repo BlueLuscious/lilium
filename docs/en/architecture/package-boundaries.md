@@ -1,8 +1,8 @@
 # Package Boundaries
 
-Status: **Draft**
+Status: **Core and component foundation accepted**
 
-## Proposed foundation packages
+## Package boundaries
 
 | Package | Responsibility | Dependencies |
 | --- | --- | --- |
@@ -42,6 +42,8 @@ compiler --emits--> component and template ABIs
 
 Dependencies must not point upward around these boundaries. In particular, `core` must not import component, template, renderer, compiler, or DOM concepts, and `component` must not import template or renderer concepts.
 
+Run `pnpm check:architecture` to verify the current package dependency direction, implementation import boundaries, public barrels, and host independence.
+
 ## Package root policy
 
 Each package root is a distribution boundary, not a feature. Source code remains organized by semantic feature. A package-level `src/index.ts` composes public exports; folders such as `src/core/` or `src/kernel/` are created only if an actual feature has that responsibility.
@@ -51,3 +53,5 @@ Each package root is a distribution boundary, not a feature. Source code remains
 - Whether `@lilium/compiler` is included in the first runnable MVP or immediately follows the programmatic-template MVP.
 - Whether `@lilium/renderer-console` is published or remains a private conformance fixture.
 - Whether a facade package named `lilium` should eventually compose the browser defaults.
+
+These decisions belong to the future template, renderer, and compiler foundation epic. They do not block `@lilium/core` or `@lilium/component` runtime implementation.
