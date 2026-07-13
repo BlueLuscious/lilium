@@ -1,5 +1,5 @@
-import type { RuntimeApi } from "./contracts/runtime-api.contract.js";
 import { ReactiveRuntimeRuntime } from "../reactivity/runtime/reactive-runtime/reactive-runtime.runtime.js";
+import type { RuntimeApi } from "./contracts/runtime-api.contract.js";
 
 /**
  * @description Immutable public factory for isolated reactive runtimes.

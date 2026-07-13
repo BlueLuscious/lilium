@@ -6,6 +6,4 @@ import type { ErrorBoundaryDecisionType } from "./error-boundary-decision.type.j
  * @param event - Immutable event containing the error and its nearest owner.
  * @returns Whether the failure is handled or must propagate to a parent boundary.
  */
-export type ErrorBoundaryFunctionType = (
-    event: ErrorBoundaryEvent,
-) => ErrorBoundaryDecisionType;
+export type ErrorBoundaryFunctionType = (event: ErrorBoundaryEvent) => ErrorBoundaryDecisionType;

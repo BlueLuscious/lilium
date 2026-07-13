@@ -11,12 +11,19 @@
   "scripts": {
     "build:component": "pnpm --filter @lilium/component... run build",
     "build:core": "pnpm --filter @lilium/core run build",
+    "check": "pnpm run check:code && pnpm run check:jsdoc && pnpm run check:docs && pnpm run check:architecture",
     "check:architecture": "node scripts/check-architecture.mjs",
+    "check:code": "biome check .",
+    "check:docs": "node scripts/check-docs.mjs",
+    "check:jsdoc": "node scripts/check-jsdoc.mjs",
+    "format": "biome format --write .",
+    "lint": "biome lint .",
     "watch:component": "pnpm --filter @lilium/component run watch",
     "watch:core": "pnpm --filter @lilium/core run watch"
   },
   "keywords": [],
   "devDependencies": {
+    "@biomejs/biome": "2.5.3",
     "@types/node": "^26.1.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"

@@ -47,10 +47,11 @@ describe("batching runtime", () => {
 
         runtime.batch(() => {
             assert.throws(
-                () => runtime.batch(() => {
-                    source.set(1);
-                    throw failure;
-                }),
+                () =>
+                    runtime.batch(() => {
+                        source.set(1);
+                        throw failure;
+                    }),
                 (error) => error === failure,
             );
             source.set(2);
@@ -73,10 +74,11 @@ describe("batching runtime", () => {
         });
 
         assert.throws(
-            () => runtime.batch(() => {
-                source.set(1);
-                throw failure;
-            }),
+            () =>
+                runtime.batch(() => {
+                    source.set(1);
+                    throw failure;
+                }),
             (error) => error === failure,
         );
 
@@ -104,10 +106,11 @@ describe("batching runtime", () => {
         failEffect = true;
 
         assert.throws(
-            () => runtime.batch(() => {
-                source.set(1);
-                throw batchFailure;
-            }),
+            () =>
+                runtime.batch(() => {
+                    source.set(1);
+                    throw batchFailure;
+                }),
             (error) => {
                 assert.ok(error instanceof AggregateError);
                 assert.deepEqual(error.errors, [batchFailure, effectFailure]);

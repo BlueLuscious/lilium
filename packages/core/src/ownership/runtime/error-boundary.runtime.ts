@@ -1,3 +1,4 @@
+// biome-ignore lint/correctness/noUnusedImports: The unique symbol brands a declare-only property.
 import type { ERROR_BOUNDARY_BRAND } from "../contracts/error-boundary/error-boundary.contract.js";
 import type { ErrorBoundaryFunctionType } from "../types/error-boundary/error-boundary-function.type.js";
 import type { OwnershipManager } from "./ownership.manager.js";
@@ -18,6 +19,7 @@ export class ErrorBoundaryRuntime extends ScopeRuntime {
      * @param parent - Parent scope that owns this boundary.
      * @param handler - Immutable synchronous failure handler.
      */
+    // biome-ignore lint/complexity/noUselessConstructor: The required handler preserves the boundary invariant.
     constructor(
         manager: OwnershipManager,
         parent: ScopeRuntime,

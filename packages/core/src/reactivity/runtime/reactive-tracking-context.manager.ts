@@ -78,9 +78,9 @@ class ReactiveTrackingContextManager {
      */
     invalidateCandidate(tracker: IReactiveTracker, source: IReactiveSource): void {
         if (
-            this.#tracker === tracker
-            && this.#consumer !== null
-            && this.#dependencies?.has(source) === true
+            this.#tracker === tracker &&
+            this.#consumer !== null &&
+            this.#dependencies?.has(source) === true
         ) {
             this.#consumer.invalidate();
         }

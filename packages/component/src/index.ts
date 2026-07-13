@@ -2,8 +2,8 @@ export type { ComponentApi } from "./api/contracts/index.js";
 export type { ComponentDefinition } from "./component/contracts/index.js";
 export type { ComponentControllerType } from "./controller/types/index.js";
 export type {
-    ComponentInputValuesType,
     ComponentInputsType,
+    ComponentInputValuesType,
 } from "./inputs/types/index.js";
 export type { ComponentInstance } from "./instance/contracts/index.js";
 export type { ComponentRuntime } from "./runtime/contracts/index.js";

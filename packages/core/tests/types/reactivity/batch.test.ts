@@ -1,8 +1,4 @@
-import type {
-    BatchFunctionType,
-    ReactiveRuntime,
-    Signal,
-} from "../../../src/index.js";
+import type { BatchFunctionType, ReactiveRuntime, Signal } from "../../../src/index.js";
 
 declare const first: Signal<number>;
 declare const runtime: ReactiveRuntime;

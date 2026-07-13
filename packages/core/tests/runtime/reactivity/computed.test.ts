@@ -102,7 +102,10 @@ describe("computed runtime", () => {
         assert.equal(computed.get(), 1);
         fail = true;
         source.set(2);
-        assert.throws(() => computed.get(), (error) => error === failure);
+        assert.throws(
+            () => computed.get(),
+            (error) => error === failure,
+        );
 
         fail = false;
         assert.equal(computed.get(), 2);
@@ -135,10 +138,7 @@ describe("computed runtime", () => {
         });
 
         assert.throws(
-            () => first.tracker.collect(
-                consumer.identity,
-                () => foreignComputed.get(),
-            ),
+            () => first.tracker.collect(consumer.identity, () => foreignComputed.get()),
             /across runtimes/,
         );
         assert.equal(evaluations, 0);

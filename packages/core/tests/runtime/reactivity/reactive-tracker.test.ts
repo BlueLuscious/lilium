@@ -74,10 +74,11 @@ describe("reactive tracker runtime", () => {
         runtime.tracker.collect(inner.identity, () => previousInner.read());
         runtime.tracker.collect(outer.identity, () => {
             assert.throws(
-                () => runtime.tracker.collect(inner.identity, () => {
-                    failedInner.read();
-                    throw failure;
-                }),
+                () =>
+                    runtime.tracker.collect(inner.identity, () => {
+                        failedInner.read();
+                        throw failure;
+                    }),
                 (error) => error === failure,
             );
             outerAfterFailure.read();

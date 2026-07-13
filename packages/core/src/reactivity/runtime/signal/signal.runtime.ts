@@ -1,10 +1,11 @@
 import type { OwnershipManager } from "../../../ownership/runtime/ownership.manager.js";
-import type { Signal } from "../../contracts/signal/signal.contract.js";
+import type { IReactiveRuntimeContext } from "../../contracts/internal/tracking/reactive-runtime-context.contract.js";
 import type {
     IReactiveSource,
+    // biome-ignore lint/correctness/noUnusedImports: The unique symbol brands a declare-only property.
     REACTIVE_SOURCE_BRAND,
 } from "../../contracts/internal/tracking/reactive-source.contract.js";
-import type { IReactiveRuntimeContext } from "../../contracts/internal/tracking/reactive-runtime-context.contract.js";
+import type { Signal } from "../../contracts/signal/signal.contract.js";
 import type { SignalEqualityType } from "../../types/signal/signal-equality.type.js";
 import type { SignalOptionsType } from "../../types/signal/signal-options.type.js";
 import type { SignalUpdaterType } from "../../types/signal/signal-updater.type.js";
@@ -70,9 +71,7 @@ export class SignalRuntime<T> implements Signal<T>, IReactiveSource {
      */
     set(value: T): void {
         this.#assertOpen("write");
-        const equal = this.runtime.tracker.untrack(
-            () => this.#equals(this.#value, value),
-        );
+        const equal = this.runtime.tracker.untrack(() => this.#equals(this.#value, value));
 
         if (equal) {
             return;

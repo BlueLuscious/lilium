@@ -1,13 +1,13 @@
-import type { Context } from "../../context/contracts/context/context.contract.js";
+import type { ContextIdentity } from "../../context/contracts/context-identity/context-identity.contract.js";
 import type { IContextScope } from "../../context/contracts/internal/context-scope.contract.js";
 import { CONTEXT_SCOPE_BRAND } from "../../context/contracts/internal/context-scope.contract.js";
 import type { TContextResolution } from "../../context/types/internal/context-resolution.type.js";
 import type { ErrorBoundary } from "../contracts/error-boundary/error-boundary.contract.js";
 import type { Scope } from "../contracts/scope/scope.contract.js";
 import type { ErrorBoundaryFunctionType } from "../types/error-boundary/error-boundary-function.type.js";
+import type { TOwnershipDisposer } from "../types/internal/ownership-disposer.type.js";
 import type { ScopeCleanupType } from "../types/scope/scope-cleanup.type.js";
 import type { ScopeFunctionType } from "../types/scope/scope-function.type.js";
-import type { TOwnershipDisposer } from "../types/internal/ownership-disposer.type.js";
 import type { OwnershipManager } from "./ownership.manager.js";
 
 /**
@@ -23,7 +23,7 @@ export class ScopeRuntime implements IContextScope {
     readonly #ledger: TOwnershipDisposer[] = [];
 
     /** @description Context provider values stored by portable context identity. */
-    readonly #providers = new Map<Context<unknown>, unknown>();
+    readonly #providers = new Map<ContextIdentity<unknown>, unknown>();
 
     /** @description Number of synchronous executions currently active on this scope. */
     #activeDepth = 0;
@@ -126,14 +126,14 @@ export class ScopeRuntime implements IContextScope {
      * @param value - Value stored by this scope.
      * @returns Nothing.
      */
-    provideContext<T>(context: Context<T>, value: T): void {
+    provideContext<T>(context: ContextIdentity<T>, value: T): void {
         this.#assertMutable("provide a context value");
 
         if (this.#started) {
             throw new Error("Context providers must be registered before scope execution.");
         }
 
-        const key = context as Context<unknown>;
+        const key = context as ContextIdentity<unknown>;
         if (this.#providers.has(key)) {
             throw new Error("A context value is already registered on this scope.");
         }
@@ -147,11 +147,11 @@ export class ScopeRuntime implements IContextScope {
      * @param context - Portable context identity being resolved.
      * @returns An explicit found or missing context resolution.
      */
-    resolveContext<T>(context: Context<T>): TContextResolution<T> {
+    resolveContext<T>(context: ContextIdentity<T>): TContextResolution<T> {
         this.#assertOpen("resolve a context value");
 
         let current: ScopeRuntime | null = this;
-        const key = context as Context<unknown>;
+        const key = context as ContextIdentity<unknown>;
 
         while (current !== null) {
             if (current.#providers.has(key)) {
@@ -190,11 +190,7 @@ export class ScopeRuntime implements IContextScope {
         }
 
         if (this.#activeDepth > 0) {
-            this.manager.collectError(
-                new Error("Cannot dispose an active scope."),
-                this,
-                errors,
-            );
+            this.manager.collectError(new Error("Cannot dispose an active scope."), this, errors);
             return;
         }
 

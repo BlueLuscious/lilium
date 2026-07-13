@@ -15,9 +15,7 @@ export class ReactiveRuntimeContextRuntime implements IReactiveRuntimeContext {
     readonly tracker = new ReactiveTrackerRuntime();
 
     /** @description Ownership root isolated to this runtime composition. */
-    readonly ownership = new OwnershipManager(
-        (operation) => this.tracker.untrack(operation),
-    );
+    readonly ownership = new OwnershipManager((operation) => this.tracker.untrack(operation));
 
     /** @description Deterministic scheduler isolated to this runtime composition. */
     readonly scheduler = new SchedulerRuntime(this.ownership);

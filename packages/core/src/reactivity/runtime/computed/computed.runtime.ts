@@ -2,11 +2,13 @@ import type { OwnershipManager } from "../../../ownership/runtime/ownership.mana
 import type { Computed } from "../../contracts/computed/computed.contract.js";
 import type {
     IReactiveConsumer,
+    // biome-ignore lint/correctness/noUnusedImports: The unique symbol brands a declare-only property.
     REACTIVE_CONSUMER_BRAND,
 } from "../../contracts/internal/tracking/reactive-consumer.contract.js";
 import type { IReactiveRuntimeContext } from "../../contracts/internal/tracking/reactive-runtime-context.contract.js";
 import type {
     IReactiveSource,
+    // biome-ignore lint/correctness/noUnusedImports: The unique symbol brands a declare-only property.
     REACTIVE_SOURCE_BRAND,
 } from "../../contracts/internal/tracking/reactive-source.contract.js";
 import type { ComputedFunctionType } from "../../types/computed/computed-function.type.js";
@@ -17,8 +19,7 @@ import type { ComputedFunctionType } from "../../types/computed/computed-functio
  * for callers. Failed evaluations retain committed cache and dependencies for later retry.
  * @typeParam T - Value produced and cached by the computed operation.
  */
-export class ComputedRuntime<T>
-implements Computed<T>, IReactiveConsumer, IReactiveSource {
+export class ComputedRuntime<T> implements Computed<T>, IReactiveConsumer, IReactiveSource {
     /** @description Type-only identity required by the internal reactive consumer role. */
     declare readonly [REACTIVE_CONSUMER_BRAND]: true;
 

@@ -18,14 +18,8 @@ type CounterControllerType = {
 declare const api: ComponentApi;
 declare const reactiveRuntime: ReactiveRuntime;
 
-const definition = api.define<
-    CounterInputsType,
-    CounterControllerType
->({
-    setup(
-        context: ComponentSetupContext,
-        inputs: ComponentInputsType<CounterInputsType>,
-    ) {
+const definition = api.define<CounterInputsType, CounterControllerType>({
+    setup(context: ComponentSetupContext, inputs: ComponentInputsType<CounterInputsType>) {
         const count = context.runtime.signal(inputs.initial.get());
 
         return {
@@ -35,10 +29,8 @@ const definition = api.define<
         };
     },
 });
-const reusableDefinition: ComponentDefinition<
-    CounterInputsType,
-    CounterControllerType
-> = definition;
+const reusableDefinition: ComponentDefinition<CounterInputsType, CounterControllerType> =
+    definition;
 const componentRuntime: ComponentRuntime = api.createRuntime(reactiveRuntime);
 
 api.define<CounterInputsType, CounterControllerType>({

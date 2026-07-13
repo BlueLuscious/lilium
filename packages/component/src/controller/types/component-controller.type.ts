@@ -5,6 +5,4 @@
  * @typeParam Controller - Object shape returned by component setup.
  */
 export type ComponentControllerType<Controller extends object> =
-    Controller extends PromiseLike<unknown>
-        ? never
-        : Readonly<Controller>;
+    Controller extends PromiseLike<unknown> ? never : Readonly<Controller>;

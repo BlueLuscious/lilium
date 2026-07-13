@@ -8,10 +8,7 @@ import type { ComponentInputsType } from "../../inputs/types/component-inputs.ty
  * @typeParam Inputs - Declarative input value shape of the component.
  * @typeParam Controller - Public object shape returned by component setup.
  */
-export interface ComponentInstance<
-    Inputs extends object,
-    Controller extends object,
-> {
+export interface ComponentInstance<Inputs extends object, Controller extends object> {
     /** @description Read-only public controller created during component setup. */
     readonly controller: ComponentControllerType<Controller>;
 

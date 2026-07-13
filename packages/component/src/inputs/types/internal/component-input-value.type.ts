@@ -8,6 +8,5 @@
 export type TComponentInputValue<
     Inputs extends object,
     Key extends keyof Inputs,
-> = {} extends Pick<Inputs, Key>
-    ? Exclude<Inputs[Key], undefined> | undefined
-    : Inputs[Key];
+    // biome-ignore lint/complexity/noBannedTypes: Empty-object assignability detects optional keys.
+> = {} extends Pick<Inputs, Key> ? Exclude<Inputs[Key], undefined> | undefined : Inputs[Key];

@@ -1,7 +1,7 @@
-import type { ScopeRuntime } from "../../ownership/runtime/scope.runtime.js";
 import type { OwnershipManager } from "../../ownership/runtime/ownership.manager.js";
-import type { ISchedulerJob } from "../contracts/internal/scheduler/scheduler-job.contract.js";
+import type { ScopeRuntime } from "../../ownership/runtime/scope.runtime.js";
 import type { IScheduler } from "../contracts/internal/scheduler/scheduler.contract.js";
+import type { ISchedulerJob } from "../contracts/internal/scheduler/scheduler-job.contract.js";
 import type { TSchedulerPhase } from "../types/internal/scheduler/scheduler-phase.type.js";
 import type { TSchedulerQueueEntry } from "../types/internal/scheduler/scheduler-queue-entry.type.js";
 
@@ -223,8 +223,7 @@ export class SchedulerRuntime implements IScheduler {
      * @returns Whether current render or effect work remains represented.
      */
     #hasCurrentEntries(): boolean {
-        return this.#currentRenderEntries.length > 0
-            || this.#currentEffectEntries.length > 0;
+        return this.#currentRenderEntries.length > 0 || this.#currentEffectEntries.length > 0;
     }
 
     /**
@@ -232,8 +231,7 @@ export class SchedulerRuntime implements IScheduler {
      * @returns Whether next-cycle render or effect work remains represented.
      */
     #hasNextEntries(): boolean {
-        return this.#nextRenderEntries.length > 0
-            || this.#nextEffectEntries.length > 0;
+        return this.#nextRenderEntries.length > 0 || this.#nextEffectEntries.length > 0;
     }
 
     /**
@@ -243,17 +241,13 @@ export class SchedulerRuntime implements IScheduler {
      */
     #queueFor(phase: TSchedulerPhase): TSchedulerQueueEntry[] {
         if (!this.#flushing || this.#activePhase === null) {
-            return phase === "render"
-                ? this.#currentRenderEntries
-                : this.#currentEffectEntries;
+            return phase === "render" ? this.#currentRenderEntries : this.#currentEffectEntries;
         }
 
         if (this.#activePhase === "render" && phase === "effect") {
             return this.#currentEffectEntries;
         }
 
-        return phase === "render"
-            ? this.#nextRenderEntries
-            : this.#nextEffectEntries;
+        return phase === "render" ? this.#nextRenderEntries : this.#nextEffectEntries;
     }
 }

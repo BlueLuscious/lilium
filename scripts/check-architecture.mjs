@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { extname, join, relative, resolve } from "node:path";
 
 /** @description Absolute repository root used by every architecture check. */
@@ -12,8 +12,8 @@ const violations = [];
  * @param {string} directory - Absolute directory to traverse.
  * @returns {string[]} Absolute paths for all descendant files.
  */
-const walk = (directory) => readdirSync(directory, { withFileTypes: true })
-    .flatMap((entry) => {
+const walk = (directory) =>
+    readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
         const path = join(directory, entry.name);
         return entry.isDirectory() ? walk(path) : [path];
     });
@@ -23,17 +23,16 @@ const walk = (directory) => readdirSync(directory, { withFileTypes: true })
  * @param {string} packageName - Workspace package directory name.
  * @returns {string[]} Absolute TypeScript source paths.
  */
-const sourceFiles = (packageName) => walk(join(root, "packages", packageName, "src"))
-    .filter((path) => extname(path) === ".ts");
+const sourceFiles = (packageName) =>
+    walk(join(root, "packages", packageName, "src")).filter((path) => extname(path) === ".ts");
 
 /**
  * @description Extracts static module specifiers from TypeScript source text.
  * @param {string} source - Source text to inspect.
  * @returns {string[]} Imported or reexported module specifiers.
  */
-const importsOf = (source) => [
-    ...source.matchAll(/(?:from\s+|import\s*)["']([^"']+)["']/g),
-].map((match) => match[1]);
+const importsOf = (source) =>
+    [...source.matchAll(/(?:from\s+|import\s*)["']([^"']+)["']/g)].map((match) => match[1]);
 
 /**
  * @description Records one repository-relative architecture violation.
@@ -81,7 +80,10 @@ for (const packageName of ["core", "component"]) {
         if (normalizedPath.includes("/contracts/") || normalizedPath.includes("/types/")) {
             for (const dependency of importsOf(source)) {
                 if (/\.(?:runtime|manager|engine)\.js$/.test(dependency)) {
-                    report(path, `contract/type cannot import runtime implementation ${dependency}`);
+                    report(
+                        path,
+                        `contract/type cannot import runtime implementation ${dependency}`,
+                    );
                 }
             }
         }
@@ -100,7 +102,17 @@ for (const packageName of ["core", "component"]) {
 const corePackage = JSON.parse(readFileSync(join(root, "packages/core/package.json"), "utf8"));
 
 /** @description Parsed Component package manifest used for dependency checks. */
-const componentPackage = JSON.parse(readFileSync(join(root, "packages/component/package.json"), "utf8"));
+const componentPackage = JSON.parse(
+    readFileSync(join(root, "packages/component/package.json"), "utf8"),
+);
+
+/** @description Parsed Core production compiler configuration used for host checks. */
+const coreTsConfig = JSON.parse(readFileSync(join(root, "packages/core/tsconfig.json"), "utf8"));
+
+/** @description Parsed Core test compiler configuration used for ambient-type checks. */
+const coreTestTsConfig = JSON.parse(
+    readFileSync(join(root, "packages/core/tsconfig.test.json"), "utf8"),
+);
 
 /** @description Direct dependencies declared by the Core package. */
 const coreDependencies = Object.keys(corePackage.dependencies ?? {});
@@ -111,6 +123,33 @@ const componentDependencies = Object.keys(componentPackage.dependencies ?? {});
 /** @description Public subpaths declared by the Core package export map. */
 const coreExportKeys = Object.keys(corePackage.exports ?? {});
 
+/** @description Explicit standard libraries available to Core production sources. */
+const coreLibraries = coreTsConfig.compilerOptions?.lib ?? [];
+
+/** @description Explicit ambient type packages available to Core production sources. */
+const coreTypes = coreTsConfig.compilerOptions?.types ?? [];
+
+if (coreLibraries.length !== 1 || coreLibraries[0] !== "ES2022") {
+    report(
+        join(root, "packages/core/tsconfig.json"),
+        "core production sources must compile against ES2022 only",
+    );
+}
+
+if (coreTypes.length !== 0) {
+    report(
+        join(root, "packages/core/tsconfig.json"),
+        "core production sources cannot load ambient host type packages",
+    );
+}
+
+if (!coreTestTsConfig.compilerOptions?.types?.includes("node")) {
+    report(
+        join(root, "packages/core/tsconfig.test.json"),
+        "core tests must declare Node ambient types explicitly",
+    );
+}
+
 if (coreExportKeys.length !== 1 || coreExportKeys[0] !== ".") {
     report(
         join(root, "packages/core/package.json"),
@@ -118,8 +157,10 @@ if (coreExportKeys.length !== 1 || coreExportKeys[0] !== ".") {
     );
 }
 
-if (corePackage.exports?.["."]?.import !== "./dist/index.js"
-    || corePackage.exports?.["."]?.types !== "./dist/index.d.ts") {
+if (
+    corePackage.exports?.["."]?.import !== "./dist/index.js" ||
+    corePackage.exports?.["."]?.types !== "./dist/index.d.ts"
+) {
     report(
         join(root, "packages/core/package.json"),
         "core package root must resolve to its built JavaScript and declarations",
@@ -127,12 +168,18 @@ if (corePackage.exports?.["."]?.import !== "./dist/index.js"
 }
 
 if (coreDependencies.some((dependency) => dependency.startsWith("@lilium/"))) {
-    report(join(root, "packages/core/package.json"), "core cannot depend on another Lilium package");
+    report(
+        join(root, "packages/core/package.json"),
+        "core cannot depend on another Lilium package",
+    );
 }
 
 for (const dependency of componentDependencies) {
     if (dependency.startsWith("@lilium/") && dependency !== "@lilium/core") {
-        report(join(root, "packages/component/package.json"), `component cannot depend on ${dependency}`);
+        report(
+            join(root, "packages/component/package.json"),
+            `component cannot depend on ${dependency}`,
+        );
     }
 }
 

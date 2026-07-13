@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
-import type { ISchedulerJob } from "../../../src/scheduler/contracts/internal/scheduler/scheduler-job.contract.js";
-import type { TSchedulerPhase } from "../../../src/scheduler/types/internal/scheduler/scheduler-phase.type.js";
-import { SchedulerRuntime } from "../../../src/scheduler/runtime/scheduler.runtime.js";
 import { OwnershipManager } from "../../../src/ownership/runtime/ownership.manager.js";
 import { ownershipContext } from "../../../src/ownership/runtime/ownership-context.manager.js";
+import type { ISchedulerJob } from "../../../src/scheduler/contracts/internal/scheduler/scheduler-job.contract.js";
+import { SchedulerRuntime } from "../../../src/scheduler/runtime/scheduler.runtime.js";
+import type { TSchedulerPhase } from "../../../src/scheduler/types/internal/scheduler/scheduler-phase.type.js";
 
 function job(phase: TSchedulerPhase, execute: () => void): ISchedulerJob {
     return {
@@ -93,15 +93,19 @@ describe("scheduler runtime", () => {
         });
 
         boundary.run(() => {
-            scheduler.enqueue(job("effect", () => {
-                assert.equal(ownershipContext.active, boundary);
-                order.push("failed");
-                throw handled;
-            }));
-            scheduler.enqueue(job("effect", () => {
-                assert.equal(ownershipContext.active, boundary);
-                order.push("continued");
-            }));
+            scheduler.enqueue(
+                job("effect", () => {
+                    assert.equal(ownershipContext.active, boundary);
+                    order.push("failed");
+                    throw handled;
+                }),
+            );
+            scheduler.enqueue(
+                job("effect", () => {
+                    assert.equal(ownershipContext.active, boundary);
+                    order.push("continued");
+                }),
+            );
         });
 
         scheduler.flush();
@@ -115,13 +119,18 @@ describe("scheduler runtime", () => {
         const order: string[] = [];
         const remaining = job("effect", () => order.push("remaining"));
 
-        scheduler.enqueue(job("render", () => {
-            order.push("failed");
-            throw failure;
-        }));
+        scheduler.enqueue(
+            job("render", () => {
+                order.push("failed");
+                throw failure;
+            }),
+        );
         scheduler.enqueue(remaining);
 
-        assert.throws(() => scheduler.flush(), (error) => error === failure);
+        assert.throws(
+            () => scheduler.flush(),
+            (error) => error === failure,
+        );
         scheduler.flush();
         assert.deepEqual(order, ["failed"]);
 

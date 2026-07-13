@@ -1,5 +1,5 @@
-import type { ComponentInstance } from "../component-instance.contract.js";
 import type { ComponentInputValuesType } from "../../../inputs/types/component-input-values.type.js";
+import type { ComponentInstance } from "../component-instance.contract.js";
 
 /**
  * @description Internal mutable lifecycle surface of one initialized component instance.
@@ -8,10 +8,8 @@ import type { ComponentInputValuesType } from "../../../inputs/types/component-i
  * @typeParam Inputs - Declarative input value shape of the component.
  * @typeParam Controller - Public object shape returned by component setup.
  */
-export interface IComponentInstanceLifecycle<
-    Inputs extends object,
-    Controller extends object,
-> extends ComponentInstance<Inputs, Controller> {
+export interface IComponentInstanceLifecycle<Inputs extends object, Controller extends object>
+    extends ComponentInstance<Inputs, Controller> {
     /**
      * @description Replaces every component input from one normalized value snapshot.
      * @remarks The future runtime must write all input signals in one reactive batch.

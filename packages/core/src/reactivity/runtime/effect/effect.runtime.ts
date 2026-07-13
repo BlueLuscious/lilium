@@ -1,11 +1,13 @@
 import type { OwnershipManager } from "../../../ownership/runtime/ownership.manager.js";
 import type {
     ISchedulerJob,
+    // biome-ignore lint/correctness/noUnusedImports: The unique symbol brands a declare-only property.
     SCHEDULER_JOB_BRAND,
 } from "../../../scheduler/contracts/internal/scheduler/scheduler-job.contract.js";
 import type { Effect } from "../../contracts/effect/effect.contract.js";
 import type {
     IReactiveConsumer,
+    // biome-ignore lint/correctness/noUnusedImports: The unique symbol brands a declare-only property.
     REACTIVE_CONSUMER_BRAND,
 } from "../../contracts/internal/tracking/reactive-consumer.contract.js";
 import type { IReactiveRuntimeContext } from "../../contracts/internal/tracking/reactive-runtime-context.contract.js";
@@ -85,10 +87,7 @@ export class EffectRuntime implements Effect, IReactiveConsumer, ISchedulerJob {
         const previousCleanups = this.#cleanups;
         this.#cleanups = [];
         const previousCleanupErrors = this.#release(previousCleanups);
-        this.#throwCollected(
-            previousCleanupErrors,
-            "Effect cleanup failed before reevaluation.",
-        );
+        this.#throwCollected(previousCleanupErrors, "Effect cleanup failed before reevaluation.");
 
         if (this.#disposed) {
             return undefined;
@@ -159,10 +158,7 @@ export class EffectRuntime implements Effect, IReactiveConsumer, ISchedulerJob {
         this.runtime.tracker.disconnect(this);
 
         const activeCleanups = this.#activeExecution?.close() ?? [];
-        const cleanupErrors = this.#release([
-            ...this.#cleanups,
-            ...activeCleanups,
-        ]);
+        const cleanupErrors = this.#release([...this.#cleanups, ...activeCleanups]);
         this.#cleanups = [];
         this.#throwCollected(cleanupErrors, "Effect disposal cleanup failed.");
     }

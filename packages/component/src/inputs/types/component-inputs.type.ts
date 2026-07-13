@@ -8,7 +8,5 @@ import type { TComponentInputValue } from "./internal/component-input-value.type
  * @typeParam Inputs - Declarative input value shape of the component.
  */
 export type ComponentInputsType<Inputs extends object> = {
-    readonly [Key in keyof Inputs]-?: ReadonlySignal<
-        TComponentInputValue<Inputs, Key>
-    >;
+    readonly [Key in keyof Inputs]-?: ReadonlySignal<TComponentInputValue<Inputs, Key>>;
 };
