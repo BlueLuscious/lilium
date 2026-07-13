@@ -18,6 +18,8 @@ Every write produces a candidate value and compares it with the current value. T
 
 Equality evaluation does not participate in dependency tracking. Deep reactive proxies, if introduced later, are a separate abstraction built on the reactive graph and do not alter signal semantics.
 
+Signal updater callbacks also execute untracked. `update()` is a mutation command that derives a candidate from the latest stored value; reactive reads performed inside its callback do not become dependencies of an enclosing consumer.
+
 ## Dependency tracking
 
 Reactive dependency collection is runtime-isolated and transactional. A source read outside an active consumer returns its value without creating an edge. A read inside a consumer collection registers one edge between that source and consumer, regardless of how many times the source is read.

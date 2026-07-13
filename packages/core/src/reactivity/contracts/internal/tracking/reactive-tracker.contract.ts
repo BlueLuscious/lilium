@@ -44,6 +44,15 @@ export interface IReactiveTracker {
     disconnect(consumer: IReactiveConsumer): void;
 
     /**
+     * @description Removes every graph edge connected to a reactive source.
+     * @remarks Source disconnection prevents consumers with longer ownership lifetimes
+     * from retaining a disposed signal or computed value.
+     * @param source - Source being disconnected from the graph.
+     * @returns Nothing.
+     */
+    disconnectSource(source: IReactiveSource): void;
+
+    /**
      * @description Executes an operation without collecting reactive reads.
      * @typeParam T - Value returned by the operation.
      * @param computation - Operation executed with tracking suspended.

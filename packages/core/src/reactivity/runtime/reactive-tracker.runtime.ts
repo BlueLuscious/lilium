@@ -86,6 +86,36 @@ export class ReactiveTrackerRuntime implements IReactiveTracker {
     }
 
     /**
+     * @description Removes every committed graph edge connected to one source.
+     * @param source - Runtime-owned source being disconnected during disposal.
+     * @returns Nothing.
+     */
+    disconnectSource(source: IReactiveSource): void {
+        this.#assertSource(source);
+        const consumers = this.#consumers.get(source);
+
+        if (consumers === undefined) {
+            return;
+        }
+
+        for (const consumer of consumers) {
+            const dependencies = this.#dependencies.get(consumer);
+
+            if (dependencies === undefined) {
+                continue;
+            }
+
+            dependencies.delete(source);
+
+            if (dependencies.size === 0) {
+                this.#dependencies.delete(consumer);
+            }
+        }
+
+        this.#consumers.delete(source);
+    }
+
+    /**
      * @description Executes an operation with reactive dependency collection suspended.
      * @typeParam T - Value returned by the untracked computation.
      * @param computation - Synchronous operation executed without an active consumer.

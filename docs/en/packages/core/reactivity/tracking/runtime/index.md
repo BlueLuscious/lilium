@@ -6,7 +6,7 @@ The tracking runtime implements [`IReactiveTracker`](../reactive-tracker.md) wit
 
 Each tracker owns two private weak indexes: committed sources by consumer and committed consumers by source. `collect()` creates an empty candidate set and executes the consumer through `ReactiveTrackingContextManager`. A successful return reconciles candidate and committed edges; a thrown error skips reconciliation, so the previous graph remains intact.
 
-`track()` deduplicates reads in the candidate `Set`. `invalidate()` traverses a stable subscriber snapshot, allowing consumer invalidation to disconnect or modify graph state safely. `disconnect()` removes both sides of every committed edge and is idempotent.
+`track()` deduplicates reads in the candidate `Set`. `invalidate()` traverses a stable subscriber snapshot, allowing consumer invalidation to disconnect or modify graph state safely. `disconnect()` removes dependencies owned by a consumer, while `disconnectSource()` removes one source from all connected consumers. Both cleanup paths remove both sides of every affected edge and are idempotent.
 
 ## `ReactiveTrackingContextManager`
 

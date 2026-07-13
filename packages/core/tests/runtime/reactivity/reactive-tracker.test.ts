@@ -140,4 +140,17 @@ describe("reactive tracker runtime", () => {
 
         assert.equal(consumer.invalidations, 0);
     });
+
+    test("disconnects a source from consumers with longer lifetimes", () => {
+        const runtime = new TestRuntime();
+        const consumer = new TestConsumer(runtime);
+        const source = new TestSource(runtime);
+
+        runtime.tracker.collect(consumer.identity, () => source.read());
+        runtime.tracker.disconnectSource(source.identity);
+        runtime.tracker.disconnectSource(source.identity);
+        runtime.tracker.invalidate(source.identity);
+
+        assert.equal(consumer.invalidations, 0);
+    });
 });

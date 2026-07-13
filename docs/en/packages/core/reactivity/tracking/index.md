@@ -34,13 +34,13 @@ Sources and consumers must belong to the same runtime context. A tracked cross-r
 
 ## Untracked execution
 
-Untracked execution temporarily suspends dependency collection and restores the previous consumer afterward. Signal equality functions execute untracked. The tracking behavior of signal updater callbacks will be closed with write transaction semantics.
+Untracked execution temporarily suspends dependency collection and restores the previous consumer afterward. Signal equality functions and updater callbacks execute untracked because both belong to explicit mutation rather than reactive derivation.
 
 ## Invalidation and disposal
 
 An accepted source change invalidates each connected consumer once according to that consumer's state and scheduler policy. Tracking itself does not execute consumers.
 
-Disconnecting a consumer removes all graph edges it owns. Repeated disconnection is safe.
+Disconnecting a consumer removes all dependency edges it owns. Disconnecting a source removes it from every connected consumer. Both operations are idempotent and allow resources with different ownership lifetimes to be collected independently.
 
 ## Representation boundary
 
