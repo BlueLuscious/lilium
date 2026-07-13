@@ -1,6 +1,6 @@
 # Reactivity
 
-Status: **Foundation accepted**
+Status: **Runtime implemented**
 
 The reactivity feature provides target-independent reactive values and owns dependency tracking, computed values, effects, and batching semantics.
 

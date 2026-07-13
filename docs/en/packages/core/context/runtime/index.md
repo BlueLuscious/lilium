@@ -18,4 +18,4 @@ Provider values remain in ownership scopes, so reusing one Context object across
 
 `provide(scope, value)` first verifies that Core registered the supplied scope as a compatible context scope. The scope then enforces one provider per Context identity, setup-only registration, and rejection after disposal.
 
-The concrete class is internal. The future public `Context.create()` object API will construct and return it through the public contract.
+The concrete class is internal. The public [`Context.create()` API](../../api/index.md) constructs and returns it through the public contract without exposing its constructor.

@@ -1,6 +1,6 @@
 # Context
 
-Status: **Foundation accepted**
+Status: **Runtime implemented**
 
 Context provides portable typed identities whose values are stored by ownership scopes and resolved through their parent chain.
 

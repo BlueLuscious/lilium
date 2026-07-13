@@ -1,6 +1,6 @@
 # Ownership
 
-Status: **Foundation accepted**
+Status: **Runtime implemented**
 
 Ownership provides deterministic lifetime boundaries for reactive resources, future component instances, renderer bindings, contextual values, and user cleanups.
 
@@ -16,7 +16,7 @@ A `ReactiveRuntime` is the root owner for its resources and root scopes. A scope
 
 Ownership state and stacks are internal. Public objects expose explicit creation, execution, cleanup registration, and disposal without mutable child or resource collections.
 
-Component integration belongs to Epic 002 after Core runtime completion. Renderer ownership remains deferred with the renderer package.
+Component integration belongs to `@lilium/component`. Renderer ownership remains deferred with the renderer package.
 
 ## Deferred concepts
 
