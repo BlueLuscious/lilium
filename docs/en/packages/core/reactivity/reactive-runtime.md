@@ -8,4 +8,6 @@ Its current surface creates mutable signals through `signal(initialValue, option
 
 [`Runtime.create()`](../api/index.md) is the canonical construction point. Each call creates a frozen public runtime backed by a private composition root containing independent tracking, ownership, scheduling, and batching services. `dispose()` releases owned resources in reverse order and permanently clears pending scheduler work.
 
+The internal concrete class intentionally shares the `ReactiveRuntime` domain name with the public contract. Module and layer boundaries distinguish the implementation, and the package root exports only the contract type. Its private `ReactiveRuntimeContext` composition owns the mutable services delegated to by the frozen runtime object; neither concrete class is publicly exported.
+
 See [Signal](signal/index.md), [Computed](computed/index.md), [Effect](effect/index.md), [Batching](batching/index.md), and [Scope](../ownership/scope/index.md).
