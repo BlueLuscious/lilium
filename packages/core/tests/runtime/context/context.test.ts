@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
+import { ContextIdentityRuntime } from "../../../src/context/runtime/context-identity.runtime.js";
 import type { Scope } from "../../../src/index.js";
-import { ContextRuntime } from "../../../src/context/runtime/context.runtime.js";
 import { OwnershipManager } from "../../../src/ownership/runtime/ownership.manager.js";
 
 const foreignScope: Scope = {
@@ -23,7 +23,7 @@ describe("context runtime", () => {
         const manager = new OwnershipManager();
         const root = manager.scope();
         const child = root.child();
-        const context = ContextRuntime.required<string>();
+        const context = ContextIdentityRuntime.required<string>();
 
         context.provide(root, "root");
         context.provide(child, "child");
@@ -43,7 +43,7 @@ describe("context runtime", () => {
     test("distinguishes an explicit undefined provider from absence", () => {
         const manager = new OwnershipManager();
         const scope = manager.scope();
-        const context = ContextRuntime.withDefault<string | undefined>("default");
+        const context = ContextIdentityRuntime.withDefault<string | undefined>("default");
 
         context.provide(scope, undefined);
         scope.run(() => {
@@ -53,9 +53,9 @@ describe("context runtime", () => {
     });
 
     test("uses immutable defaults and rejects missing required contexts", () => {
-        const required = ContextRuntime.required<string>();
-        const optional = ContextRuntime.withDefault("default");
-        const undefinedDefault = ContextRuntime.withDefault(undefined);
+        const required = ContextIdentityRuntime.required<string>();
+        const optional = ContextIdentityRuntime.withDefault("default");
+        const undefinedDefault = ContextIdentityRuntime.withDefault(undefined);
 
         assert.equal(optional.get(), "default");
         assert.equal(undefinedDefault.get(), undefined);
@@ -68,7 +68,7 @@ describe("context runtime", () => {
         const secondManager = new OwnershipManager();
         const firstScope = firstManager.scope();
         const secondScope = secondManager.scope();
-        const context = ContextRuntime.required<string>();
+        const context = ContextIdentityRuntime.required<string>();
 
         context.provide(firstScope, "first");
         context.provide(secondScope, "second");
@@ -89,7 +89,7 @@ describe("context runtime", () => {
         const duplicate = manager.scope();
         const late = manager.scope();
         const disposed = manager.scope();
-        const context = ContextRuntime.required<number>();
+        const context = ContextIdentityRuntime.required<number>();
 
         context.provide(duplicate, 1);
         assert.throws(() => context.provide(duplicate, 2));
@@ -105,7 +105,7 @@ describe("context runtime", () => {
     test("resolves context from the active boundary during recovery", () => {
         const manager = new OwnershipManager();
         const root = manager.scope();
-        const context = ContextRuntime.required<string>();
+        const context = ContextIdentityRuntime.required<string>();
         context.provide(root, "recovery value");
 
         const boundary = root.boundary(() => {
@@ -113,8 +113,10 @@ describe("context runtime", () => {
             return "handled";
         });
 
-        assert.doesNotThrow(() => boundary.run(() => {
-            throw new Error("handled");
-        }));
+        assert.doesNotThrow(() =>
+            boundary.run(() => {
+                throw new Error("handled");
+            }),
+        );
     });
 });

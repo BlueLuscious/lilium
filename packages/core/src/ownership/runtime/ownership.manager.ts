@@ -1,8 +1,9 @@
-import type { ScopeCleanupType } from "../types/scope/scope-cleanup.type.js";
-import type { ScopeFunctionType } from "../types/scope/scope-function.type.js";
+import type { Scope } from "../contracts/scope/scope.contract.js";
 import type { ErrorBoundaryFunctionType } from "../types/error-boundary/error-boundary-function.type.js";
 import type { TOwnershipDisposer } from "../types/internal/ownership-disposer.type.js";
 import type { TOwnershipUntrackedExecutor } from "../types/internal/ownership-untracked-executor.type.js";
+import type { ScopeCleanupType } from "../types/scope/scope-cleanup.type.js";
+import type { ScopeFunctionType } from "../types/scope/scope-function.type.js";
 import { ErrorBoundaryRuntime } from "./error-boundary.runtime.js";
 import { ownershipContext } from "./ownership-context.manager.js";
 import { ScopeRuntime } from "./scope.runtime.js";
@@ -88,11 +89,22 @@ export class OwnershipManager {
     }
 
     /**
-     * @description Creates an explicit root scope owned directly by this runtime manager.
-     * @returns A new inactive root scope registered in the runtime root ledger.
+     * @description Creates a validated root or child scope for this runtime manager.
+     * @param owner - Optional runtime-owned scope that owns the new child.
+     * @returns A new inactive scope registered under the root or supplied owner.
      */
-    scope(): ScopeRuntime {
-        this.#assertMutable("create a root scope");
+    scope(owner?: Scope): ScopeRuntime {
+        this.#assertMutable("create a scope");
+
+        if (owner !== undefined) {
+            if (!(owner instanceof ScopeRuntime)) {
+                throw new TypeError("The scope owner is not a Lilium scope.");
+            }
+
+            this.#assertOwned(owner);
+            return owner.child() as ScopeRuntime;
+        }
+
         const scope = this.#registerScope(new ScopeRuntime(this, null));
 
         this.#rootLedger.push((errors) => {
@@ -109,15 +121,10 @@ export class OwnershipManager {
      * @param handler - Immutable handler for failures from the boundary subtree.
      * @returns The registered child error boundary runtime.
      */
-    createBoundary(
-        parent: ScopeRuntime,
-        handler: ErrorBoundaryFunctionType,
-    ): ErrorBoundaryRuntime {
+    createBoundary(parent: ScopeRuntime, handler: ErrorBoundaryFunctionType): ErrorBoundaryRuntime {
         this.#assertOwned(parent);
         this.#assertMutable("create an error boundary");
-        const boundary = this.#registerScope(
-            new ErrorBoundaryRuntime(this, parent, handler),
-        );
+        const boundary = this.#registerScope(new ErrorBoundaryRuntime(this, parent, handler));
         this.#registerChild(parent, boundary);
         return boundary;
     }
@@ -144,11 +151,7 @@ export class OwnershipManager {
      * @param errors - Collection receiving the final unhandled failure.
      * @returns Nothing.
      */
-    collectError(
-        error: unknown,
-        owner: ScopeRuntime | null,
-        errors: unknown[],
-    ): void {
+    collectError(error: unknown, owner: ScopeRuntime | null, errors: unknown[]): void {
         let currentError = error;
         let current = owner;
 
@@ -159,10 +162,11 @@ export class OwnershipManager {
                 const boundary = current;
 
                 try {
-                    const decision = this.#untrack(() => ownershipContext.recover(
-                        boundary,
-                        () => handler({ error: currentError, owner }),
-                    ));
+                    const decision = this.#untrack(() =>
+                        ownershipContext.recover(boundary, () =>
+                            handler({ error: currentError, owner }),
+                        ),
+                    );
 
                     if (decision === "handled") {
                         return;

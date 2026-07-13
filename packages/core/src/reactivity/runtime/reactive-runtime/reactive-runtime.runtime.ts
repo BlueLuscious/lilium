@@ -1,7 +1,7 @@
 import type { Scope } from "../../../ownership/contracts/scope/scope.contract.js";
-import type { ReactiveRuntime } from "../../contracts/reactive-runtime.contract.js";
 import type { Computed } from "../../contracts/computed/computed.contract.js";
 import type { Effect } from "../../contracts/effect/effect.contract.js";
+import type { ReactiveRuntime } from "../../contracts/reactive-runtime.contract.js";
 import type { Signal } from "../../contracts/signal/signal.contract.js";
 import type { BatchFunctionType } from "../../types/batching/batch-function.type.js";
 import type { ComputedFunctionType } from "../../types/computed/computed-function.type.js";
@@ -51,11 +51,7 @@ export class ReactiveRuntimeRuntime implements ReactiveRuntime {
      */
     computed<T>(computation: ComputedFunctionType<T>): Computed<T> {
         this.#context.assertOpen("create a computed value");
-        return new ComputedRuntime(
-            this.#context,
-            this.#context.ownership,
-            computation,
-        );
+        return new ComputedRuntime(this.#context, this.#context.ownership, computation);
     }
 
     /**
@@ -77,12 +73,13 @@ export class ReactiveRuntimeRuntime implements ReactiveRuntime {
     }
 
     /**
-     * @description Creates an inactive root ownership scope for this runtime.
-     * @returns A root scope owned by this runtime's isolated ownership tree.
+     * @description Creates an inactive root or validated child scope for this runtime.
+     * @param owner - Optional runtime-owned scope that owns the new child.
+     * @returns A scope owned by this runtime's isolated ownership tree.
      */
-    scope(): Scope {
-        this.#context.assertOpen("create a root scope");
-        return this.#context.ownership.scope();
+    scope(owner?: Scope): Scope {
+        this.#context.assertOpen("create a scope");
+        return this.#context.ownership.scope(owner);
     }
 
     /**
@@ -94,11 +91,6 @@ export class ReactiveRuntimeRuntime implements ReactiveRuntime {
      */
     signal<T>(initialValue: T, options?: SignalOptionsType<T>): Signal<T> {
         this.#context.assertOpen("create a signal");
-        return new SignalRuntime(
-            this.#context,
-            this.#context.ownership,
-            initialValue,
-            options,
-        );
+        return new SignalRuntime(this.#context, this.#context.ownership, initialValue, options);
     }
 }

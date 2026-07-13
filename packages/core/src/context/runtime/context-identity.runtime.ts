@@ -1,6 +1,6 @@
 import type { Scope } from "../../ownership/contracts/scope/scope.contract.js";
 import { ownershipContext } from "../../ownership/runtime/ownership-context.manager.js";
-import type { Context } from "../contracts/context/context.contract.js";
+import type { ContextIdentity } from "../contracts/context-identity/context-identity.contract.js";
 
 /**
  * @description Internal immutable implementation of a portable context identity.
@@ -8,7 +8,7 @@ import type { Context } from "../contracts/context/context.contract.js";
  * optional default only, allowing reuse across isolated runtime scope trees.
  * @typeParam T - Value associated with this context identity.
  */
-export class ContextRuntime<T> implements Context<T> {
+export class ContextIdentityRuntime<T> implements ContextIdentity<T> {
     /** @description Immutable default value when this identity was created with one. */
     readonly #defaultValue: T | undefined;
 
@@ -29,20 +29,20 @@ export class ContextRuntime<T> implements Context<T> {
     /**
      * @description Creates a context identity that requires an active provider.
      * @typeParam T - Value associated with the new context identity.
-     * @returns An immutable required context runtime.
+     * @returns An immutable required context identity runtime.
      */
-    static required<T>(): ContextRuntime<T> {
-        return new ContextRuntime<T>(false);
+    static required<T>(): ContextIdentityRuntime<T> {
+        return new ContextIdentityRuntime<T>(false);
     }
 
     /**
      * @description Creates a context identity with one immutable default value.
      * @typeParam T - Value associated with the new context identity.
      * @param defaultValue - Value returned when no active provider exists.
-     * @returns An immutable defaulted context runtime.
+     * @returns An immutable defaulted context identity runtime.
      */
-    static withDefault<T>(defaultValue: T): ContextRuntime<T> {
-        return new ContextRuntime(true, defaultValue);
+    static withDefault<T>(defaultValue: T): ContextIdentityRuntime<T> {
+        return new ContextIdentityRuntime(true, defaultValue);
     }
 
     /**

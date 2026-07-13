@@ -5,13 +5,13 @@
  */
 export type TContextResolution<T> =
     | {
-        /** @description Discriminant indicating that a provider was found. */
-        readonly found: true;
+          /** @description Discriminant indicating that a provider was found. */
+          readonly found: true;
 
-        /** @description Value stored by the nearest matching provider. */
-        readonly value: T;
-    }
+          /** @description Value stored by the nearest matching provider. */
+          readonly value: T;
+      }
     | {
-        /** @description Discriminant indicating that no provider was found. */
-        readonly found: false;
-    };
+          /** @description Discriminant indicating that no provider was found. */
+          readonly found: false;
+      };

@@ -24,9 +24,10 @@ describe("ownership runtime", () => {
 
         assert.equal(ownershipContext.active, null);
         assert.throws(
-            () => parent.run(() => {
-                throw failure;
-            }),
+            () =>
+                parent.run(() => {
+                    throw failure;
+                }),
             (error) => error === failure,
         );
         assert.equal(ownershipContext.active, null);
@@ -112,9 +113,11 @@ describe("ownership runtime", () => {
         });
         const owner = inner.child();
 
-        assert.doesNotThrow(() => owner.run(() => {
-            throw original;
-        }));
+        assert.doesNotThrow(() =>
+            owner.run(() => {
+                throw original;
+            }),
+        );
         assert.deepEqual(decisions, ["inner", "outer"]);
     });
 
@@ -150,9 +153,10 @@ describe("ownership runtime", () => {
         });
 
         assert.throws(
-            () => boundary.run(() => {
-                throw original;
-            }),
+            () =>
+                boundary.run(() => {
+                    throw original;
+                }),
             (error) => {
                 assert.ok(error instanceof AggregateError);
                 assert.deepEqual(error.errors, [original, handlerFailure]);
@@ -173,9 +177,11 @@ describe("ownership runtime", () => {
             return "handled";
         });
 
-        assert.doesNotThrow(() => boundary.run(() => {
-            throw original;
-        }));
+        assert.doesNotThrow(() =>
+            boundary.run(() => {
+                throw original;
+            }),
+        );
     });
 
     test("rejects disposal while the scope or its subtree is active", () => {

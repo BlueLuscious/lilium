@@ -1,5 +1,6 @@
-export { Context, Runtime } from "./api/index.js";
 export type { ContextApi, RuntimeApi } from "./api/index.js";
+export { Context, Runtime } from "./api/index.js";
+export type { ContextIdentity } from "./context/index.js";
 
 export type {
     ErrorBoundary,

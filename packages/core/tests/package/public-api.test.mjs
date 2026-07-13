@@ -34,6 +34,21 @@ test("Runtime.create returns isolated frozen reactive runtimes", () => {
     second.dispose();
 });
 
+test("runtime scope creation validates child ownership", () => {
+    const first = Runtime.create();
+    const second = Runtime.create();
+    const owner = first.scope();
+    const child = first.scope(owner);
+
+    assert.throws(() => second.scope(owner), /runtime owner/i);
+    assert.throws(() => first.scope({}), /not a Lilium scope/i);
+    owner.dispose();
+    assert.throws(() => child.run(() => undefined), /disposed/i);
+
+    first.dispose();
+    second.dispose();
+});
+
 test("runtime disposal recursively releases owned resources once", () => {
     const runtime = Runtime.create();
     const scope = runtime.scope();

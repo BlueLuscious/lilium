@@ -1,13 +1,6 @@
+import type { ContextIdentity } from "../context/contracts/context-identity/context-identity.contract.js";
+import { ContextIdentityRuntime } from "../context/runtime/context-identity.runtime.js";
 import type { ContextApi } from "./contracts/context-api.contract.js";
-import type { Context as ContextContract } from "../context/contracts/context/context.contract.js";
-import { ContextRuntime } from "../context/runtime/context.runtime.js";
-
-/**
- * @description Public context instance type merged with the `Context` factory value.
- * @remarks This facade adds no behavior to the canonical context feature contract.
- * @typeParam T - Value resolved through the context identity.
- */
-export interface Context<T> extends ContextContract<T> {}
 
 /**
  * @description Immutable public factory for portable context identities.
@@ -21,9 +14,9 @@ export const Context: ContextApi = Object.freeze({
      * @param defaultValue - Optional explicit immutable fallback value.
      * @returns A frozen context identity independent from any reactive runtime.
      */
-    create<T>(defaultValue?: T): ContextContract<T> {
-        return arguments.length === 0
-            ? ContextRuntime.required<T>()
-            : ContextRuntime.withDefault(defaultValue as T);
+    create<T>(...defaultValue: [] | [T]): ContextIdentity<T> {
+        return defaultValue.length === 0
+            ? ContextIdentityRuntime.required<T>()
+            : ContextIdentityRuntime.withDefault(defaultValue[0]);
     },
 });

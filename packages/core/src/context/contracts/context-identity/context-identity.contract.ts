@@ -2,15 +2,15 @@ import type { Scope } from "../../../ownership/contracts/scope/scope.contract.js
 
 /**
  * @description Portable typed identity for values resolved through ownership scopes.
- * @remarks A context definition is runtime-independent and may be reused by component
+ * @remarks A context identity is runtime-independent and may be reused by component
  * libraries across multiple applications. Provider storage remains local to each scope.
  * @typeParam T - Value associated with this context identity.
  */
-export interface Context<T> {
+export interface ContextIdentity<T> {
     /**
      * @description Resolves the nearest provided value from the active ownership chain.
      * @remarks Resolution is not reactive; provide a reactive object as the value when
-     * consumers must observe changes. Missing resolution throws when the definition
+     * consumers must observe changes. Missing resolution throws when the identity
      * has no immutable default.
      * @returns The nearest provided value or the immutable context default.
      */

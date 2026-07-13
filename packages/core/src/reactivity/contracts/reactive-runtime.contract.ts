@@ -51,6 +51,15 @@ export interface ReactiveRuntime {
     scope(): Scope;
 
     /**
+     * @description Creates an inactive child scope beneath a runtime-owned scope.
+     * @remarks The operation atomically validates that the owner belongs to this runtime.
+     * Plain, disposed, and foreign scopes are rejected before a child is registered.
+     * @param owner - Existing runtime-owned scope that owns the new child.
+     * @returns A child scope registered in the owner's disposal ledger.
+     */
+    scope(owner: Scope): Scope;
+
+    /**
      * @description Creates a mutable signal owned by this reactive runtime.
      * @typeParam T - Type of value stored by the signal.
      * @param initialValue - Value initially stored by the signal.
