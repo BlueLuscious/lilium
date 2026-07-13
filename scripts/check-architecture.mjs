@@ -1,22 +1,46 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { extname, join, relative, resolve } from "node:path";
 
+/** @description Absolute repository root used by every architecture check. */
 const root = resolve(import.meta.dirname, "..");
+
+/** @description Collected architecture violations reported after all checks complete. */
 const violations = [];
 
+/**
+ * @description Recursively lists every file beneath one directory.
+ * @param {string} directory - Absolute directory to traverse.
+ * @returns {string[]} Absolute paths for all descendant files.
+ */
 const walk = (directory) => readdirSync(directory, { withFileTypes: true })
     .flatMap((entry) => {
         const path = join(directory, entry.name);
         return entry.isDirectory() ? walk(path) : [path];
     });
 
+/**
+ * @description Lists TypeScript production sources for one workspace package.
+ * @param {string} packageName - Workspace package directory name.
+ * @returns {string[]} Absolute TypeScript source paths.
+ */
 const sourceFiles = (packageName) => walk(join(root, "packages", packageName, "src"))
     .filter((path) => extname(path) === ".ts");
 
+/**
+ * @description Extracts static module specifiers from TypeScript source text.
+ * @param {string} source - Source text to inspect.
+ * @returns {string[]} Imported or reexported module specifiers.
+ */
 const importsOf = (source) => [
     ...source.matchAll(/(?:from\s+|import\s*)["']([^"']+)["']/g),
 ].map((match) => match[1]);
 
+/**
+ * @description Records one repository-relative architecture violation.
+ * @param {string} path - Absolute path containing the violation.
+ * @param {string} message - Human-readable invariant failure.
+ * @returns {void}
+ */
 const report = (path, message) => {
     violations.push(`${relative(root, path)}: ${message}`);
 };
@@ -72,10 +96,35 @@ for (const packageName of ["core", "component"]) {
     }
 }
 
+/** @description Parsed Core package manifest used for dependency and export checks. */
 const corePackage = JSON.parse(readFileSync(join(root, "packages/core/package.json"), "utf8"));
+
+/** @description Parsed Component package manifest used for dependency checks. */
 const componentPackage = JSON.parse(readFileSync(join(root, "packages/component/package.json"), "utf8"));
+
+/** @description Direct dependencies declared by the Core package. */
 const coreDependencies = Object.keys(corePackage.dependencies ?? {});
+
+/** @description Direct dependencies declared by the Component package. */
 const componentDependencies = Object.keys(componentPackage.dependencies ?? {});
+
+/** @description Public subpaths declared by the Core package export map. */
+const coreExportKeys = Object.keys(corePackage.exports ?? {});
+
+if (coreExportKeys.length !== 1 || coreExportKeys[0] !== ".") {
+    report(
+        join(root, "packages/core/package.json"),
+        "core must expose only its package root through the exports map",
+    );
+}
+
+if (corePackage.exports?.["."]?.import !== "./dist/index.js"
+    || corePackage.exports?.["."]?.types !== "./dist/index.d.ts") {
+    report(
+        join(root, "packages/core/package.json"),
+        "core package root must resolve to its built JavaScript and declarations",
+    );
+}
 
 if (coreDependencies.some((dependency) => dependency.startsWith("@lilium/"))) {
     report(join(root, "packages/core/package.json"), "core cannot depend on another Lilium package");
