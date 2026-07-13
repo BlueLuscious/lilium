@@ -29,7 +29,7 @@ Functions are used for:
 | `Signal<T>` | Stores a reactive value and exposes tracked reads and writes. |
 | `Computed<T>` | Exposes a derived reactive value. |
 | `Effect` | Represents a disposable side effect. |
-| `Context<T>` | Identifies an owned contextual value. |
+| `ContextIdentity<T>` | Identifies an owned contextual value. |
 | `ComponentDefinition<Inputs, Controller>` | Immutable reusable headless component definition. |
 | `ComponentInstance<Inputs, Controller>` | Owns one initialized headless component occurrence. |
 | `ComponentRuntime` | Creates component instances in one reactive runtime. |

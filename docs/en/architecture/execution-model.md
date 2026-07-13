@@ -98,7 +98,7 @@ See the core [Ownership](../packages/core/ownership/index.md) feature documentat
 
 ## Context resolution
 
-A `Context<T>` is a runtime-independent immutable identity. Ownership scopes store provider entries for that identity, while the active owner determines lookup position.
+A `ContextIdentity<T>` is a runtime-independent immutable identity. Ownership scopes store provider entries for that identity, while the active owner determines lookup position.
 
 Provider registration is setup-only: one value per context may be attached before a scope's first execution. Resolution walks from the active scope toward the runtime root and returns the nearest provider. Missing lookup returns the context's immutable default or throws when no default exists. Explicit `undefined` values remain distinguishable from missing providers.
 

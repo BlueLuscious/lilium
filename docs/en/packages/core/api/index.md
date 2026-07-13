@@ -16,7 +16,7 @@ The foundation exposes no scheduler configuration. Observable scheduling semanti
 
 ## `ContextApi`
 
-The `Context` value implements `ContextApi` while `Context<T>` remains the instance contract in TypeScript's separate type namespace:
+The `Context` value implements `ContextApi`, while every created object implements the separate [`ContextIdentity<T>`](../context/context-identity/index.md) contract:
 
 ```ts
 const RequiredTheme = Context.create<Theme>();

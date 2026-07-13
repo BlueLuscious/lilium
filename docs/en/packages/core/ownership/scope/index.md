@@ -6,6 +6,8 @@
 
 `ReactiveRuntime.scope()` creates an inactive root scope owned directly by the runtime. It does not implicitly attach to another active scope. `scope.child()` explicitly creates a child attached to that scope.
 
+`ReactiveRuntime.scope(owner)` creates the same child through a runtime-aware boundary. It first validates that `owner` belongs to that exact runtime and rejects plain, foreign, or disposed scopes before a child is registered. Adapter packages should prefer this form when they receive an external owner together with a bound runtime.
+
 `scope.boundary(handler)` creates a specialized child scope that handles failures from its owned subtree.
 
 Portable context definitions may register one provider on a newly created scope before its first execution. Provider topology becomes immutable when `run()` starts.

@@ -6,4 +6,4 @@
 
 The nominal internal brand lets the Context runtime reject foreign `Scope` implementations before accessing provider storage.
 
-See [Context](../index.md) and [Context identity](../context/index.md).
+See [Context](../index.md) and [`ContextIdentity<T>`](../context-identity/index.md).

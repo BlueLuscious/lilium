@@ -29,14 +29,12 @@ src/
       internal/
     runtime/
   ownership/
-    api/
     contracts/
       internal/
     types/
       internal/
     runtime/
   scheduler/
-    api/
     contracts/
       internal/
     types/
