@@ -1,6 +1,6 @@
 # `@lilium/component`
 
-Status: **Foundation accepted**
+Status: **Runtime in progress**
 
 `@lilium/component` defines portable headless component behavior. It depends on `@lilium/core` for reactive inputs, runtime creation, ownership, context resolution, scheduling, and error boundaries.
 
@@ -11,7 +11,7 @@ The package contains no templates, visual slots, renderer operations, DOM APIs, 
 - [API](api/index.md) defines the object-oriented package entry point.
 - [Component](component/index.md) defines immutable reusable headless definitions.
 - [Setup](setup/index.md) defines one-time initialization and its runtime/scope context.
-- [Inputs](inputs/index.md) maps declarative input values to read-only reactive signals.
+- [Inputs](inputs/index.md) maps declarative values to stable runtime-read-only signals.
 - [Controller](controller/index.md) defines the read-only object exposed by setup.
 - [Instance](instance/index.md) defines the public handle and its internal input lifecycle.
 - [Runtime](runtime/index.md) defines owned component creation and its private engine boundary.
@@ -25,6 +25,6 @@ The future `.lily` compiler may emit headless component definitions, template de
 ## Deferred concepts
 
 - Concrete `Component` API object.
-- Concrete component runtime and creation engine.
+- Concrete component runtime and creation engine beyond the implemented instance lifecycle.
 - Host and template lifecycle beyond ownership setup and cleanup.
 - Template composition and visual slots.
