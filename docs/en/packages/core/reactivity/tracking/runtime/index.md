@@ -8,6 +8,8 @@ Each tracker owns two private weak indexes: committed sources by consumer and co
 
 `track()` deduplicates reads in the candidate `Set`. `invalidate()` traverses a stable subscriber snapshot, allowing consumer invalidation to disconnect or modify graph state safely. `disconnect()` removes dependencies owned by a consumer, while `disconnectSource()` removes one source from all connected consumers. Both cleanup paths remove both sides of every affected edge and are idempotent.
 
+When the active consumer has already read a source that changes during the same attempt, invalidation also notifies that candidate consumer. This does not commit an edge; it only permits scheduler deduplication to reserve a later effect cycle. Transactional success or rollback still determines the final graph.
+
 ## `ReactiveTrackingContextManager`
 
 The context manager stores only the current synchronous collection frame. Before tracked, nested, or untracked execution, it saves the previous tracker, consumer, and candidate set and restores them in `finally`.

@@ -8,7 +8,7 @@
 
 ## Write flow
 
-`set(candidate)` executes the configured equality function through `untrack()`. Equality or updater failures leave the stored value unchanged and propagate to the imperative caller. An equal candidate is discarded. A changed candidate replaces the value and synchronously invalidates a stable snapshot of connected consumers.
+`set(candidate)` executes the configured equality function through `untrack()`. Equality or updater failures leave the stored value unchanged and propagate to the imperative caller. An equal candidate is discarded. A changed candidate replaces the value, synchronously invalidates a stable snapshot of connected consumers, and requests scheduler flushing. Active batches and flushes defer or absorb that request according to their execution rules.
 
 `update(updater)` executes the updater untracked with the latest stored value, then sends its result through the same `set()` equality and invalidation flow.
 

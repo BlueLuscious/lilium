@@ -54,6 +54,7 @@ export class ReactiveTrackerRuntime implements IReactiveTracker {
      */
     invalidate(source: IReactiveSource): void {
         this.#assertSource(source);
+        reactiveTrackingContext.invalidateCandidate(this, source);
         const consumers = this.#consumers.get(source);
 
         if (consumers === undefined) {

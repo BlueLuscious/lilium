@@ -54,6 +54,8 @@ Effect callbacks receive an execution-scoped `EffectExecution` object. Its `clea
 
 Effect execution transactionally collects dynamic dependencies. Multiple invalidations before a flush schedule at most one execution. A write performed by the active effect may schedule a later cycle but never reenters the same effect execution. The scheduler detects unbounded reactive cycles.
 
+A source read and then written by the active effect invalidates its candidate consumer immediately for scheduling purposes, without committing the candidate graph edge early. This allows self-invalidation during the initial execution while preserving dependency rollback if the callback fails.
+
 Before reevaluation, resources from the previous successful execution are cleaned. If the next callback fails, candidate dependencies are rolled back, cleanups registered by the failed attempt are released, and the effect remains connected to its previous committed dependencies for a later retry.
 
 Errors are delivered to the nearest ownership error boundary. Without a boundary, the active flush propagates the error to its caller. Cleanup errors do not prevent remaining cleanups from running.
@@ -75,6 +77,8 @@ Nested batches share their outer boundary. Exiting an inner batch never flushes 
 Batch operations are strictly synchronous and return no value. If an operation throws, accepted writes remain committed, batch depth and tracking context are restored, the runtime performs the same flush bookkeeping required by a successful exit, and the original error is rethrown. A caught inner-batch error does not force a flush while an outer batch remains active.
 
 Batching does not introduce a microtask boundary. Exiting the outermost batch synchronously flushes pending work before returning or propagating the batch callback error.
+
+If both the batch callback and its outermost flush fail, the runtime reports an `AggregateError` containing the callback failure followed by the flush failure. This preserves both independent observable failures.
 
 ## Transactions
 

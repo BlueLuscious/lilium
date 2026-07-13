@@ -69,6 +69,24 @@ class ReactiveTrackingContextManager {
     }
 
     /**
+     * @description Invalidates the active consumer when it already read a changed source.
+     * @remarks Candidate dependencies remain uncommitted; this notification only allows a
+     * running effect to reserve a later scheduler cycle after writing a source it consumed.
+     * @param tracker - Tracker through which the source change was reported.
+     * @param source - Reactive source changed during the active collection attempt.
+     * @returns Nothing.
+     */
+    invalidateCandidate(tracker: IReactiveTracker, source: IReactiveSource): void {
+        if (
+            this.#tracker === tracker
+            && this.#consumer !== null
+            && this.#dependencies?.has(source) === true
+        ) {
+            this.#consumer.invalidate();
+        }
+    }
+
+    /**
      * @description Executes an operation with dependency collection temporarily suspended.
      * @typeParam T - Value returned by the untracked computation.
      * @param computation - Synchronous operation executed without an active consumer.

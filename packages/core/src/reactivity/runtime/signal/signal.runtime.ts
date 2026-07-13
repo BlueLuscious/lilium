@@ -80,6 +80,7 @@ export class SignalRuntime<T> implements Signal<T>, IReactiveSource {
 
         this.#value = value;
         this.runtime.tracker.invalidate(this);
+        this.runtime.requestFlush();
     }
 
     /**

@@ -1,6 +1,6 @@
 # Batching
 
-Status: **Semantics accepted**
+Status: **Runtime implemented**
 
 Batching groups synchronous writes into one scheduling boundary without staging or rolling back state.
 
@@ -30,10 +30,10 @@ A consumer invalidated multiple times has at most one pending execution for the 
 
 Throwing does not roll back writes. Runtime bookkeeping and nesting depth are restored before the original error is rethrown. If an outer batch catches an inner error, the outer scheduling boundary remains active.
 
-When an uncaught error exits the outermost batch, pending work is flushed after bookkeeping and before the original callback error is rethrown. Interaction with an additional unhandled flush error is finalized by the ownership error model.
+When an uncaught error exits the outermost batch, pending work is flushed after bookkeeping and before the original callback error is rethrown. If that flush also fails, both failures are reported in one `AggregateError`, with the callback failure first.
 
 ## Transaction boundary
 
 A batch is not an atomic transaction. See the architecture [Execution Model](../../../../architecture/execution-model.md) for the required guarantees a future transaction would need.
 
-See [`BatchFunctionType`](batch-function.md) and [`ReactiveRuntime`](../reactive-runtime.md).
+See the [Batching Runtime](runtime/index.md), [`BatchFunctionType`](batch-function.md), and [`ReactiveRuntime`](../reactive-runtime.md).
