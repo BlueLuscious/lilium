@@ -1,6 +1,6 @@
 import type { Scope } from "../../ownership/contracts/scope/scope.contract.js";
 import { ownershipContext } from "../../ownership/runtime/ownership-context.manager.js";
-import type { ContextIdentity } from "../contracts/context-identity/context-identity.contract.js";
+import type { ContextIdentity } from "../contracts/context-identity.contract.js";
 
 /**
  * @description Internal immutable implementation of a portable context identity.

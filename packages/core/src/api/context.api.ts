@@ -1,4 +1,4 @@
-import type { ContextIdentity } from "../context/contracts/context-identity/context-identity.contract.js";
+import type { ContextIdentity } from "../context/contracts/context-identity.contract.js";
 import { ContextIdentityRuntime } from "../context/runtime/context-identity.runtime.js";
 import type { ContextApi } from "./contracts/context-api.contract.js";
 

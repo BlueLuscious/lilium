@@ -1,4 +1,4 @@
-import type { ContextIdentity } from "../../context/contracts/context-identity/context-identity.contract.js";
+import type { ContextIdentity } from "../../context/contracts/context-identity.contract.js";
 
 /**
  * @description Stateless public object API for creating portable context identities.

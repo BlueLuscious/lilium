@@ -1,6 +1,6 @@
 import type { Scope } from "../../../ownership/contracts/scope/scope.contract.js";
 import type { TContextResolution } from "../../types/internal/context-resolution.type.js";
-import type { ContextIdentity } from "../context-identity/context-identity.contract.js";
+import type { ContextIdentity } from "../context-identity.contract.js";
 
 /** @description Internal type-only identity for scopes that store context providers. */
 export declare const CONTEXT_SCOPE_BRAND: unique symbol;

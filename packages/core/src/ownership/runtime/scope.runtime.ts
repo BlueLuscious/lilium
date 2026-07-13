@@ -1,4 +1,4 @@
-import type { ContextIdentity } from "../../context/contracts/context-identity/context-identity.contract.js";
+import type { ContextIdentity } from "../../context/contracts/context-identity.contract.js";
 import type { IContextScope } from "../../context/contracts/internal/context-scope.contract.js";
 import { CONTEXT_SCOPE_BRAND } from "../../context/contracts/internal/context-scope.contract.js";
 import type { TContextResolution } from "../../context/types/internal/context-resolution.type.js";

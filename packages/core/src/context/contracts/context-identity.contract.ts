@@ -1,4 +1,4 @@
-import type { Scope } from "../../../ownership/contracts/scope/scope.contract.js";
+import type { Scope } from "../../ownership/contracts/scope/scope.contract.js";
 
 /**
  * @description Portable typed identity for values resolved through ownership scopes.
