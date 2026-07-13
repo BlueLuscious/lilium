@@ -12,10 +12,7 @@ import type { ComponentSetupContext } from "../contracts/component-setup-context
  * @param inputs - Read-only reactive component inputs.
  * @returns The read-only public component controller.
  */
-export type ComponentSetupFunctionType<
-    Inputs extends object,
-    Controller extends object,
-> = (
+export type ComponentSetupFunctionType<Inputs extends object, Controller extends object> = (
     context: ComponentSetupContext,
     inputs: ComponentInputsType<Inputs>,
 ) => ComponentControllerType<Controller>;

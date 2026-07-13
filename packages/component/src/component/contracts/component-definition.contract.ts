@@ -7,10 +7,7 @@ import type { ComponentSetupFunctionType } from "../../setup/types/component-set
  * @typeParam Inputs - Declarative input value shape accepted by the component.
  * @typeParam Controller - Public object shape exposed by each component instance.
  */
-export interface ComponentDefinition<
-    Inputs extends object,
-    Controller extends object,
-> {
+export interface ComponentDefinition<Inputs extends object, Controller extends object> {
     /** @description Synchronous setup operation executed once per component instance. */
     readonly setup: ComponentSetupFunctionType<Inputs, Controller>;
 }

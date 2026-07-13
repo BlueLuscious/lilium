@@ -1,7 +1,4 @@
-import type {
-    ReactiveRuntime,
-    Scope,
-} from "@lilium/core";
+import type { ReactiveRuntime, Scope } from "@lilium/core";
 
 /**
  * @description Public object available during one headless component setup execution.

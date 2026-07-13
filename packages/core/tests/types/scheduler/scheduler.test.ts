@@ -1,7 +1,4 @@
-import type {
-    IScheduler,
-    ISchedulerJob,
-} from "../../../src/scheduler/contracts/internal/index.js";
+import type { IScheduler, ISchedulerJob } from "../../../src/scheduler/contracts/internal/index.js";
 import type { TSchedulerPhase } from "../../../src/scheduler/types/internal/index.js";
 
 declare const job: ISchedulerJob;

@@ -6,4 +6,6 @@ Multiple cleanups are supported and execute in last-in-first-out order before re
 
 The object is valid only during its callback. Retaining it and attempting to register cleanups afterward is invalid.
 
+See the [Effect Runtime](runtime/index.md) for candidate cleanup commit and rollback behavior.
+
 See [`Effect`](index.md) and [`EffectCleanupType`](effect-cleanup.md).

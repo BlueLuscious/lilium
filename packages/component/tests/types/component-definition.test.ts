@@ -43,10 +43,7 @@ const setup: CounterSetupFunctionType = (currentContext, currentInputs) => {
     };
 };
 
-const definition: ComponentDefinition<
-    CounterInputsType,
-    CounterControllerType
-> = { setup };
+const definition: ComponentDefinition<CounterInputsType, CounterControllerType> = { setup };
 
 const controller: ComponentControllerType<CounterControllerType> = definition.setup(
     context,

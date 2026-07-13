@@ -1,8 +1,5 @@
 import type { ReadonlySignal } from "@lilium/core";
-import type {
-    ComponentInputValuesType,
-    ComponentInstance,
-} from "../../src/index.js";
+import type { ComponentInputValuesType, ComponentInstance } from "../../src/index.js";
 import type { IComponentInstanceLifecycle } from "../../src/instance/contracts/internal/component-instance-lifecycle.contract.js";
 
 type ExampleInputsType = {
@@ -14,14 +11,8 @@ type ExampleControllerType = {
     reset(): void;
 };
 
-declare const instance: ComponentInstance<
-    ExampleInputsType,
-    ExampleControllerType
->;
-declare const lifecycle: IComponentInstanceLifecycle<
-    ExampleInputsType,
-    ExampleControllerType
->;
+declare const instance: ComponentInstance<ExampleInputsType, ExampleControllerType>;
+declare const lifecycle: IComponentInstanceLifecycle<ExampleInputsType, ExampleControllerType>;
 
 const count: ReadonlySignal<number> = instance.inputs.count;
 const label: ReadonlySignal<string | undefined> = instance.inputs.label;

@@ -1,6 +1,6 @@
 import type { Scope } from "../../../ownership/contracts/scope/scope.contract.js";
 import type { TContextResolution } from "../../types/internal/context-resolution.type.js";
-import type { Context } from "../context/context.contract.js";
+import type { ContextIdentity } from "../context-identity.contract.js";
 
 /** @description Internal type-only identity for scopes that store context providers. */
 export declare const CONTEXT_SCOPE_BRAND: unique symbol;
@@ -21,7 +21,7 @@ export interface IContextScope extends Scope {
      * @param value - Value stored by this scope.
      * @returns Nothing.
      */
-    provideContext<T>(context: Context<T>, value: T): void;
+    provideContext<T>(context: ContextIdentity<T>, value: T): void;
 
     /**
      * @description Resolves the nearest provider from this scope through its ancestors.
@@ -29,5 +29,5 @@ export interface IContextScope extends Scope {
      * @param context - Portable context identity being resolved.
      * @returns A result that distinguishes a found `undefined` value from no provider.
      */
-    resolveContext<T>(context: Context<T>): TContextResolution<T>;
+    resolveContext<T>(context: ContextIdentity<T>): TContextResolution<T>;
 }

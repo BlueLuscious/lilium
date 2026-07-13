@@ -1,14 +1,13 @@
-import type { Context } from "../../../src/index.js";
 import type { IContextScope } from "../../../src/context/contracts/internal/index.js";
 import type { TContextResolution } from "../../../src/context/types/internal/index.js";
+import type { ContextIdentity } from "../../../src/index.js";
 
-declare const context: Context<string | undefined>;
+declare const context: ContextIdentity<string | undefined>;
 declare const scope: IContextScope;
 
 scope.provideContext(context, undefined);
 
-const resolution: TContextResolution<string | undefined> =
-    scope.resolveContext(context);
+const resolution: TContextResolution<string | undefined> = scope.resolveContext(context);
 
 if (resolution.found) {
     const value: string | undefined = resolution.value;

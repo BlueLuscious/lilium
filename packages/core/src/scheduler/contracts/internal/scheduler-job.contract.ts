@@ -1,4 +1,4 @@
-import type { TSchedulerPhase } from "../../../types/internal/scheduler/scheduler-phase.type.js";
+import type { TSchedulerPhase } from "../../types/internal/scheduler-phase.type.js";
 
 /** @description Internal type-only identity for a scheduler job. */
 export declare const SCHEDULER_JOB_BRAND: unique symbol;

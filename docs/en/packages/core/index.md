@@ -1,8 +1,8 @@
 # `@lilium/core`
 
-Status: **Foundation accepted**
+Status: **Runtime implemented**
 
-`@lilium/core` will provide the target-independent execution foundation for Lilium. It will not contain DOM operations, template host operations, virtual nodes, component-wide render loops, global reducers, or action dispatching.
+`@lilium/core` provides the target-independent execution foundation for Lilium. It does not contain DOM operations, template host operations, virtual nodes, component-wide render loops, global reducers, or action dispatching.
 
 ## Features
 
@@ -20,29 +20,27 @@ Headless component definitions live in `@lilium/component`, while visual definit
 
 ```text
 src/
+  api/
+    contracts/
   reactivity/
-    api/
     contracts/
       internal/
     types/
       internal/
     runtime/
   ownership/
-    api/
     contracts/
       internal/
     types/
       internal/
     runtime/
   scheduler/
-    api/
     contracts/
       internal/
     types/
       internal/
     runtime/
   context/
-    api/
     contracts/
       internal/
     types/
@@ -55,4 +53,4 @@ Folders are created only when they contain a required concept. Empty architectur
 
 Read-only inspection remains future work and will be added only when runtime tests or development tools establish concrete requirements.
 
-See the [Foundation Epic](../../../../plans/epics/000-framework-foundation/index.md) for implementation planning.
+See the [Core API](api/index.md) for package construction and export boundaries.

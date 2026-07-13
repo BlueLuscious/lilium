@@ -29,7 +29,7 @@ Functions are used for:
 | `Signal<T>` | Stores a reactive value and exposes tracked reads and writes. |
 | `Computed<T>` | Exposes a derived reactive value. |
 | `Effect` | Represents a disposable side effect. |
-| `Context<T>` | Identifies an owned contextual value. |
+| `ContextIdentity<T>` | Identifies an owned contextual value. |
 | `ComponentDefinition<Inputs, Controller>` | Immutable reusable headless component definition. |
 | `ComponentInstance<Inputs, Controller>` | Owns one initialized headless component occurrence. |
 | `ComponentRuntime` | Creates component instances in one reactive runtime. |
@@ -43,6 +43,10 @@ The immutable `Runtime`, `Context`, and `Component` facade objects are the canon
 Public objects should normally be interfaces or opaque handles. Runtime classes may implement them internally, but consumers must not depend on concrete implementation classes unless construction or extension explicitly requires it.
 
 Mutable collections and graph nodes must not be exposed directly. Inspection APIs return immutable snapshots or event records.
+
+Runtime classes use native `#` fields and methods for state and behavior that are not extension points. This preserves encapsulation in emitted JavaScript rather than enforcing it only through TypeScript. `private constructor` is reserved for TypeScript-controlled construction because JavaScript has no private-constructor syntax; package exports and facade factories provide the corresponding runtime construction boundary.
+
+`protected` members are reserved for intentionally supported inheritance points. Lilium otherwise prefers contracts and composition over subclass access to runtime internals.
 
 ## Convenience APIs
 

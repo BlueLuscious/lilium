@@ -18,6 +18,8 @@ Every write produces a candidate value and compares it with the current value. T
 
 Equality evaluation does not participate in dependency tracking. Deep reactive proxies, if introduced later, are a separate abstraction built on the reactive graph and do not alter signal semantics.
 
+Signal updater callbacks also execute untracked. `update()` is a mutation command that derives a candidate from the latest stored value; reactive reads performed inside its callback do not become dependencies of an enclosing consumer.
+
 ## Dependency tracking
 
 Reactive dependency collection is runtime-isolated and transactional. A source read outside an active consumer returns its value without creating an edge. A read inside a consumer collection registers one edge between that source and consumer, regardless of how many times the source is read.
@@ -52,6 +54,8 @@ Effect callbacks receive an execution-scoped `EffectExecution` object. Its `clea
 
 Effect execution transactionally collects dynamic dependencies. Multiple invalidations before a flush schedule at most one execution. A write performed by the active effect may schedule a later cycle but never reenters the same effect execution. The scheduler detects unbounded reactive cycles.
 
+A source read and then written by the active effect invalidates its candidate consumer immediately for scheduling purposes, without committing the candidate graph edge early. This allows self-invalidation during the initial execution while preserving dependency rollback if the callback fails.
+
 Before reevaluation, resources from the previous successful execution are cleaned. If the next callback fails, candidate dependencies are rolled back, cleanups registered by the failed attempt are released, and the effect remains connected to its previous committed dependencies for a later retry.
 
 Errors are delivered to the nearest ownership error boundary. Without a boundary, the active flush propagates the error to its caller. Cleanup errors do not prevent remaining cleanups from running.
@@ -74,6 +78,8 @@ Batch operations are strictly synchronous and return no value. If an operation t
 
 Batching does not introduce a microtask boundary. Exiting the outermost batch synchronously flushes pending work before returning or propagating the batch callback error.
 
+If both the batch callback and its outermost flush fail, the runtime reports an `AggregateError` containing the callback failure followed by the flush failure. This preserves both independent observable failures.
+
 ## Transactions
 
 Batching is not a transaction. A transaction would require staged values, isolation, explicit commit or rollback, computed cache rollback, and nested savepoint semantics. Lilium does not expose a `Transaction` contract until a concrete use case justifies those guarantees.
@@ -92,7 +98,7 @@ See the core [Ownership](../packages/core/ownership/index.md) feature documentat
 
 ## Context resolution
 
-A `Context<T>` is a runtime-independent immutable identity. Ownership scopes store provider entries for that identity, while the active owner determines lookup position.
+A `ContextIdentity<T>` is a runtime-independent immutable identity. Ownership scopes store provider entries for that identity, while the active owner determines lookup position.
 
 Provider registration is setup-only: one value per context may be attached before a scope's first execution. Resolution walks from the active scope toward the runtime root and returns the nearest provider. Missing lookup returns the context's immutable default or throws when no default exists. Explicit `undefined` values remain distinguishable from missing providers.
 

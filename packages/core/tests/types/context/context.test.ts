@@ -1,19 +1,15 @@
-import type {
-    Context,
-    Scope,
-    Signal,
-} from "../../../src/index.js";
+import type { ContextIdentity, Scope, Signal } from "../../../src/index.js";
 
 type ThemeType = "dark" | "light";
 
 declare const scope: Scope;
-declare const themeContext: Context<ThemeType>;
+declare const themeContext: ContextIdentity<ThemeType>;
 
 const theme: ThemeType = themeContext.get();
 
 themeContext.provide(scope, "dark");
 
-declare const reactiveThemeContext: Context<Signal<ThemeType>>;
+declare const reactiveThemeContext: ContextIdentity<Signal<ThemeType>>;
 declare const themeSignal: Signal<ThemeType>;
 
 reactiveThemeContext.provide(scope, themeSignal);

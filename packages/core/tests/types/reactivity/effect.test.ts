@@ -10,8 +10,7 @@ import type {
 declare const runtime: ReactiveRuntime;
 declare const signal: Signal<number>;
 
-const cleanup: EffectCleanupType = () => {
-};
+const cleanup: EffectCleanupType = () => {};
 
 const effectFunction: EffectFunctionType = (execution) => {
     signal.get();

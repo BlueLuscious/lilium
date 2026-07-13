@@ -18,10 +18,7 @@ type ExampleControllerType = {
 };
 
 declare const componentRuntime: ComponentRuntime;
-declare const definition: ComponentDefinition<
-    ExampleInputsType,
-    ExampleControllerType
->;
+declare const definition: ComponentDefinition<ExampleInputsType, ExampleControllerType>;
 declare const engine: IComponentEngine;
 declare const owner: Scope;
 
@@ -33,10 +30,8 @@ const options: ComponentCreateOptionsType<ExampleInputsType> = {
     inputs,
     owner,
 };
-const instance: ComponentInstance<
-    ExampleInputsType,
-    ExampleControllerType
-> | undefined = componentRuntime.create(definition, options);
+const instance: ComponentInstance<ExampleInputsType, ExampleControllerType> | undefined =
+    componentRuntime.create(definition, options);
 
 // @ts-expect-error Complete input snapshots require optional keys explicitly.
 const incompleteInputs: ComponentInputValuesType<ExampleInputsType> = { count: 1 };

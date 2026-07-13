@@ -1,1 +1,1 @@
-export type { Context } from "./contracts/index.js";
+export type { ContextIdentity } from "./contracts/index.js";
