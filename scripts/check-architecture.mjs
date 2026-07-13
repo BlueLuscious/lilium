@@ -79,11 +79,8 @@ for (const packageName of ["core", "component"]) {
 
         if (normalizedPath.includes("/contracts/") || normalizedPath.includes("/types/")) {
             for (const dependency of importsOf(source)) {
-                if (/\.(?:runtime|manager|engine)\.js$/.test(dependency)) {
-                    report(
-                        path,
-                        `contract/type cannot import runtime implementation ${dependency}`,
-                    );
+                if (/(?:^|\/)runtime\/(?!(?:contracts|types)(?:\/|$))/.test(dependency)) {
+                    report(path, `contract/type cannot import the runtime layer ${dependency}`);
                 }
             }
         }
