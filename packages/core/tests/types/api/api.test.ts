@@ -1,17 +1,19 @@
-import type {
+import {
     Context,
+    Runtime,
+    type Context as ContextContract,
     ContextApi,
     ReactiveRuntime,
     RuntimeApi,
 } from "../../../src/index.js";
 
-declare const contextApi: ContextApi;
-declare const runtimeApi: RuntimeApi;
+const contextApi: ContextApi = Context;
+const runtimeApi: RuntimeApi = Runtime;
 
 const runtime: ReactiveRuntime = runtimeApi.create();
-const requiredContext: Context<string> = contextApi.create<string>();
-const defaultContext: Context<number> = contextApi.create(0);
-const undefinedDefaultContext: Context<undefined> = contextApi.create(undefined);
+const requiredContext: ContextContract<string> = contextApi.create<string>();
+const defaultContext: ContextContract<number> = contextApi.create(0);
+const undefinedDefaultContext: ContextContract<undefined> = contextApi.create(undefined);
 
 // @ts-expect-error Runtime creation has no public configuration in the foundation.
 runtimeApi.create({ schedulerCycles: 10 });

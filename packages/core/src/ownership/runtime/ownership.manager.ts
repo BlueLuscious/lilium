@@ -52,6 +52,22 @@ export class OwnershipManager {
     }
 
     /**
+     * @description Reports whether root disposal has permanently completed.
+     * @returns Whether this ownership manager is disposed.
+     */
+    get disposed(): boolean {
+        return this.#disposed;
+    }
+
+    /**
+     * @description Reports whether root disposal is currently releasing resources.
+     * @returns Whether this ownership manager is disposing.
+     */
+    get disposing(): boolean {
+        return this.#disposing;
+    }
+
+    /**
      * @description Captures the active scope when it belongs to this ownership manager.
      * @remarks A `null` result represents a resource owned directly by the runtime root.
      * @returns The active owned scope, or `null` when execution is at the runtime root.

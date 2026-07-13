@@ -2,7 +2,7 @@ import type { Context } from "../../context/contracts/context/context.contract.j
 
 /**
  * @description Stateless public object API for creating portable context identities.
- * @remarks The future `Context` value implements this contract in the value namespace
+ * @remarks The public `Context` value implements this contract in the value namespace
  * while the existing `Context<T>` interface remains its type-level instance contract.
  */
 export interface ContextApi {

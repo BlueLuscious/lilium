@@ -32,6 +32,9 @@ export class SchedulerRuntime implements IScheduler {
     /** @description Whether an outer synchronous flush is currently draining work. */
     #flushing = false;
 
+    /** @description Whether this scheduler has permanently released its queues. */
+    #disposed = false;
+
     /** @description Ownership service used to capture and restore semantic job owners. */
     readonly #ownership: OwnershipManager;
 
@@ -66,11 +69,29 @@ export class SchedulerRuntime implements IScheduler {
     }
 
     /**
+     * @description Permanently cancels and releases every pending scheduler entry.
+     * @remarks Disposal is idempotent and prevents future jobs from being enqueued.
+     * @returns Nothing.
+     */
+    dispose(): void {
+        if (this.#disposed) {
+            return;
+        }
+
+        this.#disposed = true;
+        this.#clear();
+    }
+
+    /**
      * @description Enqueues a job once in the earliest scheduler cycle allowed by phase state.
      * @param job - Identity-bearing synchronous render or effect job.
      * @returns Nothing.
      */
     enqueue(job: ISchedulerJob): void {
+        if (this.#disposed) {
+            throw new Error("Cannot enqueue work on a disposed scheduler.");
+        }
+
         if (this.#pending.has(job)) {
             return;
         }
@@ -95,7 +116,7 @@ export class SchedulerRuntime implements IScheduler {
      * @returns Nothing.
      */
     flush(): void {
-        if (this.#flushing) {
+        if (this.#disposed || this.#flushing) {
             return;
         }
 

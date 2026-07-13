@@ -1,9 +1,5 @@
-export type {
-    ContextApi,
-    RuntimeApi,
-} from "./api/contracts/index.js";
-
-export type { Context } from "./context/contracts/index.js";
+export { Context, Runtime } from "./api/index.js";
+export type { ContextApi, RuntimeApi } from "./api/index.js";
 
 export type {
     ErrorBoundary,

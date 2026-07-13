@@ -2,7 +2,7 @@ import type { ReactiveRuntime } from "../../reactivity/contracts/reactive-runtim
 
 /**
  * @description Stateless public object API for creating isolated reactive runtimes.
- * @remarks The future `Runtime` value implements this contract. Concrete runtime classes
+ * @remarks The public `Runtime` value implements this contract. Concrete runtime classes
  * remain internal so construction cannot bypass runtime invariants.
  */
 export interface RuntimeApi {

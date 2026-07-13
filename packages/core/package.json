@@ -7,9 +7,20 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
   "scripts": {
     "build": "tsc",
-    "test": "pnpm run test:types && pnpm run test:runtime",
+    "test": "pnpm run test:types && pnpm run test:runtime && pnpm run test:package",
+    "test:package": "pnpm run build && node --test tests/package/**/*.test.mjs",
     "test:runtime": "tsx --test tests/runtime/**/*.test.ts",
     "test:types": "tsc -p tsconfig.test.json",
     "watch": "tsc -w"
