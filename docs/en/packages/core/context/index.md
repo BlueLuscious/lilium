@@ -9,6 +9,7 @@ Context provides portable typed identities whose values are stored by ownership 
 - [`Context<T>`](context/index.md) defines provider registration and nearest-value resolution.
 - [`IContextScope`](internal/context-scope.md) bridges context identities to internal scope storage.
 - [`TContextResolution<T>`](internal/context-resolution.md) distinguishes absent providers from provided `undefined` values.
+- [Context Runtime](runtime/index.md) implements immutable identities and active-owner lookup.
 
 ## Portability
 

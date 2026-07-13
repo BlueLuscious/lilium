@@ -8,6 +8,7 @@ Ownership provides deterministic lifetime boundaries for reactive resources, fut
 
 - [Scope](scope/index.md) defines explicit parent-child ownership and recursive disposal.
 - [Error Boundary](error-boundary/index.md) defines nearest-owner error handling and propagation.
+- [Ownership Runtime](runtime/index.md) implements ledgers, active owners, recovery, and disposal.
 
 ## Runtime relationship
 
@@ -15,10 +16,7 @@ A `ReactiveRuntime` is the root owner for its resources and root scopes. A scope
 
 Ownership state and stacks are internal. Public objects expose explicit creation, execution, cleanup registration, and disposal without mutable child or resource collections.
 
-## Runtime work
-
-- Internal ownership manager and ledger contracts.
-- Component and renderer ownership integration.
+Component integration belongs to Epic 002 after Core runtime completion. Renderer ownership remains deferred with the renderer package.
 
 ## Deferred concepts
 
