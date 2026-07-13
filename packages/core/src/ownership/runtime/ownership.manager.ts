@@ -52,6 +52,26 @@ export class OwnershipManager {
     }
 
     /**
+     * @description Captures the active scope when it belongs to this ownership manager.
+     * @remarks A `null` result represents a resource owned directly by the runtime root.
+     * @returns The active owned scope, or `null` when execution is at the runtime root.
+     */
+    captureOwner(): ScopeRuntime | null {
+        this.#assertMutable("capture an owner");
+        const active = ownershipContext.active;
+
+        if (active === null) {
+            return null;
+        }
+
+        if (!(active instanceof ScopeRuntime) || !this.#scopes.has(active)) {
+            throw new Error("Cannot capture an owner across reactive runtimes.");
+        }
+
+        return active;
+    }
+
+    /**
      * @description Creates an explicit root scope owned directly by this runtime manager.
      * @returns A new inactive root scope registered in the runtime root ledger.
      */
@@ -198,6 +218,31 @@ export class OwnershipManager {
             }
         } finally {
             scope.endExecution();
+        }
+    }
+
+    /**
+     * @description Executes scheduled work under its previously captured semantic owner.
+     * @remarks Scope-owned work restores active ownership and error boundaries. Root-owned
+     * work routes failures through the root error path without creating a synthetic scope.
+     * @param owner - Scope captured when the scheduled resource was first enqueued.
+     * @param operation - Synchronous scheduled operation to execute.
+     * @returns Nothing.
+     */
+    executeOwned(owner: ScopeRuntime | null, operation: ScopeFunctionType): void {
+        if (owner !== null) {
+            this.execute(owner, operation);
+            return;
+        }
+
+        this.#assertMutable("execute root-owned work");
+
+        try {
+            operation();
+        } catch (error) {
+            const errors: unknown[] = [];
+            this.collectError(error, null, errors);
+            this.throwCollected(errors);
         }
     }
 

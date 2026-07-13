@@ -1,8 +1,10 @@
 # Dependency Tracking
 
-Status: **Semantics accepted**
+Status: **Runtime implemented**
 
 Dependency tracking connects reactive sources to the consumers that read them. The graph is isolated per `ReactiveRuntime` and hidden behind `IReactiveTracker`.
+
+See the [Tracking Runtime](runtime/index.md) for the implemented collection and graph-reconciliation flow.
 
 ## Collection rules
 

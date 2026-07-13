@@ -6,7 +6,9 @@ The ownership runtime implements the accepted scope, error-boundary, and root-li
 
 `OwnershipManager` owns one runtime root ledger and every scope created through it. Root resources and explicit root scopes share that ledger. The manager also validates that active resources and scopes belong to the same runtime owner.
 
-The manager routes owned failures from their original owner toward ancestor boundaries. A handled failure is removed, a propagated failure continues unchanged, and a throwing handler wraps the current failure and handler failure in an `AggregateError`. Boundary handlers execute through an untracked adapter that will connect to dependency tracking in the next runtime phase.
+The manager routes owned failures from their original owner toward ancestor boundaries. A handled failure is removed, a propagated failure continues unchanged, and a throwing handler wraps the current failure and handler failure in an `AggregateError`. Boundary handlers execute through an injected untracked adapter so the final reactive runtime composition can suspend dependency tracking during recovery.
+
+The scheduler uses `captureOwner()` when a job identity first becomes pending and `executeOwned()` when that job runs. Scope-owned work restores active ownership and boundary traversal; root-owned work uses the runtime root error path without a synthetic scope.
 
 ## `ScopeRuntime`
 
