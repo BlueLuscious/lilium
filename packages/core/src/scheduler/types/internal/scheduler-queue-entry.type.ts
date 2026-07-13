@@ -1,4 +1,4 @@
-import type { ISchedulerJob } from "../../../contracts/internal/scheduler/scheduler-job.contract.js";
+import type { ISchedulerJob } from "../../contracts/internal/scheduler-job.contract.js";
 
 /**
  * @description Internal cancellable queue entry for one scheduler job appearance.

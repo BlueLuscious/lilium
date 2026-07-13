@@ -3,8 +3,8 @@ import { describe, test } from "node:test";
 import type { IReactiveConsumer } from "../../../src/reactivity/contracts/internal/tracking/reactive-consumer.contract.js";
 import type { IReactiveRuntimeContext } from "../../../src/reactivity/contracts/internal/tracking/reactive-runtime-context.contract.js";
 import type { IReactiveSource } from "../../../src/reactivity/contracts/internal/tracking/reactive-source.contract.js";
-import { ReactiveTrackerRuntime } from "../../../src/reactivity/runtime/reactive-tracker.runtime.js";
-import type { IScheduler } from "../../../src/scheduler/contracts/internal/scheduler/scheduler.contract.js";
+import { ReactiveTrackerRuntime } from "../../../src/reactivity/runtime/tracking/reactive-tracker.runtime.js";
+import type { IScheduler } from "../../../src/scheduler/contracts/internal/scheduler.contract.js";
 
 class TestRuntime implements IReactiveRuntimeContext {
     declare readonly scheduler: IScheduler;

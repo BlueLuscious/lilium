@@ -4,8 +4,8 @@ import type { IReactiveRuntimeContext } from "../../../src/reactivity/contracts/
 import { BatchingManager } from "../../../src/reactivity/runtime/batching/batching.manager.js";
 import { ComputedRuntime } from "../../../src/reactivity/runtime/computed/computed.runtime.js";
 import { EffectRuntime } from "../../../src/reactivity/runtime/effect/effect.runtime.js";
-import { ReactiveTrackerRuntime } from "../../../src/reactivity/runtime/reactive-tracker.runtime.js";
 import { SignalRuntime } from "../../../src/reactivity/runtime/signal/signal.runtime.js";
+import { ReactiveTrackerRuntime } from "../../../src/reactivity/runtime/tracking/reactive-tracker.runtime.js";
 import type { BatchFunctionType } from "../../../src/reactivity/types/batching/batch-function.type.js";
 import type { ComputedFunctionType } from "../../../src/reactivity/types/computed/computed-function.type.js";
 import type { EffectFunctionType } from "../../../src/reactivity/types/effect/effect-function.type.js";

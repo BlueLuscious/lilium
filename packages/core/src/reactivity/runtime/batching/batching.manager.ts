@@ -1,4 +1,4 @@
-import type { IScheduler } from "../../../scheduler/contracts/internal/scheduler/scheduler.contract.js";
+import type { IScheduler } from "../../../scheduler/contracts/internal/scheduler.contract.js";
 import type { BatchFunctionType } from "../../types/batching/batch-function.type.js";
 
 /**

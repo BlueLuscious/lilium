@@ -1,7 +1,7 @@
-import type { IReactiveConsumer } from "../contracts/internal/tracking/reactive-consumer.contract.js";
-import type { IReactiveSource } from "../contracts/internal/tracking/reactive-source.contract.js";
-import type { IReactiveTracker } from "../contracts/internal/tracking/reactive-tracker.contract.js";
-import type { TReactiveComputation } from "../types/internal/tracking/reactive-computation.type.js";
+import type { IReactiveConsumer } from "../../contracts/internal/tracking/reactive-consumer.contract.js";
+import type { IReactiveSource } from "../../contracts/internal/tracking/reactive-source.contract.js";
+import type { IReactiveTracker } from "../../contracts/internal/tracking/reactive-tracker.contract.js";
+import type { TReactiveComputation } from "../../types/internal/tracking/reactive-computation.type.js";
 
 /**
  * @description Process-wide synchronous stack for active reactive dependency collection.

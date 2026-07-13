@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 import { OwnershipManager } from "../../../src/ownership/runtime/ownership.manager.js";
 import { ownershipContext } from "../../../src/ownership/runtime/ownership-context.manager.js";
-import type { ISchedulerJob } from "../../../src/scheduler/contracts/internal/scheduler/scheduler-job.contract.js";
+import type { ISchedulerJob } from "../../../src/scheduler/contracts/internal/scheduler-job.contract.js";
 import { SchedulerRuntime } from "../../../src/scheduler/runtime/scheduler.runtime.js";
-import type { TSchedulerPhase } from "../../../src/scheduler/types/internal/scheduler/scheduler-phase.type.js";
+import type { TSchedulerPhase } from "../../../src/scheduler/types/internal/scheduler-phase.type.js";
 
 function job(phase: TSchedulerPhase, execute: () => void): ISchedulerJob {
     return {

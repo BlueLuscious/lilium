@@ -3,7 +3,7 @@ import type {
     ISchedulerJob,
     // biome-ignore lint/correctness/noUnusedImports: The unique symbol brands a declare-only property.
     SCHEDULER_JOB_BRAND,
-} from "../../../scheduler/contracts/internal/scheduler/scheduler-job.contract.js";
+} from "../../../scheduler/contracts/internal/scheduler-job.contract.js";
 import type { Effect } from "../../contracts/effect/effect.contract.js";
 import type {
     IReactiveConsumer,

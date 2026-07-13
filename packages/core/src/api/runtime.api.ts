@@ -1,4 +1,4 @@
-import { ReactiveRuntimeRuntime } from "../reactivity/runtime/reactive-runtime/reactive-runtime.runtime.js";
+import { ReactiveRuntime } from "../reactivity/runtime/reactive-runtime/reactive-runtime.js";
 import type { RuntimeApi } from "./contracts/runtime-api.contract.js";
 
 /**
@@ -10,5 +10,5 @@ export const Runtime: RuntimeApi = Object.freeze({
      * @description Creates one isolated reactive runtime and ownership root.
      * @returns A new frozen reactive runtime object.
      */
-    create: () => ReactiveRuntimeRuntime.create(),
+    create: () => ReactiveRuntime.create(),
 });

@@ -1,4 +1,4 @@
-import type { IScheduler } from "../../../../scheduler/contracts/internal/scheduler/scheduler.contract.js";
+import type { IScheduler } from "../../../../scheduler/contracts/internal/scheduler.contract.js";
 import type { IReactiveTracker } from "./reactive-tracker.contract.js";
 
 /**

@@ -1,9 +1,9 @@
 import type { OwnershipManager } from "../../ownership/runtime/ownership.manager.js";
 import type { ScopeRuntime } from "../../ownership/runtime/scope.runtime.js";
-import type { IScheduler } from "../contracts/internal/scheduler/scheduler.contract.js";
-import type { ISchedulerJob } from "../contracts/internal/scheduler/scheduler-job.contract.js";
-import type { TSchedulerPhase } from "../types/internal/scheduler/scheduler-phase.type.js";
-import type { TSchedulerQueueEntry } from "../types/internal/scheduler/scheduler-queue-entry.type.js";
+import type { IScheduler } from "../contracts/internal/scheduler.contract.js";
+import type { ISchedulerJob } from "../contracts/internal/scheduler-job.contract.js";
+import type { TSchedulerPhase } from "../types/internal/scheduler-phase.type.js";
+import type { TSchedulerQueueEntry } from "../types/internal/scheduler-queue-entry.type.js";
 
 /** @description Maximum number of complete scheduler cycles allowed by one outer flush. */
 const SCHEDULER_CYCLE_LIMIT = 100;

@@ -3,14 +3,14 @@ import { SchedulerRuntime } from "../../../scheduler/runtime/scheduler.runtime.j
 import type { IReactiveRuntimeContext } from "../../contracts/internal/tracking/reactive-runtime-context.contract.js";
 import type { BatchFunctionType } from "../../types/batching/batch-function.type.js";
 import { BatchingManager } from "../batching/batching.manager.js";
-import { ReactiveTrackerRuntime } from "../reactive-tracker.runtime.js";
+import { ReactiveTrackerRuntime } from "../tracking/reactive-tracker.runtime.js";
 
 /**
  * @description Internal composition root for one isolated reactive runtime.
  * @remarks Public runtime instances delegate to this context without exposing its graph,
  * ownership manager, scheduler, or batching coordinator.
  */
-export class ReactiveRuntimeContextRuntime implements IReactiveRuntimeContext {
+export class ReactiveRuntimeContext implements IReactiveRuntimeContext {
     /** @description Dependency tracker isolated to this runtime composition. */
     readonly tracker = new ReactiveTrackerRuntime();
 

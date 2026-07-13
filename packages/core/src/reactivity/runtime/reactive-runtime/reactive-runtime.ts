@@ -1,7 +1,7 @@
 import type { Scope } from "../../../ownership/contracts/scope/scope.contract.js";
 import type { Computed } from "../../contracts/computed/computed.contract.js";
 import type { Effect } from "../../contracts/effect/effect.contract.js";
-import type { ReactiveRuntime } from "../../contracts/reactive-runtime.contract.js";
+import type { ReactiveRuntime as ReactiveRuntimeContract } from "../../contracts/reactive-runtime.contract.js";
 import type { Signal } from "../../contracts/signal/signal.contract.js";
 import type { BatchFunctionType } from "../../types/batching/batch-function.type.js";
 import type { ComputedFunctionType } from "../../types/computed/computed-function.type.js";
@@ -10,23 +10,23 @@ import type { SignalOptionsType } from "../../types/signal/signal-options.type.j
 import { ComputedRuntime } from "../computed/computed.runtime.js";
 import { EffectRuntime } from "../effect/effect.runtime.js";
 import { SignalRuntime } from "../signal/signal.runtime.js";
-import { ReactiveRuntimeContextRuntime } from "./reactive-runtime-context.runtime.js";
+import { ReactiveRuntimeContext } from "./reactive-runtime-context.js";
 
 /**
  * @description Internal immutable public-facing implementation of one reactive runtime.
- * @remarks The object exposes only the {@link ReactiveRuntime} surface and delegates all
+ * @remarks The object exposes only the {@link ReactiveRuntimeContract} surface and delegates all
  * mutable service state to a private runtime composition context.
  */
-export class ReactiveRuntimeRuntime implements ReactiveRuntime {
+export class ReactiveRuntime implements ReactiveRuntimeContract {
     /** @description Private composition root containing this runtime's mutable services. */
-    readonly #context = new ReactiveRuntimeContextRuntime();
+    readonly #context = new ReactiveRuntimeContext();
 
     /**
      * @description Creates one isolated reactive runtime implementation.
      * @returns A frozen runtime object with a fresh internal composition root.
      */
-    static create(): ReactiveRuntimeRuntime {
-        return new ReactiveRuntimeRuntime();
+    static create(): ReactiveRuntime {
+        return new ReactiveRuntime();
     }
 
     /** @description Prevents construction outside the canonical internal factory. */
