@@ -44,6 +44,10 @@ Public objects should normally be interfaces or opaque handles. Runtime classes 
 
 Mutable collections and graph nodes must not be exposed directly. Inspection APIs return immutable snapshots or event records.
 
+Runtime classes use native `#` fields and methods for state and behavior that are not extension points. This preserves encapsulation in emitted JavaScript rather than enforcing it only through TypeScript. `private constructor` is reserved for TypeScript-controlled construction because JavaScript has no private-constructor syntax; package exports and facade factories provide the corresponding runtime construction boundary.
+
+`protected` members are reserved for intentionally supported inheritance points. Lilium otherwise prefers contracts and composition over subclass access to runtime internals.
+
 ## Convenience APIs
 
 Composable functions may be added where they improve authoring ergonomics, but they delegate to the object model and do not define separate semantics. The object API remains the canonical extension and lifecycle model.

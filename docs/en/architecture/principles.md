@@ -44,6 +44,8 @@ The `.lily` compiler may optimize templates, but compiled and programmatically-c
 
 Core reactivity and ownership do not depend on DOM APIs. Templates depend on an abstract renderer protocol. Target-specific behavior belongs to a renderer adapter.
 
+Target independence concerns host APIs rather than JavaScript language compatibility. See [Distribution](distribution.md) for the accepted module and ECMAScript baseline.
+
 ### Observable internals without public mutation
 
 Internal instrumentation may expose read-only events and snapshots for tests and future development tools. It must not permit external mutation of the reactive graph.
