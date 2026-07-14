@@ -25,6 +25,6 @@ The future `.lily` compiler may emit headless component definitions, template de
 ## Deferred concepts
 
 - Concrete `Component` API object.
-- Concrete component runtime and creation engine beyond the implemented instance lifecycle.
+- Concrete `Component` facade and public component runtime bound to one Core runtime.
 - Host and template lifecycle beyond ownership setup and cleanup.
 - Template composition and visual slots.

@@ -23,15 +23,20 @@ The owner must belong to the same reactive runtime as the component runtime. A m
 
 ## Internal engine
 
-`IComponentEngine` is the private creation bridge used by the public runtime. It receives the reactive runtime explicitly and returns an `IComponentInstanceLifecycle` internally. The mutable lifecycle is erased before the instance reaches consumers.
+`IComponentEngine` is the private creation bridge used by the public runtime. The frozen internal `componentEngine` object implements this contract, receives the reactive runtime explicitly, and returns an `IComponentInstanceLifecycle` internally. The mutable lifecycle is erased before the instance reaches consumers.
 
-The engine must perform creation atomically:
+The engine performs creation atomically:
 
-1. Validate the owner and initial snapshot before setup.
-2. Create a child component scope.
-3. Create every mutable input signal from the normalized snapshot.
-4. Run setup once with the child scope active.
-5. Return the initialized lifecycle only after setup succeeds.
-6. Dispose the incomplete child scope if setup aborts.
+1. Validate the observable definition and options shapes before creating ownership.
+2. Ask Core to validate the explicit owner and create a child component scope.
+3. Create every mutable input signal while that child scope is active.
+4. Run setup exactly once with a frozen setup context and stable read-only inputs.
+5. Reject non-object and Promise-like controller results inside the owned setup execution.
+6. Return the initialized lifecycle only after setup succeeds.
+7. Dispose the incomplete child scope if creation aborts.
+
+Runtime validation cannot reconstruct erased generic keys. It verifies that definitions, options, inputs, owners, and controllers have the supported observable forms; complete input keys are established by the normalized initial snapshot. Core remains responsible for proving that the owner is a live scope from the same reactive runtime.
+
+When setup failure is handled by an ownership boundary, scoped execution returns without a controller. The engine disposes the incomplete scope and returns `undefined`. A propagated failure is rethrown unchanged after successful cleanup. If incomplete cleanup also propagates a failure, the engine throws one `AggregateError` containing the creation failure first and the disposal failure second.
 
 Input updates and disposal follow the [Component Instance](../instance/index.md) lifecycle. Template mounting and host attachment remain outside this package.
