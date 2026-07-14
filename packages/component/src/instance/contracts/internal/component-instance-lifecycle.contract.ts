@@ -12,7 +12,7 @@ export interface IComponentInstanceLifecycle<Inputs extends object, Controller e
     extends ComponentInstance<Inputs, Controller> {
     /**
      * @description Replaces every component input from one normalized value snapshot.
-     * @remarks The future runtime must write all input signals in one reactive batch.
+     * @remarks The component lifecycle writes all input signals in one reactive batch.
      * Calling this operation after disposal is an invalid lifecycle transition.
      * @param values - Complete next input values, including optional keys as `undefined`.
      * @returns Nothing.

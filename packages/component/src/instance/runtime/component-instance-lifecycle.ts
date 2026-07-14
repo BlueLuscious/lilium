@@ -53,8 +53,8 @@ export class ComponentInstanceLifecycle<Inputs extends object, Controller extend
     }
 
     /**
-     * @description Reports whether the component scope has completed disposal.
-     * @returns Whether this component lifecycle is permanently disposed.
+     * @description Reports whether the component scope has entered disposal.
+     * @returns Whether this component lifecycle has begun or completed disposal.
      */
     get disposed(): boolean {
         return this.#disposed;

@@ -39,4 +39,6 @@ Runtime validation cannot reconstruct erased generic keys. It verifies that defi
 
 When setup failure is handled by an ownership boundary, scoped execution returns without a controller. The engine disposes the incomplete scope and returns `undefined`. A propagated failure is rethrown unchanged after successful cleanup. If incomplete cleanup also propagates a failure, the engine throws one `AggregateError` containing the creation failure first and the disposal failure second.
 
+Boundary traversal follows Core ownership from the nearest boundary outward. An inner boundary may propagate a setup failure to an outer boundary; if one boundary handles it, creation still aborts, the incomplete component scope is disposed, and the public runtime returns `undefined`.
+
 Input updates and disposal follow the [Component Instance](../instance/index.md) lifecycle. Template mounting and host attachment remain outside this package.

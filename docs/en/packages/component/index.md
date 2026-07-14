@@ -1,6 +1,6 @@
 # `@lilium/component`
 
-Status: **Public runtime implemented; behavioral hardening in progress**
+Status: **MVP runtime complete**
 
 `@lilium/component` defines portable headless component behavior. It depends on `@lilium/core` for reactive inputs, runtime creation, ownership, context resolution, scheduling, and error boundaries.
 

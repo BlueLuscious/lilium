@@ -8,7 +8,7 @@ A component instance is one initialized occurrence of a reusable [`ComponentDefi
 
 - `inputs`, the stable [`ComponentInputsType`](../inputs/index.md) object owned by the instance;
 - `controller`, the read-only [`ComponentControllerType`](../controller/index.md) returned by setup;
-- `disposed`, a non-reactive lifecycle observation;
+- `disposed`, a non-reactive observation that becomes `true` when disposal begins;
 - `dispose()`, the idempotent operation that disposes the internal component scope.
 
 The ownership scope remains private. Exposing it would let consumers attach arbitrary resources to an instance and weaken the component boundary.
@@ -20,6 +20,8 @@ The ownership scope remains private. Exposing it would let consumers attach arbi
 `ComponentInstanceLifecycle` is the internal mutable implementation created after setup succeeds. It retains the private `ComponentInputStore`, exposes the exact stable input object used during setup, and registers its disposal state as a component-scope cleanup.
 
 The separate internal `ComponentInstance` class wraps that lifecycle before `ComponentRuntime.create()` returns. Its frozen public object delegates only `controller`, `inputs`, `disposed`, and `dispose()`. It has no `updateInputs` property in JavaScript, so internal mutation is erased at runtime rather than hidden only by a TypeScript contract. Its delegated disposed observation follows explicit, parent, and reactive-runtime disposal.
+
+Disposal follows Core's ownership ledger in last-in-first-out order across nested scopes. The lifecycle enters its disposed state before setup cleanups execute, so it remains permanently unusable even when a cleanup failure is handled by an ownership boundary or propagates to the caller. Repeated public disposal does not execute cleanups or route the same failure again.
 
 For example, `{ label?: string }` becomes `{ readonly label: string | undefined }`. This gives input removal an explicit representation and prevents an omitted key from ambiguously meaning either "unchanged" or "cleared".
 

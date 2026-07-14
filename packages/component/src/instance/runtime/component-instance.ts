@@ -47,8 +47,8 @@ export class ComponentInstance<Inputs extends object, Controller extends object>
     }
 
     /**
-     * @description Reports whether the internal component lifecycle is permanently disposed.
-     * @returns Whether the component instance has completed disposal.
+     * @description Reports whether the internal component lifecycle has entered disposal.
+     * @returns Whether the component instance has begun or completed disposal.
      */
     get disposed(): boolean {
         return this.#lifecycle.disposed;
