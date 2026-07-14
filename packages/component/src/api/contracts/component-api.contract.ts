@@ -4,7 +4,7 @@ import type { ComponentRuntime } from "../../runtime/contracts/component-runtime
 
 /**
  * @description Stateless public object API for defining and executing headless components.
- * @remarks The future `Component` value implements this contract. Definitions remain
+ * @remarks The exported `Component` value implements this contract. Definitions remain
  * independent of a runtime, while each component runtime is bound to one reactive runtime.
  */
 export interface ComponentApi {

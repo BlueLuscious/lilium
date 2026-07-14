@@ -98,7 +98,7 @@ for (const packageName of ["core", "component"]) {
 /** @description Parsed Core package manifest used for dependency and export checks. */
 const corePackage = JSON.parse(readFileSync(join(root, "packages/core/package.json"), "utf8"));
 
-/** @description Parsed Component package manifest used for dependency checks. */
+/** @description Parsed Component package manifest used for dependency and export checks. */
 const componentPackage = JSON.parse(
     readFileSync(join(root, "packages/component/package.json"), "utf8"),
 );
@@ -119,6 +119,9 @@ const componentDependencies = Object.keys(componentPackage.dependencies ?? {});
 
 /** @description Public subpaths declared by the Core package export map. */
 const coreExportKeys = Object.keys(corePackage.exports ?? {});
+
+/** @description Public subpaths declared by the Component package export map. */
+const componentExportKeys = Object.keys(componentPackage.exports ?? {});
 
 /** @description Explicit standard libraries available to Core production sources. */
 const coreLibraries = coreTsConfig.compilerOptions?.lib ?? [];
@@ -161,6 +164,23 @@ if (
     report(
         join(root, "packages/core/package.json"),
         "core package root must resolve to its built JavaScript and declarations",
+    );
+}
+
+if (componentExportKeys.length !== 1 || componentExportKeys[0] !== ".") {
+    report(
+        join(root, "packages/component/package.json"),
+        "component must expose only its package root through the exports map",
+    );
+}
+
+if (
+    componentPackage.exports?.["."]?.import !== "./dist/index.js" ||
+    componentPackage.exports?.["."]?.types !== "./dist/index.d.ts"
+) {
+    report(
+        join(root, "packages/component/package.json"),
+        "component package root must resolve to its built JavaScript and declarations",
     );
 }
 

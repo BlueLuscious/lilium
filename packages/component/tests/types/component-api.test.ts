@@ -1,10 +1,11 @@
 import type { ReactiveRuntime } from "@lilium/core";
-import type {
-    ComponentApi,
-    ComponentDefinition,
-    ComponentInputsType,
-    ComponentRuntime,
-    ComponentSetupContext,
+import {
+    Component,
+    type ComponentApi,
+    type ComponentDefinition,
+    type ComponentInputsType,
+    type ComponentRuntime,
+    type ComponentSetupContext,
 } from "../../src/index.js";
 
 type CounterInputsType = {
@@ -15,10 +16,10 @@ type CounterControllerType = {
     increment(): void;
 };
 
-declare const api: ComponentApi;
 declare const reactiveRuntime: ReactiveRuntime;
 
-const definition = api.define<CounterInputsType, CounterControllerType>({
+const api: ComponentApi = Component;
+const definition = Component.define<CounterInputsType, CounterControllerType>({
     setup(context: ComponentSetupContext, inputs: ComponentInputsType<CounterInputsType>) {
         const count = context.runtime.signal(inputs.initial.get());
 
@@ -31,9 +32,9 @@ const definition = api.define<CounterInputsType, CounterControllerType>({
 });
 const reusableDefinition: ComponentDefinition<CounterInputsType, CounterControllerType> =
     definition;
-const componentRuntime: ComponentRuntime = api.createRuntime(reactiveRuntime);
+const componentRuntime: ComponentRuntime = Component.createRuntime(reactiveRuntime);
 
-api.define<CounterInputsType, CounterControllerType>({
+Component.define<CounterInputsType, CounterControllerType>({
     // @ts-expect-error Definitions cannot use asynchronous setup.
     async setup() {
         return { increment() {} };
@@ -41,7 +42,8 @@ api.define<CounterInputsType, CounterControllerType>({
 });
 
 // @ts-expect-error Component runtimes require a reactive runtime.
-api.createRuntime();
+Component.createRuntime();
 
+void api;
 void componentRuntime;
 void reusableDefinition;

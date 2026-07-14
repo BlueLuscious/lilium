@@ -1,4 +1,5 @@
-export type { ComponentApi } from "./api/contracts/index.js";
+export type { ComponentApi } from "./api/index.js";
+export { Component } from "./api/index.js";
 export type { ComponentDefinition } from "./component/contracts/index.js";
 export type { ComponentControllerType } from "./controller/types/index.js";
 export type {

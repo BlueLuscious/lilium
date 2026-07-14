@@ -1,14 +1,14 @@
 # Component API
 
-The component API is the object-oriented entry point for defining headless behavior and connecting it to a reactive runtime. Its contract is declared before implementation so the public surface can be reviewed independently from concrete classes and factories.
+The component API is the object-oriented entry point for defining headless behavior and connecting it to a reactive runtime. The package root exports its immutable `Component` value and the separate `ComponentApi` contract.
 
 ## `ComponentApi`
 
-The future exported `Component` object will implement `ComponentApi`. The API is stateless and exposes two operations.
+The exported `Component` object implements `ComponentApi`. It is frozen, stateless, and exposes two operations.
 
 ### `define(definition)`
 
-`define()` creates an immutable reusable [`ComponentDefinition`](../component/index.md). It does not execute setup, capture a runtime, create signals, or allocate an ownership scope.
+`define()` validates the observable definition shape and creates an immutable reusable [`ComponentDefinition`](../component/index.md). It copies only the `setup` operation into a new frozen object, so it neither freezes the caller-owned object nor retains unrelated properties. It does not execute setup, capture a runtime, create signals, or allocate an ownership scope.
 
 Keeping definitions runtime-independent allows one definition to be reused by multiple applications, tests, renderers, and reactive runtimes.
 
@@ -24,7 +24,7 @@ The explicit generic form is the stable low-level authoring API. Contextual infe
 
 ### `createRuntime(runtime)`
 
-`createRuntime()` associates component execution with one `ReactiveRuntime` and returns a [`ComponentRuntime`](../runtime/index.md). It does not transfer ownership of the supplied runtime, create a component instance, or allocate a scope.
+`createRuntime()` associates component execution with one `ReactiveRuntime` and returns a frozen [`ComponentRuntime`](../runtime/index.md). It does not transfer ownership of the supplied runtime, create a component instance, or allocate a scope.
 
 ```ts
 const components = Component.createRuntime(reactiveRuntime);
@@ -41,4 +41,4 @@ The object facade is intentional:
 - it leaves component definitions as plain immutable protocol objects;
 - it permits future dependency injection without changing component definitions.
 
-The package currently exports the `ComponentApi` contract only. Exporting the concrete `Component` value is deferred until the API runtime is implemented, preventing a declaration-only value from appearing as a broken JavaScript export.
+Only `Component` is emitted as a JavaScript value from the package root. Contracts and type aliases remain declaration-only exports, while concrete facade, runtime, engine, lifecycle, and input classes stay behind the package export map.

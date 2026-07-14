@@ -1,16 +1,28 @@
 {
   "name": "@lilium/component",
   "version": "0.1.0",
-  "description": "Headless component definitions and setup contracts for Lilium.",
+  "description": "Headless component definitions and runtime for Lilium.",
   "author": "BlueLuscious",
   "license": "ISC",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
   "scripts": {
     "build": "pnpm run clean && tsc",
     "clean": "node ../../scripts/clean-package-dist.mjs",
-    "test": "pnpm run test:types",
+    "test": "pnpm --filter @lilium/core run build && pnpm run test:types && pnpm run test:runtime && pnpm run test:package",
+    "test:package": "pnpm run build && node --test tests/package/**/*.test.mjs",
+    "test:runtime": "tsx --test tests/runtime/**/*.test.ts",
     "test:types": "tsc -p tsconfig.test.json",
     "watch": "tsc -w"
   },

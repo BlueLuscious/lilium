@@ -12,7 +12,7 @@ export interface ComponentInstance<Inputs extends object, Controller extends obj
     /** @description Read-only public controller created during component setup. */
     readonly controller: ComponentControllerType<Controller>;
 
-    /** @description Whether this component instance has completed disposal. */
+    /** @description Whether this component instance has begun or completed disposal. */
     readonly disposed: boolean;
 
     /** @description Stable read-only reactive inputs owned by this component instance. */
