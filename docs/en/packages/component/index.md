@@ -1,6 +1,6 @@
 # `@lilium/component`
 
-Status: **Runtime in progress**
+Status: **Public runtime implemented; behavioral hardening in progress**
 
 `@lilium/component` defines portable headless component behavior. It depends on `@lilium/core` for reactive inputs, runtime creation, ownership, context resolution, scheduling, and error boundaries.
 
@@ -24,7 +24,5 @@ The future `.lily` compiler may emit headless component definitions, template de
 
 ## Deferred concepts
 
-- Concrete `Component` API object.
-- Concrete `Component` facade and public component runtime bound to one Core runtime.
 - Host and template lifecycle beyond ownership setup and cleanup.
 - Template composition and visual slots.

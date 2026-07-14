@@ -17,7 +17,9 @@ The ownership scope remains private. Exposing it would let consumers attach arbi
 
 `IComponentInstanceLifecycle<Inputs, Controller>` extends the public instance only inside the component engine. Its `updateInputs(values)` operation receives a complete [`ComponentInputValuesType`](../inputs/index.md) snapshot and updates every mutable input signal in one reactive batch.
 
-`ComponentInstanceLifecycle` is the internal concrete implementation created after setup succeeds. It retains the private `ComponentInputStore`, exposes the exact stable input object used during setup, and registers its disposal state as a component-scope cleanup. The public instance object is frozen, while its private disposed flag follows explicit, parent, and runtime disposal.
+`ComponentInstanceLifecycle` is the internal mutable implementation created after setup succeeds. It retains the private `ComponentInputStore`, exposes the exact stable input object used during setup, and registers its disposal state as a component-scope cleanup.
+
+The separate internal `ComponentInstance` class wraps that lifecycle before `ComponentRuntime.create()` returns. Its frozen public object delegates only `controller`, `inputs`, `disposed`, and `dispose()`. It has no `updateInputs` property in JavaScript, so internal mutation is erased at runtime rather than hidden only by a TypeScript contract. Its delegated disposed observation follows explicit, parent, and reactive-runtime disposal.
 
 For example, `{ label?: string }` becomes `{ readonly label: string | undefined }`. This gives input removal an explicit representation and prevents an omitted key from ambiguously meaning either "unchanged" or "cleared".
 

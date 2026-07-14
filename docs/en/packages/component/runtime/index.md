@@ -8,9 +8,9 @@ The component runtime is the public object responsible for turning a reusable [`
 
 Creation requires [`ComponentCreateOptionsType`](#componentcreateoptionstypeinputs) and returns either the initialized instance or `undefined`. `undefined` means setup failed and the nearest ownership error boundary handled that failure. An unhandled failure propagates to the synchronous caller without exposing a partial instance.
 
-The component runtime does not own or dispose the reactive runtime supplied when its future API object is created.
+The concrete internal `ComponentRuntime` stores one reactive runtime and the private creation engine, then freezes itself. Its construction performs no scope allocation. It exposes no runtime disposal operation and never owns or disposes the supplied reactive runtime.
 
-Programmatic consumers obtain this object through [`Component.createRuntime()`](../api/index.md).
+Programmatic consumers obtain this object through [`Component.createRuntime()`](../api/index.md). Each successful engine result is wrapped in the protected public object described by [Component Instance](../instance/index.md); the mutable lifecycle never crosses the JavaScript package boundary.
 
 ## `ComponentCreateOptionsType<Inputs>`
 
@@ -23,7 +23,7 @@ The owner must belong to the same reactive runtime as the component runtime. A m
 
 ## Internal engine
 
-`IComponentEngine` is the private creation bridge used by the public runtime. The frozen internal `componentEngine` object implements this contract, receives the reactive runtime explicitly, and returns an `IComponentInstanceLifecycle` internally. The mutable lifecycle is erased before the instance reaches consumers.
+`IComponentEngine` is the private creation bridge used by the public runtime. The frozen internal `componentEngine` object implements this contract, receives the reactive runtime explicitly, and returns an `IComponentInstanceLifecycle` internally. `ComponentRuntime` converts that result into a public instance instead of exposing or casting the lifecycle.
 
 The engine performs creation atomically:
 
