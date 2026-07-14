@@ -5,11 +5,11 @@ import type { ComponentRuntime as ComponentRuntimeContract } from "../runtime/co
 import type { ComponentApi } from "./contracts/component-api.contract.js";
 
 /**
- * @description Stateless object-oriented facade for the public Component domain.
+ * @description Immutable stateless public facade for the Component domain.
  * @remarks Definitions are normalized without mutating caller-owned objects, while runtime
  * creation binds execution to Core without taking ownership or allocating component scopes.
  */
-class ComponentFacade implements ComponentApi {
+export const Component: ComponentApi = Object.freeze({
     /**
      * @description Creates an immutable reusable headless component definition.
      * @typeParam Inputs - Declarative input value shape accepted by the component.
@@ -33,7 +33,7 @@ class ComponentFacade implements ComponentApi {
         return Object.freeze({
             setup,
         }) as ComponentDefinition<Inputs, Controller>;
-    }
+    },
 
     /**
      * @description Creates a component runtime associated with one reactive runtime.
@@ -42,8 +42,5 @@ class ComponentFacade implements ComponentApi {
      */
     createRuntime(runtime: ReactiveRuntime): ComponentRuntimeContract {
         return ComponentRuntime.create(runtime);
-    }
-}
-
-/** @description Immutable stateless public facade for defining and executing components. */
-export const Component: ComponentApi = Object.freeze(new ComponentFacade());
+    },
+});
