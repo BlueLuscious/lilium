@@ -111,6 +111,16 @@ const coreTestTsConfig = JSON.parse(
     readFileSync(join(root, "packages/core/tsconfig.test.json"), "utf8"),
 );
 
+/** @description Parsed Component production compiler configuration used for host checks. */
+const componentTsConfig = JSON.parse(
+    readFileSync(join(root, "packages/component/tsconfig.json"), "utf8"),
+);
+
+/** @description Parsed Component test compiler configuration used for ambient-type checks. */
+const componentTestTsConfig = JSON.parse(
+    readFileSync(join(root, "packages/component/tsconfig.test.json"), "utf8"),
+);
+
 /** @description Direct dependencies declared by the Core package. */
 const coreDependencies = Object.keys(corePackage.dependencies ?? {});
 
@@ -123,32 +133,58 @@ const coreExportKeys = Object.keys(corePackage.exports ?? {});
 /** @description Public subpaths declared by the Component package export map. */
 const componentExportKeys = Object.keys(componentPackage.exports ?? {});
 
-/** @description Explicit standard libraries available to Core production sources. */
-const coreLibraries = coreTsConfig.compilerOptions?.lib ?? [];
+/**
+ * @description Verifies one target-independent package compiler boundary.
+ * @param {string} packageName - Workspace package directory and diagnostic name.
+ * @param {Record<string, unknown>} productionConfig - Parsed production TypeScript config.
+ * @param {Record<string, unknown>} testConfig - Parsed test TypeScript config.
+ * @returns {void}
+ */
+const verifyHostIndependentCompilerConfig = (packageName, productionConfig, testConfig) => {
+    const productionCompiler = productionConfig.compilerOptions ?? {};
+    const testCompiler = testConfig.compilerOptions ?? {};
+    const libraries = productionCompiler.lib ?? [];
+    const productionTypes = productionCompiler.types ?? [];
+    const testTypes = testCompiler.types ?? [];
 
-/** @description Explicit ambient type packages available to Core production sources. */
-const coreTypes = coreTsConfig.compilerOptions?.types ?? [];
+    if (libraries.length !== 1 || libraries[0] !== "ES2022") {
+        report(
+            join(root, `packages/${packageName}/tsconfig.json`),
+            `${packageName} production sources must compile against ES2022 only`,
+        );
+    }
 
-if (coreLibraries.length !== 1 || coreLibraries[0] !== "ES2022") {
-    report(
-        join(root, "packages/core/tsconfig.json"),
-        "core production sources must compile against ES2022 only",
-    );
-}
+    if (productionTypes.length !== 0) {
+        report(
+            join(root, `packages/${packageName}/tsconfig.json`),
+            `${packageName} production sources cannot load ambient host type packages`,
+        );
+    }
 
-if (coreTypes.length !== 0) {
-    report(
-        join(root, "packages/core/tsconfig.json"),
-        "core production sources cannot load ambient host type packages",
-    );
-}
+    if (productionCompiler.noEmitOnError !== true) {
+        report(
+            join(root, `packages/${packageName}/tsconfig.json`),
+            `${packageName} production builds must stop emit after type errors`,
+        );
+    }
 
-if (!coreTestTsConfig.compilerOptions?.types?.includes("node")) {
-    report(
-        join(root, "packages/core/tsconfig.test.json"),
-        "core tests must declare Node ambient types explicitly",
-    );
-}
+    if (testCompiler.noEmit !== true) {
+        report(
+            join(root, `packages/${packageName}/tsconfig.test.json`),
+            `${packageName} tests cannot emit distribution files`,
+        );
+    }
+
+    if (testTypes.length !== 1 || testTypes[0] !== "node") {
+        report(
+            join(root, `packages/${packageName}/tsconfig.test.json`),
+            `${packageName} tests must load only Node ambient types`,
+        );
+    }
+};
+
+verifyHostIndependentCompilerConfig("core", coreTsConfig, coreTestTsConfig);
+verifyHostIndependentCompilerConfig("component", componentTsConfig, componentTestTsConfig);
 
 if (coreExportKeys.length !== 1 || coreExportKeys[0] !== ".") {
     report(
