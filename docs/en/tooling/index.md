@@ -16,10 +16,13 @@ Repository tooling enforces development policies without becoming part of any pu
 - `pnpm check:architecture` validates current package and compiler boundaries.
 - `pnpm check:docs` validates local links under `docs/en/`.
 - `pnpm check:jsdoc` validates production sources under package `src/` directories and `tooling/`.
+- `pnpm build` builds every workspace package in dependency order.
+- `pnpm test` builds the workspace once, then runs tooling, type, runtime, and package tests.
 - `pnpm test:tooling` runs repository-tooling behavior tests.
+- `pnpm verify` runs every required static check, build, and test used by CI.
 - Package-level `pnpm clean` commands remove only the invoking package's `dist/` directory after validating its workspace boundary.
 
-The future repository-level verification command will compose these commands with package builds and tests. CI must invoke that public root command instead of depending on individual tooling file paths.
+The `Continuous Integration` workflow installs the pinned workspace package manager and dependencies from the immutable lockfile before invoking only `pnpm verify`. CI does not depend on individual tooling file paths.
 
 ## Extension policy
 
