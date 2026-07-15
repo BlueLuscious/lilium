@@ -1,9 +1,20 @@
 {
   "name": "lilium",
-  "description": "",
+  "description": "Target-independent frontend framework built around fine-grained reactivity and explicit ownership.",
   "private": true,
   "author": "BlueLuscious",
   "license": "ISC",
+  "homepage": "https://github.com/BlueLuscious/lilium#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BlueLuscious/lilium.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BlueLuscious/lilium/issues"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "packageManager": "pnpm@10.17.0",
   "workspaces": [
     "packages/*"
@@ -28,7 +39,12 @@
     "watch:component": "pnpm --filter @lilium/component run watch",
     "watch:core": "pnpm --filter @lilium/core run watch"
   },
-  "keywords": [],
+  "keywords": [
+    "frontend",
+    "framework",
+    "reactivity",
+    "typescript"
+  ],
   "devDependencies": {
     "@biomejs/biome": "2.5.3",
     "@types/node": "^24.13.3",
