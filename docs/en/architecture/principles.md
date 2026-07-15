@@ -36,6 +36,8 @@ A component definition is an immutable object that can be exported by a package,
 
 A template describes stable structure and dynamic binding points. A renderer instantiates the stable structure once and updates only affected bindings.
 
+See [Template ABI](template-abi.md).
+
 ### Compiler-independent semantics
 
 The `.lily` compiler may optimize templates, but compiled and programmatically-created definitions must obey the same public contracts. Compiler optimizations must not change observable behavior.

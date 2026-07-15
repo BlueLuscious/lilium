@@ -24,7 +24,7 @@ Headless behavior has a lifecycle and reuse boundary independent of visual struc
 
 ## Why templates are separate
 
-The template package defines target-independent visual structure, reactive bindings, and composition with a headless component. A default presentation is a separate templated-component object, not mutable or optional state on the headless definition.
+The template package defines target-independent visual structure, reactive bindings, and composition with a headless component. A default presentation is a separate templated-component object, not mutable or optional state on the headless definition. The accepted object and declaration model is defined by [Template ABI](template-abi.md).
 
 Libraries may export a headless component, one or more templates, and ready-to-render component-template compositions independently.
 

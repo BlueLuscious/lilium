@@ -33,10 +33,19 @@ Functions are used for:
 | `ComponentDefinition<Inputs, Controller>` | Immutable reusable headless component definition. |
 | `ComponentInstance<Inputs, Controller>` | Owns one initialized headless component occurrence. |
 | `ComponentRuntime` | Creates component instances in one reactive runtime. |
+| `TemplateDefinition<State>` | Owns one immutable target-independent template program. |
+| `TemplatePrimitive<Properties>` | Identifies one portable host capability. |
+| `TemplateProperty<Primitive, Value>` | Identifies one typed primitive value capability. |
+| `TemplateSlot<Inputs>` | Identifies one typed visual projection point. |
+| `TemplatedComponentDefinition<Inputs, Controller>` | Composes headless behavior with one compatible template. |
 
-The immutable `Runtime`, `Context`, and `Component` facade objects are the canonical construction boundaries. Their API contracts are accepted; concrete values are exported only with their runtime implementations.
+The immutable `Runtime`, `Context`, `Component`, and future `Template` facade objects are the
+canonical construction boundaries. Core and Component concrete values are exported only with
+their runtime implementations; Template remains accepted architecture until its package epic.
 
-`TemplateDefinition`, `Renderer`, and `Application` remain future package concepts. `Application` requires mounted-root and renderer semantics and therefore does not belong to `@lilium/core`.
+The Template object model is accepted in [Template ABI](template-abi.md), although its package is
+not implemented yet. `Renderer` and `Application` remain future package concepts. `Application`
+requires mounted-root and renderer semantics and therefore does not belong to `@lilium/core`.
 
 ## Encapsulation
 
@@ -68,5 +77,7 @@ Signals are created by a `ReactiveRuntime`; their concrete implementation classe
 - `Runtime.create()` creates an isolated `ReactiveRuntime`.
 - `Context.create()` creates portable context identities.
 - `Component.define()` and `Component.createRuntime()` define and execute headless components.
+- `Template` creates immutable primitive, property, slot, template, and component-template
+  definitions without capturing runtime state.
 - Convenience composables are deferred until concrete authoring repetition justifies them.
 - Public contracts are extension protocols only when third-party implementation is intentional; otherwise concrete implementations remain opaque.

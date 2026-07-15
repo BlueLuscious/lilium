@@ -28,9 +28,14 @@ The following capabilities are recorded without approving package names or imple
 - Progressive Web Application support may compose browser rendering, routing, manifests, service workers, offline behavior, and build integrations.
 - A future Lilium Native platform may execute shared component and template concepts through a native host renderer rather than DOM emulation.
 
+## Accepted foundation
+
+The target-independent definition, binding, composition, and slot model is accepted in
+[Template ABI](../architecture/template-abi.md). The package remains proposed until its
+implementation epic is approved.
+
 ## Deferred foundation decisions
 
-- Define the target-independent template instantiation and dynamic binding ABI.
 - Define the universal renderer host boundary and cleanup ordering.
 - Decide whether `@lilium/renderer-console` is publishable or only a conformance fixture.
 - Define compiler output ownership between component and template packages.

@@ -18,11 +18,15 @@ The package contains no templates, visual slots, renderer operations, DOM APIs, 
 
 ## Package relationship
 
-`@lilium/template` will consume a `ComponentDefinition` and a `TemplateDefinition` to produce a separate templated-component definition. The headless component never receives an optional template member and never imports the template package.
+The accepted [Template ABI](../../architecture/template-abi.md) composes a
+`ComponentDefinition` and compatible `TemplateDefinition` into a separate
+`TemplatedComponentDefinition`. The headless component never receives an optional template member
+and never imports the template package.
 
 The future `.lily` compiler may emit headless component definitions, template definitions, or composed definitions while targeting these separate ABIs.
 
-## Deferred concepts
+## External concepts
 
-- Host and template lifecycle beyond ownership setup and cleanup.
-- Template composition and visual slots.
+- Template declarations, component-template composition, and visual slots belong to
+  `@lilium/template`.
+- Mounting, host lifecycle, and rendered occurrences belong to `@lilium/renderer`.

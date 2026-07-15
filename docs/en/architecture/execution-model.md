@@ -119,11 +119,17 @@ Flushes are synchronous and automatic outside batching. FIFO queues deduplicate 
 
 See the core [Scheduler](../packages/core/scheduler/index.md) feature documentation.
 
-## Future template model
+## Template model
 
-A future template contains stable structure plus dynamic binding declarations. A binding reads reactive values and applies its latest result through renderer operations. This enables fine-grained updates without diffing complete trees.
+A template contains an immutable declaration program with stable primitive structure, component and
+slot composition, and independently tracked dynamic bindings. A renderer instantiates structure
+once and retains only the occurrence handles required for updates and disposal. It never diffs a
+mutable copy of the complete definition graph.
 
-The cross-package ownership and scheduling boundary is accepted in [Rendering Integration](rendering-integration.md). The template representation, renderer host protocol, and compiled ABI remain deferred to their dedicated foundation phases.
+Programmatic authoring and compiled `.lily` output target the same [Template ABI](template-abi.md).
+The cross-package ownership and scheduling boundary is defined by
+[Rendering Integration](rendering-integration.md). The renderer host protocol and concrete compiler
+boundary remain deferred to their dedicated foundation phases.
 
 ## Disposal
 

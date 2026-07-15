@@ -86,8 +86,8 @@ recursive last-in-first-out disposal releases presentation resources before comp
 resources.
 
 A root template that has no component receives an attachment scope directly beneath the
-application or requesting template owner. Projected slot content ownership is deferred to the
-Template ABI decision and must not reverse this package direction.
+application or requesting template owner. Projected slot content retains the supplying parent
+owner through the dual-lifetime projection model defined by [Template ABI](template-abi.md#projection-ownership).
 
 Registration inside an attachment must preserve this observable disposal order:
 
