@@ -1,9 +1,18 @@
 {
   "name": "@lilium/core",
   "version": "0.1.0",
-  "description": "",
+  "description": "Target-independent reactivity, ownership, context, and scheduling runtime for Lilium.",
   "author": "BlueLuscious",
   "license": "ISC",
+  "homepage": "https://github.com/BlueLuscious/lilium/tree/master/docs/en/packages/core",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BlueLuscious/lilium.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/BlueLuscious/lilium/issues"
+  },
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -19,12 +28,18 @@
   "sideEffects": false,
   "scripts": {
     "build": "pnpm run clean && tsc",
-    "clean": "node ../../scripts/clean-package-dist.mjs",
-    "test": "pnpm run test:types && pnpm run test:runtime && pnpm run test:package",
-    "test:package": "pnpm run build && node --test tests/package/**/*.test.mjs",
+    "clean": "node ../../tooling/cli/clean-package-distribution.mjs",
+    "test": "pnpm run build && pnpm run test:types && pnpm run test:runtime && pnpm run test:package",
+    "test:package": "node --test tests/package/**/*.test.mjs",
     "test:runtime": "tsx --test tests/runtime/**/*.test.ts",
     "test:types": "tsc -p tsconfig.test.json",
     "watch": "tsc -w"
   },
-  "keywords": []
+  "keywords": [
+    "frontend",
+    "lilium",
+    "reactivity",
+    "signals",
+    "typescript"
+  ]
 }

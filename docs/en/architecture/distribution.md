@@ -19,3 +19,9 @@ CommonJS, legacy ECMAScript targets, and parallel modern/legacy artifacts are ou
 The ES2022 baseline does not introduce DOM knowledge into target-independent packages. JavaScript language compatibility and renderer host compatibility are separate boundaries: Core and Component remain host-independent, while future renderer adapters define their own host requirements.
 
 See [Architecture Principles](principles.md), [API Style](api-style.md), and [Package Boundaries](package-boundaries.md).
+
+## Development runtime
+
+The repository workspace requires Node.js 24 or newer and uses the pnpm version pinned in the root `packageManager` field. Continuous integration validates the workspace on Node.js 24 LTS.
+
+Target-independent runtime packages do not declare a Node engine because Node is not their required execution host. Their consumer compatibility contract is ESM and ES2022. A future Node-hosted package such as a CLI, compiler, development server, or server renderer must declare and test its own Node engine explicitly.
