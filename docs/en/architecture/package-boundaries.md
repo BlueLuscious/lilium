@@ -42,6 +42,11 @@ compiler --emits--> component and template ABIs
 
 Dependencies must not point upward around these boundaries. In particular, `core` must not import component, template, renderer, compiler, or DOM concepts, and `component` must not import template or renderer concepts.
 
+Core and Component may expose narrow `integration` subpaths for framework adapters. These are
+supported public package boundaries rather than implementation paths, and they do not enlarge the
+end-user APIs exported from package roots. Their accepted authority and dependency direction are
+defined by [Rendering Integration](rendering-integration.md).
+
 Run `pnpm check:architecture` to verify the current package dependency direction, implementation import boundaries, public barrels, and host independence.
 
 ## Package root policy

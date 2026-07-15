@@ -64,7 +64,7 @@ Effect callbacks and cleanups are strictly synchronous. Asynchronous work requir
 
 Disposal is idempotent: it cancels pending execution, disconnects dependencies, runs remaining cleanups, and prevents future invalidation. Effects belong to the active ownership scope when one exists.
 
-Renderer bindings are internal consumers scheduled in the render phase, not public effects. Therefore user effects observe host updates after renderer bindings have completed.
+Renderer bindings are adapter-created consumers scheduled in the render phase, not public effects. Therefore user effects observe host updates after renderer bindings have completed. The authorized capability and ownership boundary are defined by [Rendering Integration](rendering-integration.md).
 
 ## Batching
 
@@ -123,13 +123,13 @@ See the core [Scheduler](../packages/core/scheduler/index.md) feature documentat
 
 A future template contains stable structure plus dynamic binding declarations. A binding reads reactive values and applies its latest result through renderer operations. This enables fine-grained updates without diffing complete trees.
 
-The template representation, renderer protocol, cleanup timing, and compiled ABI are intentionally deferred to their own foundation epic. They are not prerequisites for Core or headless Component runtime implementation.
+The cross-package ownership and scheduling boundary is accepted in [Rendering Integration](rendering-integration.md). The template representation, renderer host protocol, and compiled ABI remain deferred to their dedicated foundation phases.
 
 ## Disposal
 
 Disposing a reactive runtime recursively disposes its root resources, scopes, effects, computations, component instances, and registered cleanups according to the ownership ledger. Repeated disposal is safe.
 
-A future mounted application will additionally own renderer bindings and host nodes through its root scope.
+A future mounted application will additionally own component attachments, renderer bindings, and host resources through the accepted [rendering ownership topology](rendering-integration.md#ownership-topology).
 
 ## Error boundaries
 

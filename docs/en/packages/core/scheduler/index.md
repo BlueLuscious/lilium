@@ -20,4 +20,7 @@ Scheduler is an internal core feature that deterministically executes renderer b
 
 Signal writes and dependency invalidation are synchronous graph operations, not scheduler jobs. Computed values remain lazy and evaluate when scheduled consumers read them. Cleanup belongs to effect or ownership lifecycle. Consequently, neither `compute` nor `cleanup` is an executable queue phase.
 
-The future renderer package will require a controlled adapter-facing bridge to create render jobs without exposing scheduler mutation to application code.
+Core will expose a controlled adapter-facing integration capability for reactive render bindings.
+Renderer supplies the binding work, while Core retains tracking, queueing, batching, cancellation,
+ownership restoration, and fixed render-before-effect ordering. The capability does not expose
+scheduler mutation to application code. See [Rendering Integration](../../../architecture/rendering-integration.md).

@@ -16,7 +16,10 @@ A `ReactiveRuntime` is the root owner for its resources and root scopes. A scope
 
 Ownership state and stacks are internal. Public objects expose explicit creation, execution, cleanup registration, and disposal without mutable child or resource collections.
 
-Component integration belongs to `@lilium/component`. Renderer ownership remains deferred with the renderer package.
+Component integration belongs to `@lilium/component`. The cross-package attachment topology and
+presentation-before-component disposal guarantee are defined by
+[Rendering Integration](../../../architecture/rendering-integration.md); concrete Renderer
+ownership objects remain deferred to the Renderer protocol and implementation.
 
 ## Deferred concepts
 
