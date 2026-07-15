@@ -19,7 +19,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "pnpm run clean && tsc",
-    "clean": "node ../../scripts/clean-package-dist.mjs",
+    "clean": "node ../../tooling/cli/clean-package-distribution.mjs",
     "test": "pnpm run test:types && pnpm run test:runtime && pnpm run test:package",
     "test:package": "pnpm run build && node --test tests/package/**/*.test.mjs",
     "test:runtime": "tsx --test tests/runtime/**/*.test.ts",
