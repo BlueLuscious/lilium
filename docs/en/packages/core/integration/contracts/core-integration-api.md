@@ -1,7 +1,7 @@
 # `CoreIntegrationApi`
 
-`CoreIntegrationApi` is the object contract for the future `CoreIntegration` value exported only
-from `@lilium/core/integration`.
+`CoreIntegrationApi` is the object contract implemented by the frozen `CoreIntegration` value
+exported only from `@lilium/core/integration`.
 
 `createRuntime(runtime)` accepts the public [`ReactiveRuntime`](../../reactivity/reactive-runtime.md)
 contract and returns a [`RenderBindingRuntime`](render-binding-runtime.md). The concrete API must

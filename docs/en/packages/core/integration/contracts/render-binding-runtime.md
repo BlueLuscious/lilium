@@ -12,6 +12,9 @@ failure propagates after terminalization and owned cleanup.
 Later dependency invalidations are deduplicated and scheduled by Core in the accepted render phase.
 The consumer cannot choose that phase, flush work, or invoke the binding directly.
 
+The runtime rejects foreign structural runtime implementations, disposed Core runtimes, non-function
+operations, non-function terminalizers, and non-`undefined` callback results.
+
 The operation and finalizer are described by
 [`RenderBindingFunctionType`](../types/render-binding-function.md) and
 [`RenderBindingTerminalFunctionType`](../types/render-binding-terminal-function.md).

@@ -1,6 +1,6 @@
 # Rendering Integration
 
-Status: **Foundation accepted**
+Status: **Core bridge implemented; Component bridge declared**
 
 This document is the canonical architecture decision for the capabilities that connect Core,
 Component, Template, and Renderer. It defines ownership and execution responsibilities without
@@ -237,5 +237,12 @@ Later implementation epics must include these prerequisites before Renderer runt
    decision.
 5. Implement Renderer only against the two integration subpaths and the accepted Template ABI.
 
-The contract phase creates no runtime implementation. Concrete integration API values and bridge
-behavior are introduced by the following Core and Component runtime phases.
+The initial contract phase created no runtime implementation. Concrete integration API values and
+bridge behavior are introduced independently by the following Core and Component runtime phases.
+
+## Implementation status
+
+The Core bridge is implemented by the `CoreIntegration` subpath API, its runtime-bound binding
+factory, an internal render-phase lifecycle, and a protected disposal-only wrapper. Terminal
+settlement occurs only after active owned work unwinds. The Component occurrence bridge remains
+contract-only until its implementation phase.

@@ -1,6 +1,6 @@
 # Core Integration
 
-Status: **Contracts declared**
+Status: **Runtime implemented**
 
 `@lilium/core/integration` is a supported adapter-facing subpath for Renderer. It is intentionally
 absent from the `@lilium/core` package root and grants only render-binding creation authority.
@@ -9,7 +9,12 @@ absent from the `@lilium/core` package root and grants only render-binding creat
 
 - [`CoreIntegrationApi`](contracts/core-integration-api.md) binds integration authority to one genuine Core runtime.
 - [`RenderBindingRuntime`](contracts/render-binding-runtime.md) creates tracked owned bindings.
-- [`RenderBinding`](contracts/render-binding.md) exposes only disposal state and idempotent cancellation.
+- [`RenderBinding`](contracts/render-binding.md) exposes only idempotent cancellation.
+
+## Runtime
+
+- [`CoreIntegration`](api/index.md) validates and connects one genuine Core runtime.
+- [Render binding runtime](runtime/index.md) owns tracked execution, scheduling, protected handles, and terminal settlement.
 
 ## Types
 
