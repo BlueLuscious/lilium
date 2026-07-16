@@ -29,6 +29,15 @@ importers:
 
   packages/core: {}
 
+  packages/template:
+    dependencies:
+      '@lilium/component':
+        specifier: workspace:*
+        version: link:../component
+      '@lilium/core':
+        specifier: workspace:*
+        version: link:../core
+
 packages:
 
   '@biomejs/biome@2.5.3':
