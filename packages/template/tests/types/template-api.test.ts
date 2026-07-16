@@ -66,7 +66,7 @@ const CounterView = Template.define<
         }),
     ],
 });
-const Counter = CompleteTemplate.compose(CounterBehavior, CounterView);
+const Counter = Template.compose(CounterBehavior, CounterView);
 
 const ActionView = Template.define<
     ComponentTemplateStateType<ActionInputsType, ActionControllerType>
@@ -78,7 +78,13 @@ const ActionView = Template.define<
         }),
     ],
 });
-const Action = CompleteTemplate.compose(ActionBehavior, ActionView);
+const Action = Template.compose(ActionBehavior, ActionView);
+const NestedCounter = Template.component(Counter, {
+    inputs: () => ({ initial: 1 }),
+});
+const StaticAction = Template.component(Action, {
+    inputs: { label: "Run" },
+});
 const ActionProjection = Template.define<
     TemplateProjectionStateType<ParentStateType, ActionSlotInputsType>
 >({
@@ -104,7 +110,7 @@ const ParentView = Template.define<ParentStateType>({
 const api: TemplateApi = CompleteTemplate;
 const implementedApi: Pick<
     TemplateApi,
-    "binding" | "define" | "node" | "primitive" | "property" | "value"
+    "binding" | "component" | "compose" | "define" | "node" | "primitive" | "property" | "value"
 > = Template;
 const primitive: TemplatePrimitive = Stack;
 const property: TemplateProperty<typeof Label, string> = LabelValue;
@@ -119,9 +125,14 @@ const binding: TemplateBinding<ParentStateType, typeof Label, string, undefined>
 // @ts-expect-error Static property values must match their property capability.
 Template.value(LabelValue, 1);
 
-CompleteTemplate.component(Action, {
+Template.component(Action, {
     // @ts-expect-error Nested component input evaluators must return complete snapshots.
     inputs: () => ({}),
+});
+
+Template.component(Action, {
+    // @ts-expect-error Static nested component inputs must contain every declared key.
+    inputs: {},
 });
 
 // @ts-expect-error Binding evaluators cannot return Promise-like values for string properties.
@@ -132,6 +143,8 @@ void binding;
 void composition;
 void definition;
 void implementedApi;
+void NestedCounter;
 void primitive;
 void property;
 void slot;
+void StaticAction;

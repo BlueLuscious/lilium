@@ -104,7 +104,7 @@ export interface TemplateApi {
      * @typeParam ChildInputs - Complete child component input value shape.
      * @typeParam ChildController - Public child controller object.
      * @param component - Existing immutable component-template composition.
-     * @param options - Complete input evaluator and optional static projections.
+     * @param options - Complete static snapshot or lazy evaluator declaration.
      * @returns An immutable unnormalized nested-component declaration.
      */
     component<

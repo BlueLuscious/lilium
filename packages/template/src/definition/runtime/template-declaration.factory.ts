@@ -1,6 +1,14 @@
+import type { ComponentInputValuesType } from "@lilium/component";
 import type { TemplateBinding } from "../../binding/contracts/template-binding.contract.js";
 import type { TemplateBindingEvaluatorType } from "../../binding/types/template-binding-evaluator.type.js";
 import type { TemplateBindingOptionsType } from "../../binding/types/template-binding-options.type.js";
+import type { TemplateComponent } from "../../component/contracts/template-component.contract.js";
+import type { TemplateComponentInputBinding } from "../../component/contracts/template-component-input-binding.contract.js";
+import type { TemplateComponentInputValue } from "../../component/contracts/template-component-input-value.contract.js";
+import type { TemplatedComponentDefinition } from "../../component/contracts/templated-component-definition.contract.js";
+import type { TemplateComponentInputType } from "../../component/types/template-component-input.type.js";
+import type { TemplateComponentInputEvaluatorType } from "../../component/types/template-component-input-evaluator.type.js";
+import type { TemplateComponentOptionsType } from "../../component/types/template-component-options.type.js";
 import type { TemplateNode } from "../../primitive/contracts/template-node.contract.js";
 import type { TemplatePrimitive } from "../../primitive/contracts/template-primitive.contract.js";
 import type { TemplateProperty } from "../../primitive/contracts/template-property.contract.js";
@@ -8,6 +16,7 @@ import type { TemplateStaticValue } from "../../primitive/contracts/template-sta
 import type { TemplateIdentityRegistry } from "../../primitive/runtime/template-identity.registry.js";
 import type { TemplateNodeOptionsType } from "../../primitive/types/template-node-options.type.js";
 import type { TemplatePropertyInstructionType } from "../../primitive/types/template-property-instruction.type.js";
+import type { TemplateInstructionType } from "../types/template-instruction.type.js";
 
 /**
  * @description Internal factory for genuine frozen unnormalized Template declaration records.
@@ -20,6 +29,9 @@ export class TemplateDeclarationFactory {
 
     /** @description Genuine dynamic binding declarations created by this factory. */
     readonly #bindings = new WeakSet<object>();
+
+    /** @description Genuine nested component declarations created by this factory. */
+    readonly #components = new WeakSet<object>();
 
     /** @description Genuine primitive node declarations created by this factory. */
     readonly #nodes = new WeakSet<object>();
@@ -102,6 +114,45 @@ export class TemplateDeclarationFactory {
     }
 
     /**
+     * @description Creates one frozen nested component declaration with static or dynamic inputs.
+     * @typeParam ParentState - Read-only state of the declaring parent template.
+     * @typeParam ChildInputs - Complete child component input value shape.
+     * @typeParam ChildController - Public child controller object.
+     * @param component - Genuine component-template composition identity.
+     * @param options - Complete static snapshot or lazy evaluator declaration.
+     * @returns An immutable genuine unnormalized nested component declaration.
+     */
+    createComponent<
+        ParentState extends object,
+        ChildInputs extends object,
+        ChildController extends object,
+    >(
+        component: TemplatedComponentDefinition<ChildInputs, ChildController>,
+        options: TemplateComponentOptionsType<ParentState, ChildInputs>,
+    ): TemplateComponent<ParentState, undefined> {
+        this.#assertRecord(options, "component options");
+        const inputCandidate = Reflect.get(options, "inputs");
+        const projections = Reflect.get(options, "projections");
+
+        if (projections !== undefined) {
+            throw new TypeError(
+                "Template component projections are unavailable until the Slot feature is implemented.",
+            );
+        }
+
+        const inputs = this.#createComponentInputs<ParentState, ChildInputs>(inputCandidate);
+        const declaration = Object.freeze({
+            kind: "component" as const,
+            reference: undefined,
+            component,
+            inputs,
+            projections: Object.freeze([]),
+        }) as TemplateComponent<ParentState, undefined>;
+        this.#components.add(declaration);
+        return declaration;
+    }
+
+    /**
      * @description Creates one frozen primitive node with copied declaration arrays.
      * @typeParam State - Read-only template occurrence state.
      * @typeParam Primitive - Genuine portable primitive identity.
@@ -126,15 +177,14 @@ export class TemplateDeclarationFactory {
         }
 
         for (const child of childCandidates) {
-            this.assertNode(child);
+            this.assertInstruction(child);
         }
 
         const properties = Object.freeze([
             ...propertyCandidates,
         ]) as readonly TemplatePropertyInstructionType<State, Primitive, undefined>[];
-        const children = Object.freeze([...childCandidates]) as readonly TemplateNode<
+        const children = Object.freeze([...childCandidates]) as readonly TemplateInstructionType<
             State,
-            TemplatePrimitive<object>,
             undefined
         >[];
         const declaration = Object.freeze({
@@ -164,6 +214,39 @@ export class TemplateDeclarationFactory {
     }
 
     /**
+     * @description Verifies that a candidate is a genuine supported unnormalized instruction.
+     * @param instruction - Candidate encountered in a root or child fragment.
+     * @returns Nothing.
+     */
+    assertInstruction(
+        instruction: unknown,
+    ): asserts instruction is TemplateInstructionType<object, undefined> {
+        if (!this.isNode(instruction) && !this.isComponent(instruction)) {
+            throw new TypeError(
+                "A template fragment can contain only genuine Template declarations.",
+            );
+        }
+    }
+
+    /**
+     * @description Reports whether a candidate is a genuine primitive node declaration.
+     * @param value - Candidate instruction encountered during normalization.
+     * @returns Whether the candidate was created by this declaration factory.
+     */
+    isNode(value: unknown): value is TemplateNode<object, TemplatePrimitive<object>, undefined> {
+        return typeof value === "object" && value !== null && this.#nodes.has(value);
+    }
+
+    /**
+     * @description Reports whether a candidate is a genuine nested component declaration.
+     * @param value - Candidate instruction encountered during normalization.
+     * @returns Whether the candidate was created by this declaration factory.
+     */
+    isComponent(value: unknown): value is TemplateComponent<object, undefined> {
+        return typeof value === "object" && value !== null && this.#components.has(value);
+    }
+
+    /**
      * @description Reports whether a candidate is a genuine static value declaration.
      * @param value - Candidate property instruction encountered during normalization.
      * @returns Whether the candidate was created by this declaration factory.
@@ -179,6 +262,32 @@ export class TemplateDeclarationFactory {
      */
     isBinding(value: unknown): value is TemplateBinding<object> {
         return typeof value === "object" && value !== null && this.#bindings.has(value);
+    }
+
+    /**
+     * @description Creates an explicit static or dynamic component input declaration.
+     * @typeParam ParentState - Read-only state of the declaring parent template.
+     * @typeParam ChildInputs - Complete child component input value shape.
+     * @param candidate - Static snapshot object or lazy evaluator from component options.
+     * @returns A frozen discriminated component input declaration.
+     */
+    #createComponentInputs<ParentState extends object, ChildInputs extends object>(
+        candidate:
+            | ComponentInputValuesType<ChildInputs>
+            | TemplateComponentInputEvaluatorType<ParentState, ChildInputs>,
+    ): TemplateComponentInputType<ParentState, ChildInputs> {
+        if (typeof candidate === "function") {
+            return Object.freeze({
+                kind: "binding" as const,
+                evaluate: candidate,
+            }) as TemplateComponentInputBinding<ParentState, ChildInputs>;
+        }
+
+        this.#assertRecord(candidate, "component input snapshot");
+        return Object.freeze({
+            kind: "value" as const,
+            value: Object.freeze({ ...candidate }),
+        }) as TemplateComponentInputValue<ChildInputs>;
     }
 
     /**
@@ -237,6 +346,18 @@ export class TemplateDeclarationFactory {
             value !== undefined &&
             (typeof value !== "object" || value === null || Array.isArray(value))
         ) {
+            throw new TypeError(`Template ${description} must be a non-array object.`);
+        }
+    }
+
+    /**
+     * @description Verifies one required caller value is a non-array record.
+     * @param value - Candidate supplied to a declaration operation.
+     * @param description - Record family used in deterministic validation errors.
+     * @returns Nothing.
+     */
+    #assertRecord(value: unknown, description: string): asserts value is object {
+        if (typeof value !== "object" || value === null || Array.isArray(value)) {
             throw new TypeError(`Template ${description} must be a non-array object.`);
         }
     }

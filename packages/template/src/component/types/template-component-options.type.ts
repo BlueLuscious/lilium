@@ -1,3 +1,4 @@
+import type { ComponentInputValuesType } from "@lilium/component";
 import type { TemplateProjection } from "../../slot/contracts/template-projection.contract.js";
 import type { TemplateComponentInputEvaluatorType } from "./template-component-input-evaluator.type.js";
 
@@ -10,8 +11,10 @@ export type TemplateComponentOptionsType<
     ParentState extends object,
     ChildInputs extends object,
 > = Readonly<{
-    /** @description Pure evaluator producing complete child-component inputs. */
-    inputs: TemplateComponentInputEvaluatorType<ParentState, ChildInputs>;
+    /** @description Static complete snapshot or pure evaluator producing complete child inputs. */
+    inputs:
+        | ComponentInputValuesType<ChildInputs>
+        | TemplateComponentInputEvaluatorType<ParentState, ChildInputs>;
 
     /** @description Ordered projected content keyed by accepted slot identities. */
     projections?: readonly TemplateProjection<ParentState, object>[];

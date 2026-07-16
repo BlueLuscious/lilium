@@ -1,6 +1,6 @@
 import type { TemplateReferenceType } from "../../definition/types/template-reference.type.js";
 import type { TemplateProjection } from "../../slot/contracts/template-projection.contract.js";
-import type { TemplateComponentInputEvaluatorType } from "../types/template-component-input-evaluator.type.js";
+import type { TemplateComponentInputType } from "../types/template-component-input.type.js";
 
 /**
  * @description Immutable declaration for one nested templated-component occurrence.
@@ -22,8 +22,8 @@ export interface TemplateComponent<
     /** @description Templated component identity retained without runtime instantiation. */
     readonly component: object;
 
-    /** @description Typed input evaluator erased to its immutable protocol result. */
-    readonly inputs: TemplateComponentInputEvaluatorType<ParentState, object>;
+    /** @description Static or dynamic complete-input declaration erased to the protocol shape. */
+    readonly inputs: TemplateComponentInputType<ParentState, object>;
 
     /** @description Ordered static projected-content declarations. */
     readonly projections: readonly TemplateProjection<ParentState, object>[];

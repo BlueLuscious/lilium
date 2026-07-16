@@ -9,7 +9,10 @@ export type {
 export type {
     ComponentTemplateStateType,
     TemplateComponent,
+    TemplateComponentInputBinding,
     TemplateComponentInputEvaluatorType,
+    TemplateComponentInputType,
+    TemplateComponentInputValue,
     TemplateComponentOptionsType,
     TemplatedComponentDefinition,
 } from "./component/index.js";

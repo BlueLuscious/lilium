@@ -233,6 +233,8 @@ describe("template definitions and bindings", () => {
         assert.equal(Object.isFrozen(Template), true);
         assert.deepEqual(Object.keys(Template).sort(), [
             "binding",
+            "component",
+            "compose",
             "define",
             "node",
             "primitive",

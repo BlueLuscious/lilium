@@ -1,9 +1,16 @@
+import type { ComponentDefinition } from "@lilium/component";
 import type { TemplateBinding } from "../binding/contracts/template-binding.contract.js";
 import type { TemplateBindingEvaluatorType } from "../binding/types/template-binding-evaluator.type.js";
 import type { TemplateBindingOptionsType } from "../binding/types/template-binding-options.type.js";
+import type { TemplateComponent } from "../component/contracts/template-component.contract.js";
+import type { TemplatedComponentDefinition } from "../component/contracts/templated-component-definition.contract.js";
+import { TemplateComponentComposer } from "../component/runtime/template-component.composer.js";
+import type { ComponentTemplateStateType } from "../component/types/component-template-state.type.js";
+import type { TemplateComponentOptionsType } from "../component/types/template-component-options.type.js";
 import type { TemplateDefinition } from "../definition/contracts/template-definition.contract.js";
 import { TemplateDeclarationFactory } from "../definition/runtime/template-declaration.factory.js";
 import { TemplateDefinitionNormalizer } from "../definition/runtime/template-definition.normalizer.js";
+import { TemplateDefinitionRegistry } from "../definition/runtime/template-definition.registry.js";
 import type { TemplateDefinitionOptionsType } from "../definition/types/template-definition-options.type.js";
 import type { TemplateNode } from "../primitive/contracts/template-node.contract.js";
 import type { TemplatePrimitive } from "../primitive/contracts/template-primitive.contract.js";
@@ -19,13 +26,24 @@ const templateIdentities = new TemplateIdentityRegistry();
 /** @description Package-local factory shared by every Template declaration operation. */
 const templateDeclarations = new TemplateDeclarationFactory(templateIdentities);
 
+/** @description Package-local nominal registry shared by definition and composition operations. */
+const templateDefinitionIdentities = new TemplateDefinitionRegistry();
+
 /** @description Package-local normalizer shared by every Template definition operation. */
-const templateDefinitions = new TemplateDefinitionNormalizer(templateDeclarations);
+const templateDefinitions = new TemplateDefinitionNormalizer(
+    templateDeclarations,
+    templateDefinitionIdentities,
+);
+
+/** @description Package-local composer shared by component-template declaration operations. */
+const templateComponents: TemplateComponentComposer = new TemplateComponentComposer(
+    templateDefinitionIdentities,
+);
 
 /**
  * @description Frozen stateless public facade for implemented Template declaration features.
- * @remarks Phase 01 exposes primitive, property, value, binding, node, and definition creation.
- * Component and Slot operations join this object only when their real behavior is implemented.
+ * @remarks Definitions, bindings, and Component composition have real behavior. Slot operations
+ * join this object only when their identities, outlets, and projections are implemented.
  */
 export const Template = Object.freeze({
     /**
@@ -105,6 +123,27 @@ export const Template = Object.freeze({
     },
 
     /**
+     * @description Declares one nested templated component without creating an occurrence.
+     * @typeParam ParentState - Read-only state of the declaring parent template.
+     * @typeParam ChildInputs - Complete child component input value shape.
+     * @typeParam ChildController - Public child controller object.
+     * @param component - Existing immutable component-template composition.
+     * @param options - Complete static snapshot or lazy evaluator declaration.
+     * @returns An immutable unnormalized nested-component declaration.
+     */
+    component<
+        ParentState extends object,
+        ChildInputs extends object,
+        ChildController extends object,
+    >(
+        component: TemplatedComponentDefinition<ChildInputs, ChildController>,
+        options: TemplateComponentOptionsType<ParentState, ChildInputs>,
+    ): TemplateComponent<ParentState, undefined> {
+        templateComponents.assertComposition(component);
+        return templateDeclarations.createComponent(component, options);
+    },
+
+    /**
      * @description Validates, copies, normalizes, and freezes one complete template program.
      * @typeParam State - Read-only object supplied to each Renderer occurrence.
      * @param definition - Caller-owned ordered root declarations.
@@ -115,4 +154,22 @@ export const Template = Object.freeze({
     ): TemplateDefinition<State> {
         return templateDefinitions.define(definition);
     },
-}) satisfies Pick<TemplateApi, "binding" | "define" | "node" | "primitive" | "property" | "value">;
+
+    /**
+     * @description Composes independent compatible headless behavior and visual definitions.
+     * @typeParam Inputs - Declarative component input value shape.
+     * @typeParam Controller - Public controller object returned by setup.
+     * @param component - Reusable immutable headless component definition.
+     * @param template - Reusable genuine template accepting the component state shape.
+     * @returns A separate immutable component-template composition identity.
+     */
+    compose<Inputs extends object, Controller extends object>(
+        component: ComponentDefinition<Inputs, Controller>,
+        template: TemplateDefinition<ComponentTemplateStateType<Inputs, Controller>>,
+    ): TemplatedComponentDefinition<Inputs, Controller> {
+        return templateComponents.compose(component, template);
+    },
+}) satisfies Pick<
+    TemplateApi,
+    "binding" | "component" | "compose" | "define" | "node" | "primitive" | "property" | "value"
+>;

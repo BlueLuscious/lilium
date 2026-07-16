@@ -1,12 +1,16 @@
 import type { TemplateBinding } from "../../binding/contracts/template-binding.contract.js";
+import type { TemplateComponent } from "../../component/contracts/template-component.contract.js";
+import type { TemplateComponentInputType } from "../../component/types/template-component-input.type.js";
 import type { TemplateNode } from "../../primitive/contracts/template-node.contract.js";
 import type { TemplatePrimitive } from "../../primitive/contracts/template-primitive.contract.js";
 import type { TemplatePropertyInstructionType } from "../../primitive/types/template-property-instruction.type.js";
 import type { TemplateDefinition } from "../contracts/template-definition.contract.js";
 import type { TTemplateNormalizationContext } from "../types/internal/template-normalization-context.type.js";
 import type { TemplateDefinitionOptionsType } from "../types/template-definition-options.type.js";
+import type { TemplateInstructionType } from "../types/template-instruction.type.js";
 import type { TemplateReferenceType } from "../types/template-reference.type.js";
 import type { TemplateDeclarationFactory } from "./template-declaration.factory.js";
+import type { TemplateDefinitionRegistry } from "./template-definition.registry.js";
 
 /**
  * @description Internal validator and deterministic copier for complete template definitions.
@@ -17,15 +21,17 @@ export class TemplateDefinitionNormalizer {
     /** @description Factory validating genuine unnormalized declarations. */
     readonly #declarations: TemplateDeclarationFactory;
 
-    /** @description Genuine normalized template definitions created by this normalizer. */
-    readonly #definitions = new WeakSet<object>();
+    /** @description Registry receiving each genuine normalized definition identity. */
+    readonly #definitions: TemplateDefinitionRegistry;
 
     /**
      * @description Constructs one normalizer over the package declaration factory.
      * @param declarations - Factory validating genuine declaration identities.
+     * @param definitions - Registry receiving normalized definition identities.
      */
-    constructor(declarations: TemplateDeclarationFactory) {
+    constructor(declarations: TemplateDeclarationFactory, definitions: TemplateDefinitionRegistry) {
         this.#declarations = declarations;
+        this.#definitions = definitions;
     }
 
     /**
@@ -49,26 +55,35 @@ export class TemplateDefinitionNormalizer {
             nextReference: 0,
         };
         const roots = Object.freeze(
-            candidateRoots.map((node) => this.#normalizeNode<State>(node, context)),
+            candidateRoots.map((instruction) =>
+                this.#normalizeInstruction<State>(instruction, context),
+            ),
         );
         const normalized = Object.freeze({ roots }) as unknown as TemplateDefinition<State>;
-        this.#definitions.add(normalized);
+        this.#definitions.register(normalized);
         return normalized;
     }
 
     /**
-     * @description Verifies that a candidate is a genuine normalized template definition.
-     * @param definition - Candidate supplied to a later composition operation.
-     * @returns Nothing.
+     * @description Dispatches one genuine unnormalized instruction to its feature normalizer.
+     * @typeParam State - Read-only template occurrence state.
+     * @param candidate - Unnormalized instruction candidate from a fragment.
+     * @param context - State isolated to the active definition normalization pass.
+     * @returns A frozen normalized instruction with a deterministic reference.
      */
-    assertDefinition(definition: unknown): asserts definition is TemplateDefinition<object> {
-        if (
-            typeof definition !== "object" ||
-            definition === null ||
-            !this.#definitions.has(definition)
-        ) {
-            throw new TypeError("A template definition must be a genuine Template definition.");
+    #normalizeInstruction<State extends object>(
+        candidate: unknown,
+        context: TTemplateNormalizationContext,
+    ): TemplateInstructionType<State> {
+        if (this.#declarations.isNode(candidate)) {
+            return this.#normalizeNode<State>(candidate, context);
         }
+
+        if (this.#declarations.isComponent(candidate)) {
+            return this.#normalizeComponent<State>(candidate, context);
+        }
+
+        throw new TypeError("A template fragment can contain only genuine Template declarations.");
     }
 
     /**
@@ -104,7 +119,9 @@ export class TemplateDefinitionNormalizer {
                 ),
             );
             const children = Object.freeze(
-                candidate.children.map((child) => this.#normalizeNode<State>(child, context)),
+                candidate.children.map((child) =>
+                    this.#normalizeInstruction<State>(child, context),
+                ),
             );
 
             return Object.freeze({
@@ -117,6 +134,52 @@ export class TemplateDefinitionNormalizer {
         } finally {
             context.active.delete(candidate);
         }
+    }
+
+    /**
+     * @description Copies one genuine nested component and its complete-input declaration.
+     * @typeParam State - Read-only parent template occurrence state.
+     * @param candidate - Genuine unnormalized nested component declaration.
+     * @param context - State isolated to the active definition normalization pass.
+     * @returns A frozen normalized nested component instruction.
+     */
+    #normalizeComponent<State extends object>(
+        candidate: TemplateComponent<object, undefined>,
+        context: TTemplateNormalizationContext,
+    ): TemplateComponent<State, TemplateReferenceType> {
+        const reference = context.nextReference;
+        context.nextReference += 1;
+        const inputs = this.#normalizeComponentInputs<State>(candidate.inputs);
+
+        return Object.freeze({
+            kind: "component" as const,
+            reference,
+            component: candidate.component,
+            inputs,
+            projections: Object.freeze([]),
+        });
+    }
+
+    /**
+     * @description Copies one static or dynamic complete component input declaration.
+     * @typeParam State - Read-only parent template occurrence state.
+     * @param inputs - Genuine discriminated component input declaration.
+     * @returns A frozen normalized input declaration retaining application values or evaluator.
+     */
+    #normalizeComponentInputs<State extends object>(
+        inputs: TemplateComponentInputType<object, object>,
+    ): TemplateComponentInputType<State, object> {
+        if (inputs.kind === "binding") {
+            return Object.freeze({
+                kind: "binding" as const,
+                evaluate: inputs.evaluate,
+            });
+        }
+
+        return Object.freeze({
+            kind: "value" as const,
+            value: Object.freeze({ ...inputs.value }),
+        });
     }
 
     /**
