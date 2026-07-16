@@ -21,6 +21,9 @@ const operation: RenderBindingFunctionType = () => undefined;
 const terminalize: RenderBindingTerminalFunctionType = (_error: unknown) => undefined;
 const binding: RenderBinding | undefined = bindingRuntime.create(operation, terminalize);
 
+api.assertRuntime(runtime);
+CoreIntegration.assertRuntime(runtime);
+
 // @ts-expect-error Render consumers cannot select scheduler phases.
 bindingRuntime.create(operation, terminalize, "render");
 

@@ -26,9 +26,19 @@ export class RenderBindingRuntime implements RenderBindingRuntimeContract {
      * @returns A frozen narrow render-binding runtime.
      */
     static create(runtime: ReactiveRuntimeContract): RenderBindingRuntimeContract {
-        const context = ReactiveRuntime.contextOf(runtime);
-        context.assertOpen("create a render-binding runtime");
+        const context = RenderBindingRuntime.assertRuntime(runtime);
         return new RenderBindingRuntime(context);
+    }
+
+    /**
+     * @description Verifies a candidate and resolves its private live Core runtime context.
+     * @param runtime - Public runtime candidate supplied to an integration API.
+     * @returns The private context of one genuine live Core runtime.
+     */
+    static assertRuntime(runtime: ReactiveRuntimeContract): ReactiveRuntimeContext {
+        const context = ReactiveRuntime.contextOf(runtime);
+        context.assertOpen("use a reactive runtime for integration");
+        return context;
     }
 
     /**

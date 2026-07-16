@@ -23,6 +23,21 @@ test("the integration subpath is supported without enlarging the package root", 
     assert.equal("CoreIntegration" in core, false);
 });
 
+test("the compiled integration API validates genuine live runtimes", () => {
+    const runtime = Runtime.create();
+
+    assert.doesNotThrow(() => integration.CoreIntegration.assertRuntime(runtime));
+    assert.throws(
+        () => integration.CoreIntegration.assertRuntime({}),
+        /genuine Lilium reactive runtime/i,
+    );
+    runtime.dispose();
+    assert.throws(
+        () => integration.CoreIntegration.assertRuntime(runtime),
+        /disposed reactive runtime/i,
+    );
+});
+
 test("the compiled integration API creates protected render bindings", () => {
     const runtime = Runtime.create();
     const bindings = integration.CoreIntegration.createRuntime(runtime);
