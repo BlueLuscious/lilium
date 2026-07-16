@@ -18,8 +18,40 @@ test("the package root exposes only immutable public API values", () => {
 });
 
 test("the integration subpath is supported without enlarging the package root", () => {
-    assert.deepEqual(Object.keys(integration), []);
+    assert.deepEqual(Object.keys(integration), ["CoreIntegration"]);
+    assert.equal(Object.isFrozen(integration.CoreIntegration), true);
     assert.equal("CoreIntegration" in core, false);
+});
+
+test("the compiled integration API creates protected render bindings", () => {
+    const runtime = Runtime.create();
+    const bindings = integration.CoreIntegration.createRuntime(runtime);
+    const source = runtime.signal(1);
+    const values = [];
+    const binding = bindings.create(
+        () => {
+            values.push(source.get());
+        },
+        () => assert.fail("Successful package binding cannot terminalize."),
+    );
+
+    assert.equal(Object.isFrozen(bindings), true);
+    assert.deepEqual(Object.keys(bindings), []);
+    assert.equal("scheduler" in bindings, false);
+    assert.equal("tracker" in bindings, false);
+    assert.equal("ownership" in bindings, false);
+    assert.ok(binding);
+    assert.equal(Object.isFrozen(binding), true);
+    assert.deepEqual(Object.keys(binding), []);
+    assert.equal("execute" in binding, false);
+    assert.equal("invalidate" in binding, false);
+    assert.equal("runtime" in binding, false);
+    assert.equal("phase" in binding, false);
+    source.set(2);
+    assert.deepEqual(values, [1, 2]);
+
+    binding.dispose();
+    runtime.dispose();
 });
 
 test("Runtime.create returns isolated frozen reactive runtimes", () => {

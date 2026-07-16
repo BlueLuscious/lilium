@@ -21,6 +21,12 @@ const executeNormally: TOwnershipUntrackedExecutor = (operation) => operation();
  * boundaries, and coordinates recursive disposal without exposing mutable collections.
  */
 export class OwnershipManager {
+    /** @description Deferred failure settlements waiting for owned execution to unwind. */
+    readonly #deferredFailureSettlements: Array<() => unknown[]> = [];
+
+    /** @description Number of nested operations currently executing through this manager. */
+    #executionDepth = 0;
+
     /** @description Runtime-root disposal operations in registration order. */
     readonly #rootLedger: TOwnershipDisposer[] = [];
 
@@ -186,6 +192,44 @@ export class OwnershipManager {
     }
 
     /**
+     * @description Defers terminal finalization and failure routing until owned work unwinds.
+     * @remarks The original owner remains the semantic error source even when finalization
+     * disposes it. Finalization executes untracked and contributes a second ordered failure.
+     * @param owner - Captured owner of the failed resource, or `null` for the runtime root.
+     * @param error - Original failure raised by owned work.
+     * @param finalize - Terminal operation that must run outside active owned execution.
+     * @returns Nothing unless immediate settlement propagates an unhandled failure.
+     */
+    deferFailure(owner: ScopeRuntime | null, error: unknown, finalize: () => void): void {
+        if (owner !== null) {
+            this.#assertOwned(owner);
+        }
+
+        this.#deferredFailureSettlements.push(() => {
+            let settledError = error;
+
+            try {
+                this.#untrack(finalize);
+            } catch (finalizationError) {
+                settledError = new AggregateError(
+                    [error, finalizationError],
+                    "Owned work and terminal finalization both failed.",
+                );
+            }
+
+            const errors: unknown[] = [];
+            this.collectError(settledError, owner, errors);
+            return errors;
+        });
+
+        if (this.#executionDepth === 0) {
+            const errors: unknown[] = [];
+            this.#settleDeferredFailures(errors);
+            this.throwCollected(errors);
+        }
+    }
+
+    /**
      * @description Disposes every root resource and root scope in reverse registration order.
      * @remarks Disposal is idempotent and permanently closes this ownership manager even when
      * unhandled disposal failures are reported after all entries are attempted.
@@ -227,18 +271,28 @@ export class OwnershipManager {
         this.#assertOwned(scope);
         this.#assertMutable("run a scope");
         scope.beginExecution();
+        this.#executionDepth += 1;
+        let operationError: unknown;
+        let operationFailed = false;
 
         try {
-            try {
-                ownershipContext.run(scope, operation);
-            } catch (error) {
-                const errors: unknown[] = [];
-                this.collectError(error, scope, errors);
-                this.throwCollected(errors);
-            }
+            ownershipContext.run(scope, operation);
+        } catch (error) {
+            operationError = error;
+            operationFailed = true;
         } finally {
             scope.endExecution();
+            this.#executionDepth -= 1;
         }
+
+        const errors: unknown[] = [];
+
+        if (operationFailed) {
+            this.collectError(operationError, scope, errors);
+        }
+
+        this.#settleDeferredFailures(errors);
+        this.throwCollected(errors);
     }
 
     /**
@@ -256,14 +310,27 @@ export class OwnershipManager {
         }
 
         this.#assertMutable("execute root-owned work");
+        this.#executionDepth += 1;
+        let operationError: unknown;
+        let operationFailed = false;
 
         try {
             operation();
         } catch (error) {
-            const errors: unknown[] = [];
-            this.collectError(error, null, errors);
-            this.throwCollected(errors);
+            operationError = error;
+            operationFailed = true;
+        } finally {
+            this.#executionDepth -= 1;
         }
+
+        const errors: unknown[] = [];
+
+        if (operationFailed) {
+            this.collectError(operationError, null, errors);
+        }
+
+        this.#settleDeferredFailures(errors);
+        this.throwCollected(errors);
     }
 
     /**
@@ -326,6 +393,25 @@ export class OwnershipManager {
 
         if (errors.length > 1) {
             throw new AggregateError(errors, "Multiple ownership operations failed.");
+        }
+    }
+
+    /**
+     * @description Settles every deferred failure after the outermost owned execution unwinds.
+     * @param errors - Collection receiving unhandled settled failures in registration order.
+     * @returns Nothing.
+     */
+    #settleDeferredFailures(errors: unknown[]): void {
+        if (this.#executionDepth > 0) {
+            return;
+        }
+
+        while (this.#deferredFailureSettlements.length > 0) {
+            const settle = this.#deferredFailureSettlements.shift();
+
+            if (settle !== undefined) {
+                errors.push(...settle());
+            }
         }
     }
 

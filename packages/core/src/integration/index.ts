@@ -1,3 +1,4 @@
+export { CoreIntegration } from "./api/index.js";
 export type {
     CoreIntegrationApi,
     RenderBinding,

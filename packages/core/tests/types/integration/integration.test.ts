@@ -6,6 +6,7 @@ import type {
     RenderBindingRuntime,
     RenderBindingTerminalFunctionType,
 } from "../../../src/integration/index.js";
+import { CoreIntegration } from "../../../src/integration/index.js";
 
 // @ts-expect-error Integration authority is not exported from the Core package root.
 type RootCoreIntegrationApi = import("../../../src/index.js").CoreIntegrationApi;
@@ -15,6 +16,7 @@ declare const rootApi: RootCoreIntegrationApi;
 declare const runtime: ReactiveRuntime;
 
 const bindingRuntime: RenderBindingRuntime = api.createRuntime(runtime);
+const concreteApi: CoreIntegrationApi = CoreIntegration;
 const operation: RenderBindingFunctionType = () => undefined;
 const terminalize: RenderBindingTerminalFunctionType = (_error: unknown) => undefined;
 const binding: RenderBinding | undefined = bindingRuntime.create(operation, terminalize);
@@ -36,3 +38,4 @@ if (binding !== undefined) {
 }
 
 void rootApi;
+void concreteApi;
