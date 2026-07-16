@@ -24,3 +24,6 @@ Core will expose a controlled adapter-facing integration capability for reactive
 Renderer supplies the binding work, while Core retains tracking, queueing, batching, cancellation,
 ownership restoration, and fixed render-before-effect ordering. The capability does not expose
 scheduler mutation to application code. See [Rendering Integration](../../../architecture/rendering-integration.md).
+
+The accepted [Renderer Protocol](../../../architecture/renderer-protocol.md) restricts Renderer to
+that capability and defines initial mount batching, dynamic binding execution, and terminalization.

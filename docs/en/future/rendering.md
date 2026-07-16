@@ -2,7 +2,7 @@
 
 Status: **Future candidate**
 
-Lilium's universal renderer protocol must remain independent from a particular execution host. Client-side rendering and server-side rendering are separate adapters and execution models built on the same accepted Template ABI.
+Lilium's accepted [Renderer Protocol](../architecture/renderer-protocol.md) remains independent from a particular execution host. Client-side rendering and server-side rendering are separate adapters and execution models built on that protocol and the accepted Template ABI.
 
 ## Client-side rendering
 

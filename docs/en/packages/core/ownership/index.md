@@ -19,7 +19,8 @@ Ownership state and stacks are internal. Public objects expose explicit creation
 Component integration belongs to `@lilium/component`. The cross-package attachment topology and
 presentation-before-component disposal guarantee are defined by
 [Rendering Integration](../../../architecture/rendering-integration.md); concrete Renderer
-ownership objects remain deferred to the Renderer protocol and implementation.
+ownership objects and disposal stages are defined by
+[Renderer Protocol](../../../architecture/renderer-protocol.md) and remain unimplemented.
 
 ## Deferred concepts
 

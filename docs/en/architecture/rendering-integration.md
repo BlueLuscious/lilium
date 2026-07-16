@@ -163,16 +163,15 @@ under their semantic owner. Their failures traverse the nearest ownership error 
 its ancestors.
 
 A handled setup or initial-mount failure still aborts that creation attempt and exposes no partial
-occurrence. A handled dynamic render failure terminalizes the failing binding and performs
-best-effort rollback or detachment before Core continues unrelated scheduled work. The Renderer
-Protocol must define whether that terminal state closes only the binding or its complete rendered
-subtree; it may not allow the failed binding to execute again.
+occurrence. A handled dynamic render failure terminalizes the complete rendered occurrence that
+owns the failing binding and performs best-effort rollback or detachment before Core continues
+unrelated scheduled work. See [Renderer Protocol](renderer-protocol.md#dynamic-binding-or-host-failure).
 
 ### Propagated failure
 
 An unhandled setup or mount failure propagates synchronously after partial ownership is released.
 An unhandled scheduled render failure aborts the active Core flush and clears remaining pending
-jobs according to existing scheduler semantics. Renderer must terminalize the failing work before
+jobs according to existing scheduler semantics. Renderer terminalizes the owning occurrence before
 forwarding the failure so a later owner disposal remains safe and idempotent.
 
 ### Cleanup failure

@@ -235,7 +235,8 @@ or host work exists.
 
 Renderer performs one depth-first instantiation of the immutable declarations:
 
-1. Validate that the host supports every encountered primitive and property capability.
+1. Preflight every reachable primitive, property, and parent-child requirement before Component
+   setup or host mutation.
 2. Create primitive host values and apply static properties.
 3. Evaluate and apply initial dynamic bindings.
 4. Create nested component occurrences through Component integration.
@@ -261,15 +262,16 @@ projection occurrences, and follows the attachment-before-component ordering fro
 
 Definition validation failures are direct synchronous API errors because no semantic owner exists.
 
-Initial binding, nested-component, projection, fallback, unsupported-capability, and host failures
-belong to the attachment currently being instantiated. A handled failure still aborts that
-occurrence and releases partial work. A propagated failure preserves the original error before any
-propagated cleanup failure.
+Unsupported-capability preflight failures belong to the application owner and occur before
+Component setup or host mutation. Initial binding, nested-component, projection, fallback, and host
+failures belong to the attachment currently being instantiated. A handled failure still aborts
+that occurrence and releases partial work. A propagated failure preserves the original error
+before any propagated cleanup failure.
 
-Dynamic evaluator or property-application failure terminalizes its binding before entering normal
-ownership boundary traversal. The Renderer Protocol decides the smallest host subtree that can be
-made consistent, but it cannot retry the failed binding implicitly or leave newly created partial
-host resources unowned.
+Dynamic evaluator or property-application failure terminalizes the complete rendered occurrence
+that owns its binding before normal ownership boundary traversal. This accepted
+[Renderer Protocol](renderer-protocol.md#dynamic-binding-or-host-failure) prevents sibling bindings
+from continuing against an inconsistent host subtree.
 
 Projected-content errors traverse the supplying parent ownership chain. Fallback-content errors
 traverse the receiving child chain. Cleanup attempts every resource and aggregates only unhandled

@@ -128,8 +128,20 @@ mutable copy of the complete definition graph.
 
 Programmatic authoring and compiled `.lily` output target the same [Template ABI](template-abi.md).
 The cross-package ownership and scheduling boundary is defined by
-[Rendering Integration](rendering-integration.md). The renderer host protocol and concrete compiler
-boundary remain deferred to their dedicated foundation phases.
+[Rendering Integration](rendering-integration.md). Universal execution and host capabilities are
+defined by [Renderer Protocol](renderer-protocol.md), while the concrete compiler boundary remains
+deferred.
+
+## Renderer execution
+
+Renderer preflights host capabilities before Component setup, builds primitive subtrees through
+opaque host handles, and places completed root values without handing complete Template programs to
+the host. Initial mount executes inside one Core batch so setup-created effects run only after the
+initial host state is attached.
+
+Dynamic bindings issue direct property or snapshot updates. Host insertion and movement share one
+parent-and-anchor placement operation. No update reevaluates or diffs a complete Template
+definition. See [Renderer Protocol](renderer-protocol.md).
 
 ## Disposal
 

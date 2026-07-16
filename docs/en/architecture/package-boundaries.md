@@ -16,6 +16,10 @@ Status: **Core and component foundation accepted**
 
 Only packages that physically exist under `packages/` receive package documentation under `docs/en/packages/`. Planned packages remain documented here and in [Future Packages](../future/packages.md) until they are created.
 
+The universal execution, host-session, placement, failure, and conformance boundaries are accepted
+in [Renderer Protocol](renderer-protocol.md). Host-specific packages implement that protocol and
+never become dependencies of universal Renderer.
+
 ## Why components are separate
 
 Headless behavior has a lifecycle and reuse boundary independent of visual structure. An external UI library can publish component definitions without requiring templates, DOM behavior, or renderer internals.

@@ -34,9 +34,12 @@ The target-independent definition, binding, composition, and slot model is accep
 [Template ABI](../architecture/template-abi.md). The package remains proposed until its
 implementation epic is approved.
 
+The universal execution, host-session, placement, cleanup, and conformance model is accepted in
+[Renderer Protocol](../architecture/renderer-protocol.md). Renderer and its host adapters remain
+proposed until their implementation epics are approved.
+
 ## Deferred foundation decisions
 
-- Define the universal renderer host boundary and cleanup ordering.
 - Decide whether `@lilium/renderer-console` is publishable or only a conformance fixture.
 - Define compiler output ownership between component and template packages.
 - Choose the minimum `.lily` compiler milestone.

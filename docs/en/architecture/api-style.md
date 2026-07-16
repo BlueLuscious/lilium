@@ -38,14 +38,19 @@ Functions are used for:
 | `TemplateProperty<Primitive, Value>` | Identifies one typed primitive value capability. |
 | `TemplateSlot<Inputs>` | Identifies one typed visual projection point. |
 | `TemplatedComponentDefinition<Inputs, Controller>` | Composes headless behavior with one compatible template. |
+| `RendererRuntime` | Executes Template programs through one reactive runtime and host adapter. |
+| `RenderedApplication` | Owns one mounted root lifecycle and host session. |
+| `RenderedComponent<Inputs, Controller>` | Exposes one mounted component and complete root-input updates. |
+| `RenderedTemplate<State>` | Exposes one mounted standalone template and its stable state. |
 
 The immutable `Runtime`, `Context`, `Component`, and future `Template` facade objects are the
 canonical construction boundaries. Core and Component concrete values are exported only with
 their runtime implementations; Template remains accepted architecture until its package epic.
 
-The Template object model is accepted in [Template ABI](template-abi.md), although its package is
-not implemented yet. `Renderer` and `Application` remain future package concepts. `Application`
-requires mounted-root and renderer semantics and therefore does not belong to `@lilium/core`.
+The Template and Renderer object models are accepted in [Template ABI](template-abi.md) and
+[Renderer Protocol](renderer-protocol.md), although their packages are not implemented yet. A
+higher-level browser-oriented `Application` facade remains a future package concept and does not
+belong to `@lilium/core`.
 
 ## Encapsulation
 
@@ -79,5 +84,7 @@ Signals are created by a `ReactiveRuntime`; their concrete implementation classe
 - `Component.define()` and `Component.createRuntime()` define and execute headless components.
 - `Template` creates immutable primitive, property, slot, template, and component-template
   definitions without capturing runtime state.
+- `Renderer.createRuntime()` creates a configured `RendererRuntime`; its mount operations return
+  owned rendered-application handles.
 - Convenience composables are deferred until concrete authoring repetition justifies them.
 - Public contracts are extension protocols only when third-party implementation is intentional; otherwise concrete implementations remain opaque.
