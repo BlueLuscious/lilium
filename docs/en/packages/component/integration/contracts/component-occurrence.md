@@ -14,3 +14,7 @@ batch. The public instance never receives this mutation authority.
 The attachment scope owns template execution, reactive render bindings, nested rendered
 occurrences, and host cleanup. The private component scope, mutable input store, and internal
 lifecycle never escape through this contract.
+
+The concrete occurrence is frozen. Its lifecycle, component scope, and input store are absent from
+the JavaScript surface rather than hidden only by TypeScript. The regular `instance` similarly has
+no `updateInputs()` operation.

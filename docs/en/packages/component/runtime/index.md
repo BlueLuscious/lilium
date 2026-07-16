@@ -15,8 +15,7 @@ Programmatic consumers obtain this object through [`Component.createRuntime()`](
 The adapter-facing `@lilium/component/integration` subpath declares a separate, narrow occurrence
 capability for Renderer. It retains complete-snapshot updates and a dedicated attachment owner
 without changing this root `ComponentRuntime` API or exposing the engine. Its contracts are
-documented under [Component Integration](../integration/index.md), and its runtime implementation
-is introduced separately.
+and runtime are documented under [Component Integration](../integration/index.md).
 
 ## `ComponentCreateOptionsType<Inputs>`
 

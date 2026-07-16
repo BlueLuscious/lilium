@@ -10,3 +10,7 @@ is created beneath the private component scope only after setup succeeds.
 
 The runtime returns [`ComponentOccurrence`](component-occurrence.md) rather than the mutable engine
 lifecycle and exposes no engine or runtime disposal method.
+
+If occurrence materialization fails after setup, the runtime disposes the initialized lifecycle
+before propagating the creation failure. A disposal failure is aggregated after the original
+materialization failure.

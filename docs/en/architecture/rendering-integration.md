@@ -1,6 +1,6 @@
 # Rendering Integration
 
-Status: **Core bridge implemented; Component bridge declared**
+Status: **Core and Component bridges implemented**
 
 This document is the canonical architecture decision for the capabilities that connect Core,
 Component, Template, and Renderer. It defines ownership and execution responsibilities without
@@ -8,17 +8,17 @@ defining the Template ABI or the Renderer host protocol.
 
 ## Boundary decision
 
-Core and Component will each expose a narrow adapter-facing integration subpath. These subpaths
+Core and Component each expose a narrow adapter-facing integration subpath. These subpaths
 are supported public package boundaries, but they are not part of the end-user object APIs
 exported from the package roots.
 
-- `@lilium/core/integration` will bind to a genuine `ReactiveRuntime` and create owned reactive
-  render bindings. It will not expose scheduler queues, scheduler phases, dependency graph
+- `@lilium/core/integration` binds to a genuine `ReactiveRuntime` and creates owned reactive
+  render bindings. It does not expose scheduler queues, scheduler phases, dependency graph
   mutation, ownership managers, or runtime implementation classes.
-- `@lilium/component/integration` will create renderer-facing component occurrences. It will
-  retain the complete-input update capability, expose the regular read-only component instance,
-  provide one dedicated attachment owner beneath the private component owner, and coordinate
-  idempotent disposal. It will not expose the component engine, input store, mutable signals,
+- `@lilium/component/integration` creates renderer-facing component occurrences. It
+  retains the complete-input update capability, exposes the regular read-only component instance,
+  provides one dedicated attachment owner beneath the private component owner, and coordinates
+  idempotent disposal. It does not expose the component engine, input store, mutable signals,
   component scope, or internal lifecycle object.
 
 Importing an integration subpath grants an explicit framework-adapter capability. JavaScript
@@ -38,8 +38,8 @@ before host updates and batching could not provide one deterministic flush bound
 
 ## Capability shape
 
-The integration contracts are declared by their owning packages. Runtime implementations follow
-in the bridge phases without changing this authority.
+The integration contracts and runtime implementations are owned by their respective packages
+without changing this authority.
 
 The Core capability:
 
@@ -211,7 +211,8 @@ permanently disposed even when cleanup propagates.
 The selected boundaries preserve one-way dependencies:
 
 ```text
-component root/integration --> core root
+component root             --> core root
+component integration      --> core root, core integration
 template                   --> core root, component root
 renderer                   --> core integration, component integration, template
 host adapter               --> renderer
@@ -225,24 +226,25 @@ a host adapter. Template does not import Renderer. The graph is therefore acycli
 
 ## Implementation requirements
 
-Later implementation epics must include these prerequisites before Renderer runtime work:
+The bridge implementation establishes these prerequisites before Renderer runtime work:
 
-1. Add and test the Core adapter-facing render-binding capability without exporting scheduler or
-   tracking internals.
-2. Add and test the Component adapter-facing occurrence capability without changing the root
-   `ComponentRuntime` or public `ComponentInstance` contracts.
-3. Verify complete input snapshots, initial failure cleanup, scheduled failure routing, recursive
-   disposal, and package export boundaries against built distributions.
-4. Implement Template ABI contracts only after their ownership assumptions conform to this
-   decision.
-5. Implement Renderer only against the two integration subpaths and the accepted Template ABI.
+1. Core provides and tests the adapter-facing render-binding capability without exporting
+   scheduler or tracking internals.
+2. Component provides and tests the adapter-facing occurrence capability without changing the
+   root `ComponentRuntime` or public `ComponentInstance` contracts.
+3. Boundary hardening verifies complete input snapshots, initial failure cleanup, scheduled
+   failure routing, recursive disposal, and package exports against built distributions.
 
-The initial contract phase created no runtime implementation. Concrete integration API values and
-bridge behavior are introduced independently by the following Core and Component runtime phases.
+Template ABI contracts must conform to this ownership decision. Renderer must depend only on the
+two integration subpaths and the accepted Template ABI.
 
 ## Implementation status
 
 The Core bridge is implemented by the `CoreIntegration` subpath API, its runtime-bound binding
 factory, an internal render-phase lifecycle, and a protected disposal-only wrapper. Terminal
-settlement occurs only after active owned work unwinds. The Component occurrence bridge remains
-contract-only until its implementation phase.
+settlement occurs only after active owned work unwinds.
+
+The Component bridge is implemented by `ComponentIntegration`, a runtime-bound occurrence factory,
+one post-setup attachment per occurrence, and a protected wrapper retaining complete input update
+authority. Component Integration uses `CoreIntegration.assertRuntime()` only for nominal runtime
+validation; root Component features remain limited to the Core root API.
