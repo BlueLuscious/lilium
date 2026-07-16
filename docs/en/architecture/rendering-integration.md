@@ -38,8 +38,8 @@ before host updates and batching could not provide one deterministic flush bound
 
 ## Capability shape
 
-The exact contract and symbol names belong to later implementation epics. Their minimum semantic
-shape is already fixed.
+The integration contracts are declared by their owning packages. Runtime implementations follow
+in the bridge phases without changing this authority.
 
 The Core capability:
 
@@ -51,6 +51,11 @@ The Core capability:
 - permits Renderer to supply work but never to select a phase, flush a queue, or mutate scheduler
   state.
 
+`CoreIntegrationApi.createRuntime(runtime)` returns a `RenderBindingRuntime`.
+`RenderBindingRuntime.create(operation, terminalize)` performs synchronous initial evaluation and
+returns a `RenderBinding` or `undefined` after a handled initial failure. `RenderBinding` exposes
+only idempotent `dispose()`.
+
 The Component capability:
 
 - is created for one existing `ReactiveRuntime` independently of the root `Component` API;
@@ -60,6 +65,11 @@ The Component capability:
   input update operation, a dedicated attachment `Scope`, and idempotent disposal;
 - creates the attachment scope as a child of the private component scope after setup succeeds;
 - never adds input mutation or ownership attachment to the public `ComponentInstance` object.
+
+`ComponentIntegrationApi.createRuntime(runtime)` returns a `ComponentOccurrenceRuntime`.
+`ComponentOccurrenceRuntime.create(definition, options)` returns a `ComponentOccurrence` or
+`undefined` after handled setup failure. The occurrence exposes `instance`, `attachment`,
+`updateInputs(values)`, and `dispose()`.
 
 Renderer owns the adapter occurrence. Application and component code may receive its read-only
 instance or controller, but not its renderer-facing update authority.
@@ -227,5 +237,5 @@ Later implementation epics must include these prerequisites before Renderer runt
    decision.
 5. Implement Renderer only against the two integration subpaths and the accepted Template ABI.
 
-This phase creates no package or runtime implementation. Concrete names, contracts, and tests are
-assigned when the implementation epics are created.
+The contract phase creates no runtime implementation. Concrete integration API values and bridge
+behavior are introduced by the following Core and Component runtime phases.

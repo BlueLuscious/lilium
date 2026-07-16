@@ -13,6 +13,7 @@ Status: **Runtime implemented**
 | [`ownership`](ownership/index.md) | Resource scopes, parent-child ownership, cleanup, and recursive disposal. |
 | [`scheduler`](scheduler/index.md) | Deterministic render/effect phases, queues, deduplication, and reentry control. |
 | [`context`](context/index.md) | Portable typed identities and values resolved through ownership. |
+| [`integration`](integration/index.md) | Narrow Renderer-facing render-binding contracts kept outside the package root. |
 
 Headless component definitions live in `@lilium/component`, while visual definitions and component-template composition belong to the future `@lilium/template`. Core remains independent from both protocols.
 
@@ -46,6 +47,9 @@ src/
     types/
       internal/
     runtime/
+  integration/
+    contracts/
+    types/
   index.ts
 ```
 

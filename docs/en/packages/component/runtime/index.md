@@ -12,10 +12,11 @@ The concrete internal `ComponentRuntime` stores one reactive runtime and the pri
 
 Programmatic consumers obtain this object through [`Component.createRuntime()`](../api/index.md). Each successful engine result is wrapped in the protected public object described by [Component Instance](../instance/index.md); the mutable lifecycle never crosses the root JavaScript package boundary.
 
-A future adapter-facing `@lilium/component/integration` subpath will create a separate, narrow
-occurrence capability for Renderer. It will retain complete-snapshot updates and create a dedicated
-attachment owner without changing this root `ComponentRuntime` API or exposing the engine. See
-[Rendering Integration](../../../architecture/rendering-integration.md).
+The adapter-facing `@lilium/component/integration` subpath declares a separate, narrow occurrence
+capability for Renderer. It retains complete-snapshot updates and a dedicated attachment owner
+without changing this root `ComponentRuntime` API or exposing the engine. Its contracts are
+documented under [Component Integration](../integration/index.md), and its runtime implementation
+is introduced separately.
 
 ## `ComponentCreateOptionsType<Inputs>`
 
