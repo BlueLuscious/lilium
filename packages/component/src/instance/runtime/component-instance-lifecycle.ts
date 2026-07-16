@@ -15,6 +15,9 @@ import type { IComponentInstanceLifecycle } from "../contracts/internal/componen
 export class ComponentInstanceLifecycle<Inputs extends object, Controller extends object>
     implements IComponentInstanceLifecycle<Inputs, Controller>
 {
+    /** @description Whether this lifecycle has already created its unique attachment scope. */
+    #attachmentCreated = false;
+
     /** @description Whether the component scope has begun or completed disposal. */
     #disposed = false;
 
@@ -58,6 +61,24 @@ export class ComponentInstanceLifecycle<Inputs extends object, Controller extend
      */
     get disposed(): boolean {
         return this.#disposed;
+    }
+
+    /**
+     * @description Creates the unique attachment child beneath the private component scope.
+     * @returns A child scope dedicated to presentation resources.
+     */
+    createAttachment(): Scope {
+        if (this.#disposed) {
+            throw new Error("Cannot attach a disposed component instance.");
+        }
+
+        if (this.#attachmentCreated) {
+            throw new Error("A component instance already has an attachment scope.");
+        }
+
+        const attachment = this.#scope.child();
+        this.#attachmentCreated = true;
+        return attachment;
     }
 
     /**

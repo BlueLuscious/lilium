@@ -15,8 +15,43 @@ test("the package root exposes only the immutable Component API value", () => {
 });
 
 test("the integration subpath is supported without enlarging the package root", () => {
-    assert.deepEqual(Object.keys(integration), []);
+    assert.deepEqual(Object.keys(integration), ["ComponentIntegration"]);
+    assert.equal(Object.isFrozen(integration.ComponentIntegration), true);
     assert.equal("ComponentIntegration" in component, false);
+});
+
+test("the compiled integration API creates protected component occurrences", () => {
+    const definition = Component.define({
+        setup(_context, inputs) {
+            return { value: () => inputs.value.get() };
+        },
+    });
+    const runtime = Runtime.create();
+    const owner = runtime.scope();
+    const occurrences = integration.ComponentIntegration.createRuntime(runtime);
+    const occurrence = occurrences.create(definition, {
+        inputs: { value: 1 },
+        owner,
+    });
+
+    assert.equal(Object.isFrozen(occurrences), true);
+    assert.deepEqual(Object.keys(occurrences), []);
+    assert.equal("engine" in occurrences, false);
+    assert.equal("runtime" in occurrences, false);
+    assert.ok(occurrence);
+    assert.equal(Object.isFrozen(occurrence), true);
+    assert.deepEqual(Object.keys(occurrence).sort(), ["attachment", "instance"]);
+    assert.equal("lifecycle" in occurrence, false);
+    assert.equal("scope" in occurrence, false);
+    assert.equal("inputStore" in occurrence, false);
+    assert.equal("updateInputs" in occurrence.instance, false);
+    assert.equal(occurrence.instance.controller.value(), 1);
+
+    occurrence.updateInputs({ value: 2 });
+    assert.equal(occurrence.instance.controller.value(), 2);
+    occurrence.dispose();
+    assert.equal(occurrence.instance.disposed, true);
+    runtime.dispose();
 });
 
 test("the compiled public API creates definitions, runtimes, and protected instances", () => {

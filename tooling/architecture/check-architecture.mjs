@@ -14,7 +14,7 @@ const packagePolicies = Object.freeze([
     }),
     Object.freeze({
         name: "component",
-        allowedLiliumDependencies: Object.freeze(["@lilium/core"]),
+        allowedLiliumDependencies: Object.freeze(["@lilium/core", "@lilium/core/integration"]),
         exports: Object.freeze({
             ".": "./dist/index",
             "./integration": "./dist/integration/index",
@@ -81,6 +81,13 @@ export function checkArchitecture(root) {
                     !policy.allowedLiliumDependencies.includes(dependency)
                 ) {
                     report(path, `${policy.name} cannot depend on ${dependency}`);
+                }
+
+                if (
+                    dependency === "@lilium/core/integration" &&
+                    !normalizedPath.includes("/src/integration/")
+                ) {
+                    report(path, `${policy.name} root features cannot import Core integration`);
                 }
 
                 if (

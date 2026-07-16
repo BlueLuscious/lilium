@@ -66,6 +66,20 @@ describe("architecture checker", () => {
         );
     });
 
+    test("restricts Core integration imports to Component integration sources", (context) => {
+        const root = createRepository(context);
+        writeFileSync(
+            join(root, "packages", "component", "src", "index.ts"),
+            'import { CoreIntegration } from "@lilium/core/integration";\nvoid CoreIntegration;\n',
+        );
+
+        const violations = checkArchitecture(root);
+        assert.equal(
+            violations.some((violation) => violation.includes("root features cannot import")),
+            true,
+        );
+    });
+
     test("reports invalid compiler and export boundaries", (context) => {
         const root = createRepository(context);
         writeJson(join(root, "packages", "component", "tsconfig.json"), {

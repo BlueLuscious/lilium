@@ -1,3 +1,4 @@
+export { ComponentIntegration } from "./api/index.js";
 export type {
     ComponentIntegrationApi,
     ComponentOccurrence,

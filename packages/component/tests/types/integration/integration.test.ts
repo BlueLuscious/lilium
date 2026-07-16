@@ -5,6 +5,7 @@ import type {
     ComponentOccurrence,
     ComponentOccurrenceRuntime,
 } from "../../../src/integration/index.js";
+import { ComponentIntegration } from "../../../src/integration/index.js";
 
 // @ts-expect-error Integration authority is not exported from the Component package root.
 type RootComponentIntegrationApi = import("../../../src/index.js").ComponentIntegrationApi;
@@ -25,6 +26,7 @@ declare const rootApi: RootComponentIntegrationApi;
 declare const runtime: ReactiveRuntime;
 
 const occurrenceRuntime: ComponentOccurrenceRuntime = api.createRuntime(runtime);
+const concreteApi: ComponentIntegrationApi = ComponentIntegration;
 const occurrence: ComponentOccurrence<InputsType, ControllerType> | undefined =
     occurrenceRuntime.create(definition, {
         inputs: { count: 1, label: undefined },
@@ -59,3 +61,4 @@ if (occurrence !== undefined) {
 occurrenceRuntime.engine;
 
 void rootApi;
+void concreteApi;
