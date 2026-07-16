@@ -15,7 +15,7 @@ Status: **Runtime implemented**
 | [`context`](context/index.md) | Portable typed identities and values resolved through ownership. |
 | [`integration`](integration/index.md) | Narrow Renderer-facing render-binding contracts kept outside the package root. |
 
-Headless component definitions live in `@lilium/component`, while visual definitions and component-template composition belong to the future `@lilium/template`. Core remains independent from both protocols.
+Headless component definitions live in `@lilium/component`, while visual definitions and component-template composition live in `@lilium/template`. Core remains independent from both protocols.
 
 ## Source structure
 
