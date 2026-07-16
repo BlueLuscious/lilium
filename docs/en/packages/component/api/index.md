@@ -20,7 +20,10 @@ const Counter = Component.define<CounterInputs, CounterController>({
 });
 ```
 
-The explicit generic form is the stable low-level authoring API. Contextual inference may be improved later without changing the definition ABI. The `.lily` compiler can emit a definition directly against the same contract.
+The explicit generic form is the stable low-level authoring API. Contextual inference may be
+improved later without changing the definition ABI. The first accepted `.lily` compiler imports an
+existing definition; direct Component definition generation is deferred by the
+[compiler boundary](../../../architecture/lily-compiler-boundary.md).
 
 ### `createRuntime(runtime)`
 

@@ -10,7 +10,12 @@ Creation requires [`ComponentCreateOptionsType`](#componentcreateoptionstypeinpu
 
 The concrete internal `ComponentRuntime` stores one reactive runtime and the private creation engine, then freezes itself. Its construction performs no scope allocation. It exposes no runtime disposal operation and never owns or disposes the supplied reactive runtime.
 
-Programmatic consumers obtain this object through [`Component.createRuntime()`](../api/index.md). Each successful engine result is wrapped in the protected public object described by [Component Instance](../instance/index.md); the mutable lifecycle never crosses the JavaScript package boundary.
+Programmatic consumers obtain this object through [`Component.createRuntime()`](../api/index.md). Each successful engine result is wrapped in the protected public object described by [Component Instance](../instance/index.md); the mutable lifecycle never crosses the root JavaScript package boundary.
+
+A future adapter-facing `@lilium/component/integration` subpath will create a separate, narrow
+occurrence capability for Renderer. It will retain complete-snapshot updates and create a dedicated
+attachment owner without changing this root `ComponentRuntime` API or exposing the engine. See
+[Rendering Integration](../../../architecture/rendering-integration.md).
 
 ## `ComponentCreateOptionsType<Inputs>`
 
@@ -41,4 +46,4 @@ When setup failure is handled by an ownership boundary, scoped execution returns
 
 Boundary traversal follows Core ownership from the nearest boundary outward. An inner boundary may propagate a setup failure to an outer boundary; if one boundary handles it, creation still aborts, the incomplete component scope is disposed, and the public runtime returns `undefined`.
 
-Input updates and disposal follow the [Component Instance](../instance/index.md) lifecycle. Template mounting and host attachment remain outside this package.
+Input updates and disposal follow the [Component Instance](../instance/index.md) lifecycle. Template mounting and host attachment remain outside the headless runtime and use the separately authorized integration boundary.

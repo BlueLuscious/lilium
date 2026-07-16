@@ -21,6 +21,11 @@ The ownership scope remains private. Exposing it would let consumers attach arbi
 
 The separate internal `ComponentInstance` class wraps that lifecycle before `ComponentRuntime.create()` returns. Its frozen public object delegates only `controller`, `inputs`, `disposed`, and `dispose()`. It has no `updateInputs` property in JavaScript, so internal mutation is erased at runtime rather than hidden only by a TypeScript contract. Its delegated disposed observation follows explicit, parent, and reactive-runtime disposal.
 
+Renderer will not receive this internal lifecycle. The accepted
+[Component integration capability](../../../architecture/rendering-integration.md#capability-shape)
+will retain update authority behind a distinct adapter occurrence while exposing only this regular
+read-only instance view to application and component code.
+
 Disposal follows Core's ownership ledger in last-in-first-out order across nested scopes. The lifecycle enters its disposed state before setup cleanups execute, so it remains permanently unusable even when a cleanup failure is handled by an ownership boundary or propagates to the caller. Repeated public disposal does not execute cleanups or route the same failure again.
 
 For example, `{ label?: string }` becomes `{ readonly label: string | undefined }`. This gives input removal an explicit representation and prevents an omitted key from ambiguously meaning either "unchanged" or "cleared".

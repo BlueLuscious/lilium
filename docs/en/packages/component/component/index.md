@@ -4,7 +4,7 @@
 
 It contains one `setup` operation and no presentation. A definition may be exported by a UI library, instantiated by multiple runtimes, tested without a renderer, and later composed with one or more templates.
 
-Programmatic definitions are declared through the [`Component.define()` API](../api/index.md). The definition itself captures no runtime and remains the stable ABI that a future `.lily` compiler may emit.
+Programmatic definitions are declared through the [`Component.define()` API](../api/index.md). The definition itself captures no runtime and remains the stable ABI imported by the first accepted [`.lily` compiler boundary](../../../architecture/lily-compiler-boundary.md).
 
 ## Inputs
 

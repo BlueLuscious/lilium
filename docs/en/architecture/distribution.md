@@ -24,4 +24,4 @@ See [Architecture Principles](principles.md), [API Style](api-style.md), and [Pa
 
 The repository workspace requires Node.js 24 or newer and uses the pnpm version pinned in the root `packageManager` field. Continuous integration validates the workspace on Node.js 24 LTS.
 
-Target-independent runtime packages do not declare a Node engine because Node is not their required execution host. Their consumer compatibility contract is ESM and ES2022. A future Node-hosted package such as a CLI, compiler, development server, or server renderer must declare and test its own Node engine explicitly.
+Target-independent runtime packages do not declare a Node engine because Node is not their required execution host. Their consumer compatibility contract is ESM and ES2022. The pure compiler library also accepts source strings without Node APIs. A future Node-hosted adapter such as a CLI, compiler build integration, development server, or server renderer must declare and test its own Node engine explicitly.

@@ -64,7 +64,7 @@ Effect callbacks and cleanups are strictly synchronous. Asynchronous work requir
 
 Disposal is idempotent: it cancels pending execution, disconnects dependencies, runs remaining cleanups, and prevents future invalidation. Effects belong to the active ownership scope when one exists.
 
-Renderer bindings are internal consumers scheduled in the render phase, not public effects. Therefore user effects observe host updates after renderer bindings have completed.
+Renderer bindings are adapter-created consumers scheduled in the render phase, not public effects. Therefore user effects observe host updates after renderer bindings have completed. The authorized capability and ownership boundary are defined by [Rendering Integration](rendering-integration.md).
 
 ## Batching
 
@@ -119,17 +119,35 @@ Flushes are synchronous and automatic outside batching. FIFO queues deduplicate 
 
 See the core [Scheduler](../packages/core/scheduler/index.md) feature documentation.
 
-## Future template model
+## Template model
 
-A future template contains stable structure plus dynamic binding declarations. A binding reads reactive values and applies its latest result through renderer operations. This enables fine-grained updates without diffing complete trees.
+A template contains an immutable declaration program with stable primitive structure, component and
+slot composition, and independently tracked dynamic bindings. A renderer instantiates structure
+once and retains only the occurrence handles required for updates and disposal. It never diffs a
+mutable copy of the complete definition graph.
 
-The template representation, renderer protocol, cleanup timing, and compiled ABI are intentionally deferred to their own foundation epic. They are not prerequisites for Core or headless Component runtime implementation.
+Programmatic authoring and compiled `.lily` output target the same [Template ABI](template-abi.md).
+The cross-package ownership and scheduling boundary is defined by
+[Rendering Integration](rendering-integration.md). Universal execution and host capabilities are
+defined by [Renderer Protocol](renderer-protocol.md), while the concrete compiler boundary remains
+separate and is defined by [Lily Compiler Boundary](lily-compiler-boundary.md).
+
+## Renderer execution
+
+Renderer preflights host capabilities before Component setup, builds primitive subtrees through
+opaque host handles, and places completed root values without handing complete Template programs to
+the host. Initial mount executes inside one Core batch so setup-created effects run only after the
+initial host state is attached.
+
+Dynamic bindings issue direct property or snapshot updates. Host insertion and movement share one
+parent-and-anchor placement operation. No update reevaluates or diffs a complete Template
+definition. See [Renderer Protocol](renderer-protocol.md).
 
 ## Disposal
 
 Disposing a reactive runtime recursively disposes its root resources, scopes, effects, computations, component instances, and registered cleanups according to the ownership ledger. Repeated disposal is safe.
 
-A future mounted application will additionally own renderer bindings and host nodes through its root scope.
+A future mounted application will additionally own component attachments, renderer bindings, and host resources through the accepted [rendering ownership topology](rendering-integration.md#ownership-topology).
 
 ## Error boundaries
 
