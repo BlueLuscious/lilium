@@ -14,3 +14,7 @@ Property ownership is explicit and uses the primitive object identity rather tha
 
 Adapters map capabilities explicitly as defined by
 [Primitive capabilities](../../../architecture/template-abi.md#primitive-capabilities).
+
+`TemplateIdentityRegistry` retains genuine primitive and property objects in weak identity sets.
+Names are trimmed for diagnostics, but equal names never make two capabilities equal. Property
+creation and node declaration reject structural imitations and cross-primitive property use.

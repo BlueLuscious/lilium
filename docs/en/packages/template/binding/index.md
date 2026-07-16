@@ -12,3 +12,7 @@ Core render binding for each normalized declaration.
 
 Evaluation, tracking, equality, and failure semantics remain canonical in
 [Dynamic bindings](../../../architecture/template-abi.md#dynamic-bindings).
+
+`binding()` validates and stores evaluator and equality functions without invoking either one.
+Omitted equality normalizes to `Object.is`. Definition normalization copies the binding, assigns
+its own reference and containing-node target, and continues to retain both functions by reference.

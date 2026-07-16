@@ -1,14 +1,14 @@
 # `@lilium/template`
 
-Status: **Public contracts declared**
+Status: **Definitions and bindings implemented**
 
 `@lilium/template` defines the target-independent immutable presentation protocol shared by
 programmatic authors, future `.lily` compiler output, and Renderer. It depends only on public Core
 and Component package roots.
 
-Phase 00 exports contracts and types only. The frozen `Template` value is introduced with its real
-identity, declaration, validation, and normalization behavior in the next implementation phase;
-the package does not publish placeholder methods.
+The package exports a frozen `Template` value with implemented primitive, property, static value,
+binding, node, and definition operations. Component and Slot operations remain contract-only until
+their implementation phases; the facade does not publish placeholder methods.
 
 ## Features
 
@@ -25,11 +25,14 @@ the package does not publish placeholder methods.
 src/
   api/
     contracts/
+    template.api.ts
   definition/
     contracts/
+    runtime/
     types/
   primitive/
     contracts/
+    runtime/
     types/
   binding/
     contracts/

@@ -14,3 +14,14 @@ contain definition-local numeric ordinals.
 
 Normalization and reference ordering follow the canonical
 [immutable program](../../../architecture/template-abi.md#immutable-program) decision.
+
+## Normalization flow
+
+1. `define()` validates a non-array options record and root array.
+2. Every root, property instruction, and child must be a genuine declaration created by the same package instance.
+3. A fresh counter assigns depth-first references to each node and then its bindings before visiting children.
+4. Template copies and freezes every declaration container and array.
+5. Primitive, property, evaluator, equality, and application value references remain unchanged.
+
+An active-path identity set rejects recursive declaration graphs without rejecting intentional
+reuse of one declaration at multiple structural positions.
