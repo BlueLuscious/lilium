@@ -204,4 +204,29 @@ describe("component instance lifecycle", () => {
 
         runtime.dispose();
     });
+
+    it("creates one attachment after setup and disposes it before component resources", () => {
+        const runtime = Runtime.create();
+        const owner = runtime.scope();
+        const scope = runtime.scope(owner);
+        const store = createInputStore(runtime, scope);
+        const order: string[] = [];
+
+        scope.cleanup(() => {
+            order.push("setup");
+        });
+        const lifecycle = createLifecycle(scope, store);
+        const attachment = lifecycle.createAttachment();
+        attachment.cleanup(() => {
+            order.push("attachment");
+        });
+
+        assert.throws(() => lifecycle.createAttachment(), /already has an attachment/i);
+        lifecycle.dispose();
+
+        assert.deepEqual(order, ["attachment", "setup"]);
+        assert.throws(() => attachment.run(() => undefined), /disposed scope/i);
+        assert.throws(() => lifecycle.createAttachment(), /disposed component instance/i);
+        runtime.dispose();
+    });
 });

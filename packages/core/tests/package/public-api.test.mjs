@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import * as core from "@lilium/core";
+import * as integration from "@lilium/core/integration";
 
 const { Context, Runtime } = core;
 
@@ -14,6 +15,58 @@ test("the package root exposes only immutable public API values", () => {
     assert.throws(() => {
         Context.create = () => undefined;
     }, TypeError);
+});
+
+test("the integration subpath is supported without enlarging the package root", () => {
+    assert.deepEqual(Object.keys(integration), ["CoreIntegration"]);
+    assert.equal(Object.isFrozen(integration.CoreIntegration), true);
+    assert.equal("CoreIntegration" in core, false);
+});
+
+test("the compiled integration API validates genuine live runtimes", () => {
+    const runtime = Runtime.create();
+
+    assert.doesNotThrow(() => integration.CoreIntegration.assertRuntime(runtime));
+    assert.throws(
+        () => integration.CoreIntegration.assertRuntime({}),
+        /genuine Lilium reactive runtime/i,
+    );
+    runtime.dispose();
+    assert.throws(
+        () => integration.CoreIntegration.assertRuntime(runtime),
+        /disposed reactive runtime/i,
+    );
+});
+
+test("the compiled integration API creates protected render bindings", () => {
+    const runtime = Runtime.create();
+    const bindings = integration.CoreIntegration.createRuntime(runtime);
+    const source = runtime.signal(1);
+    const values = [];
+    const binding = bindings.create(
+        () => {
+            values.push(source.get());
+        },
+        () => assert.fail("Successful package binding cannot terminalize."),
+    );
+
+    assert.equal(Object.isFrozen(bindings), true);
+    assert.deepEqual(Object.keys(bindings), []);
+    assert.equal("scheduler" in bindings, false);
+    assert.equal("tracker" in bindings, false);
+    assert.equal("ownership" in bindings, false);
+    assert.ok(binding);
+    assert.equal(Object.isFrozen(binding), true);
+    assert.deepEqual(Object.keys(binding), []);
+    assert.equal("execute" in binding, false);
+    assert.equal("invalidate" in binding, false);
+    assert.equal("runtime" in binding, false);
+    assert.equal("phase" in binding, false);
+    source.set(2);
+    assert.deepEqual(values, [1, 2]);
+
+    binding.dispose();
+    runtime.dispose();
 });
 
 test("Runtime.create returns isolated frozen reactive runtimes", () => {
@@ -111,9 +164,17 @@ test("Context.create distinguishes omitted and explicit undefined defaults", () 
     assert.equal(defaulted.get(), undefined);
 });
 
-test("the package exports map rejects internal runtime subpaths", async () => {
-    await assert.rejects(
-        import("@lilium/core/reactivity/runtime/signal/signal.runtime.js"),
-        (error) => error?.code === "ERR_PACKAGE_PATH_NOT_EXPORTED",
-    );
+test("the package exports map rejects Core implementation subpaths", async () => {
+    const implementationPaths = [
+        "@lilium/core/reactivity/runtime/signal/signal.runtime.js",
+        "@lilium/core/integration/runtime/render-binding-runtime.js",
+        "@lilium/core/integration/contracts/render-binding.contract.js",
+    ];
+
+    for (const path of implementationPaths) {
+        await assert.rejects(
+            import(path),
+            (error) => error?.code === "ERR_PACKAGE_PATH_NOT_EXPORTED",
+        );
+    }
 });

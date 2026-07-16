@@ -7,10 +7,18 @@ const packagePolicies = Object.freeze([
     Object.freeze({
         name: "core",
         allowedLiliumDependencies: Object.freeze([]),
+        exports: Object.freeze({
+            ".": "./dist/index",
+            "./integration": "./dist/integration/index",
+        }),
     }),
     Object.freeze({
         name: "component",
-        allowedLiliumDependencies: Object.freeze(["@lilium/core"]),
+        allowedLiliumDependencies: Object.freeze(["@lilium/core", "@lilium/core/integration"]),
+        exports: Object.freeze({
+            ".": "./dist/index",
+            "./integration": "./dist/integration/index",
+        }),
     }),
 ]);
 
@@ -76,6 +84,13 @@ export function checkArchitecture(root) {
                 }
 
                 if (
+                    dependency === "@lilium/core/integration" &&
+                    !normalizedPath.includes("/src/integration/")
+                ) {
+                    report(path, `${policy.name} root features cannot import Core integration`);
+                }
+
+                if (
                     (normalizedPath.includes("/contracts/") ||
                         normalizedPath.includes("/types/")) &&
                     /(?:^|\/)runtime\/(?!(?:contracts|types)(?:\/|$))/.test(dependency)
@@ -137,18 +152,25 @@ export function checkArchitecture(root) {
             report(testConfigPath, `${policy.name} tests must load only Node ambient types`);
         }
 
-        if (exportKeys.length !== 1 || exportKeys[0] !== ".") {
-            report(manifestPath, `${policy.name} must expose only its package root`);
-        }
+        const expectedExportKeys = Object.keys(policy.exports);
 
         if (
-            manifest.exports?.["."]?.import !== "./dist/index.js" ||
-            manifest.exports?.["."]?.types !== "./dist/index.d.ts"
+            exportKeys.length !== expectedExportKeys.length ||
+            expectedExportKeys.some((key) => !exportKeys.includes(key))
         ) {
-            report(
-                manifestPath,
-                `${policy.name} package root must resolve to built JavaScript and declarations`,
-            );
+            report(manifestPath, `${policy.name} must expose exactly its approved package paths`);
+        }
+
+        for (const [key, target] of Object.entries(policy.exports)) {
+            if (
+                manifest.exports?.[key]?.import !== `${target}.js` ||
+                manifest.exports?.[key]?.types !== `${target}.d.ts`
+            ) {
+                report(
+                    manifestPath,
+                    `${policy.name} export ${key} must resolve to built JavaScript and declarations`,
+                );
+            }
         }
 
         for (const dependency of dependencies) {

@@ -29,6 +29,21 @@ export class ReactiveRuntime implements ReactiveRuntimeContract {
         return new ReactiveRuntime();
     }
 
+    /**
+     * @description Resolves the private composition context of a genuine Core runtime.
+     * @remarks This package-internal bridge lets supported integration code reuse Core services
+     * without exposing the context or accepting foreign structural runtime implementations.
+     * @param runtime - Public runtime candidate supplied to an integration API.
+     * @returns The private runtime composition context.
+     */
+    static contextOf(runtime: ReactiveRuntimeContract): ReactiveRuntimeContext {
+        if (!(runtime instanceof ReactiveRuntime)) {
+            throw new TypeError("Core integration requires a genuine Lilium reactive runtime.");
+        }
+
+        return runtime.#context;
+    }
+
     /** @description Prevents construction outside the canonical internal factory. */
     private constructor() {
         Object.freeze(this);

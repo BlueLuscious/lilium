@@ -10,6 +10,12 @@ The manager routes owned failures from their original owner toward ancestor boun
 
 The scheduler uses `captureOwner()` when a job identity first becomes pending and `executeOwned()` when that job runs. Scope-owned work restores active ownership and boundary traversal; root-owned work uses the runtime root error path without a synthetic scope.
 
+Render bindings additionally use `deferFailure()` after cancelling failed work. The manager waits
+for the outermost owned execution to unwind, invokes terminal finalization untracked, and only then
+routes the original or aggregated failure from its captured semantic owner. This permits a
+terminalizer to dispose the failed occurrence without weakening the public rule that active scopes
+cannot be disposed.
+
 ## `ScopeRuntime`
 
 `ScopeRuntime` implements both the public `Scope` contract and the internal [`IContextScope`](../../context/internal/context-scope.md) bridge.

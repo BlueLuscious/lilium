@@ -1,3 +1,4 @@
+import type { Scope } from "@lilium/core";
 import type { ComponentInputValuesType } from "../../../inputs/types/component-input-values.type.js";
 import type { ComponentInstance } from "../component-instance.contract.js";
 
@@ -10,6 +11,14 @@ import type { ComponentInstance } from "../component-instance.contract.js";
  */
 export interface IComponentInstanceLifecycle<Inputs extends object, Controller extends object>
     extends ComponentInstance<Inputs, Controller> {
+    /**
+     * @description Creates the unique presentation attachment beneath the private component scope.
+     * @remarks Setup has completed before this operation becomes available. Repeated creation and
+     * creation after disposal are invalid internal lifecycle transitions.
+     * @returns A child scope dedicated to Renderer-owned presentation resources.
+     */
+    createAttachment(): Scope;
+
     /**
      * @description Replaces every component input from one normalized value snapshot.
      * @remarks The component lifecycle writes all input signals in one reactive batch.

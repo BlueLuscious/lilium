@@ -15,6 +15,7 @@ The package contains no templates, visual slots, renderer operations, DOM APIs, 
 - [Controller](controller/index.md) defines the read-only object exposed by setup.
 - [Instance](instance/index.md) defines the public handle and its internal input lifecycle.
 - [Runtime](runtime/index.md) defines owned component creation and its private engine boundary.
+- [Integration](integration/index.md) provides the verified Renderer-facing occurrence bridge outside the package root.
 
 ## Package relationship
 
