@@ -20,6 +20,10 @@ function createPackage(root, name, dependencies = {}) {
                 import: "./dist/index.js",
                 types: "./dist/index.d.ts",
             },
+            "./integration": {
+                import: "./dist/integration/index.js",
+                types: "./dist/integration/index.d.ts",
+            },
         },
     });
     writeJson(join(packageRoot, "tsconfig.json"), {
@@ -81,7 +85,7 @@ describe("architecture checker", () => {
             true,
         );
         assert.equal(
-            violations.some((violation) => violation.includes("only its package root")),
+            violations.some((violation) => violation.includes("approved package paths")),
             true,
         );
     });

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import * as component from "@lilium/component";
+import * as integration from "@lilium/component/integration";
 import { Runtime } from "@lilium/core";
 
 const { Component } = component;
@@ -11,6 +12,11 @@ test("the package root exposes only the immutable Component API value", () => {
     assert.throws(() => {
         Component.define = () => undefined;
     }, TypeError);
+});
+
+test("the integration subpath is supported without enlarging the package root", () => {
+    assert.deepEqual(Object.keys(integration), []);
+    assert.equal("ComponentIntegration" in component, false);
 });
 
 test("the compiled public API creates definitions, runtimes, and protected instances", () => {

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import * as core from "@lilium/core";
+import * as integration from "@lilium/core/integration";
 
 const { Context, Runtime } = core;
 
@@ -14,6 +15,11 @@ test("the package root exposes only immutable public API values", () => {
     assert.throws(() => {
         Context.create = () => undefined;
     }, TypeError);
+});
+
+test("the integration subpath is supported without enlarging the package root", () => {
+    assert.deepEqual(Object.keys(integration), []);
+    assert.equal("CoreIntegration" in core, false);
 });
 
 test("Runtime.create returns isolated frozen reactive runtimes", () => {
