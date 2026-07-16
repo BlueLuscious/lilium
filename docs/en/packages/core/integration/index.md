@@ -1,6 +1,6 @@
 # Core Integration
 
-Status: **Runtime implemented**
+Status: **Bridge verified**
 
 `@lilium/core/integration` is a supported adapter-facing subpath for Renderer. It is intentionally
 absent from the `@lilium/core` package root and grants only render-binding creation authority.
@@ -24,3 +24,10 @@ absent from the `@lilium/core` package root and grants only render-binding creat
 The subpath exposes no scheduler phase, queue, flush, tracker, graph mutation, ownership manager, or
 runtime implementation. The accepted authority and lifecycle are defined by
 [Rendering Integration](../../../architecture/rendering-integration.md).
+
+## Boundary verification
+
+Built-package tests verify that this subpath exports only `CoreIntegration`, remains absent from
+the package root, and rejects direct imports of its contracts and runtime implementations.
+Cross-package tests prove that bindings created under Component attachment ownership react to
+complete occurrence updates and settle terminal failure before attachment disposal.

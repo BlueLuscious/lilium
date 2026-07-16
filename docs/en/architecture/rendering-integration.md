@@ -248,3 +248,9 @@ The Component bridge is implemented by `ComponentIntegration`, a runtime-bound o
 one post-setup attachment per occurrence, and a protected wrapper retaining complete input update
 authority. Component Integration uses `CoreIntegration.assertRuntime()` only for nominal runtime
 validation; root Component features remain limited to the Core root API.
+
+Built-distribution tests prove that both integration subpaths expose only their documented API
+objects and that private contract and implementation paths remain inaccessible. Cross-package
+runtime tests compose Core bindings beneath Component attachments and verify complete-update
+invalidation, render-before-effect scheduling, terminal settlement, recursive attachment release,
+component lifecycle completion, boundary routing, and parent-owner cleanup in that order.
