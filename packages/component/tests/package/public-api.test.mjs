@@ -3,6 +3,7 @@ import test from "node:test";
 import * as component from "@lilium/component";
 import * as integration from "@lilium/component/integration";
 import { Runtime } from "@lilium/core";
+import { CoreIntegration } from "@lilium/core/integration";
 
 const { Component } = component;
 
@@ -54,6 +55,37 @@ test("the compiled integration API creates protected component occurrences", () 
     runtime.dispose();
 });
 
+test("the compiled integration subpaths compose through public bridge capabilities", () => {
+    const definition = Component.define({
+        setup(_context, inputs) {
+            return { value: () => inputs.value.get() };
+        },
+    });
+    const runtime = Runtime.create();
+    const owner = runtime.scope();
+    const occurrence = integration.ComponentIntegration.createRuntime(runtime).create(definition, {
+        inputs: { value: 1 },
+        owner,
+    });
+    assert.ok(occurrence);
+    const values = [];
+
+    occurrence.attachment.run(() => {
+        const binding = CoreIntegration.createRuntime(runtime).create(
+            () => {
+                values.push(occurrence.instance.controller.value());
+            },
+            () => assert.fail("Successful compiled bridge composition cannot terminalize."),
+        );
+        assert.ok(binding);
+    });
+    occurrence.updateInputs({ value: 2 });
+
+    assert.deepEqual(values, [1, 2]);
+    occurrence.dispose();
+    runtime.dispose();
+});
+
 test("the compiled public API creates definitions, runtimes, and protected instances", () => {
     const definition = Component.define({
         setup(_context, inputs) {
@@ -84,9 +116,17 @@ test("the compiled public API creates definitions, runtimes, and protected insta
     runtime.dispose();
 });
 
-test("the package exports map rejects internal implementation subpaths", async () => {
-    await assert.rejects(
-        import("@lilium/component/runtime/component.engine.js"),
-        (error) => error?.code === "ERR_PACKAGE_PATH_NOT_EXPORTED",
-    );
+test("the package exports map rejects Component implementation subpaths", async () => {
+    const implementationPaths = [
+        "@lilium/component/runtime/component.engine.js",
+        "@lilium/component/integration/runtime/component-occurrence-runtime.js",
+        "@lilium/component/integration/contracts/component-occurrence.contract.js",
+    ];
+
+    for (const path of implementationPaths) {
+        await assert.rejects(
+            import(path),
+            (error) => error?.code === "ERR_PACKAGE_PATH_NOT_EXPORTED",
+        );
+    }
 });

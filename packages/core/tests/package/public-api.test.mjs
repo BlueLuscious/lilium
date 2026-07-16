@@ -164,9 +164,17 @@ test("Context.create distinguishes omitted and explicit undefined defaults", () 
     assert.equal(defaulted.get(), undefined);
 });
 
-test("the package exports map rejects internal runtime subpaths", async () => {
-    await assert.rejects(
-        import("@lilium/core/reactivity/runtime/signal/signal.runtime.js"),
-        (error) => error?.code === "ERR_PACKAGE_PATH_NOT_EXPORTED",
-    );
+test("the package exports map rejects Core implementation subpaths", async () => {
+    const implementationPaths = [
+        "@lilium/core/reactivity/runtime/signal/signal.runtime.js",
+        "@lilium/core/integration/runtime/render-binding-runtime.js",
+        "@lilium/core/integration/contracts/render-binding.contract.js",
+    ];
+
+    for (const path of implementationPaths) {
+        await assert.rejects(
+            import(path),
+            (error) => error?.code === "ERR_PACKAGE_PATH_NOT_EXPORTED",
+        );
+    }
 });
