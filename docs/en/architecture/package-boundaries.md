@@ -1,6 +1,6 @@
 # Package Boundaries
 
-Status: **Core and component foundation accepted**
+Status: **Foundation and implementation milestones accepted**
 
 ## Package boundaries
 
@@ -10,9 +10,9 @@ Status: **Core and component foundation accepted**
 | `@lilium/component` | Headless component definitions, reactive inputs, setup, and controllers. | `@lilium/core`. |
 | `@lilium/template` | Template definitions, bindings, and component-template composition. | `@lilium/core`, `@lilium/component`. |
 | `@lilium/renderer` | Universal component/template execution and host renderer protocol. | `@lilium/core`, `@lilium/component`, `@lilium/template`. |
-| `@lilium/renderer-dom` | DOM host, events, attributes, mounting, and JSX integration. | `@lilium/renderer`. |
+| `@lilium/renderer-dom` | DOM host, browser primitives, properties, callbacks, and mounting. | `@lilium/renderer`. |
 | `@lilium/compiler` | Purely parses `.lily` source text and emits code targeting public Component and Template ABIs. | Build-time public contracts only. |
-| `@lilium/renderer-console` | Reference adapter used to validate renderer independence. | `@lilium/renderer`. |
+| `@lilium/renderer-console` | Private reference adapter and conformance infrastructure used to validate renderer independence. | `@lilium/renderer`. |
 
 Only packages that physically exist under `packages/` receive package documentation under `docs/en/packages/`. Planned packages remain documented here and in [Future Packages](../future/packages.md) until they are created.
 
@@ -23,6 +23,21 @@ never become dependencies of universal Renderer.
 The first source grammar, diagnostics, deterministic ESM, and source-map boundary are accepted in
 [Lily Compiler Boundary](lily-compiler-boundary.md). Compiler implementation follows the first
 programmatic Template and Renderer runtime milestone.
+
+## Approved implementation milestones
+
+The implementation order is:
+
+1. Add the authorized rendering integration bridges to the existing Core and Component packages.
+2. Create and implement `@lilium/template`.
+3. Create and implement `@lilium/renderer` after both bridges are complete.
+4. Create private `@lilium/renderer-console` conformance infrastructure after universal Renderer works against a test host.
+5. Create and implement `@lilium/compiler` after the programmatic Template and Renderer pipeline is proven.
+6. Create and implement `@lilium/renderer-dom` after Renderer conformance is proven.
+
+Packages are created when their implementation epic starts, never only to reserve a name. Compiler
+and Renderer DOM are independent consumers of the accepted foundation after their prerequisites;
+their roadmap order does not introduce a dependency between them.
 
 ## Why components are separate
 
@@ -61,10 +76,9 @@ Run `pnpm check:architecture` to verify the current package dependency direction
 
 Each package root is a distribution boundary, not a feature. Source code remains organized by semantic feature. A package-level `src/index.ts` composes public exports; folders such as `src/core/` or `src/kernel/` are created only if an actual feature has that responsibility.
 
-## Open decisions
+## Deferred packages
 
-- Whether `@lilium/renderer-console` is published or remains a private conformance fixture.
-- Whether a facade package named `lilium` should eventually compose the browser defaults.
+- A facade package named `lilium` remains deferred until repeated browser bootstrap behavior proves a responsibility distinct from re-exporting other packages.
+- SSR, hydration, static generation, native rendering, CLI integration, routing, and public testing utilities remain future boundaries.
 
-These remaining decisions belong to the package-milestone phase. They do not block
-`@lilium/core` or `@lilium/component` runtime implementation.
+Deferred packages stay outside the workspace until their responsibilities and dependency boundaries are approved.

@@ -365,9 +365,9 @@ minimum conformance surface contains:
 - assertions that reject invalid anchors, released handles, duplicate release, and unsupported
   capabilities.
 
-Tests use the trace to verify exact mount, update, movement, failure, and unmount sequences. Whether
-`@lilium/renderer-console` is published or remains private conformance infrastructure is deferred to
-the package-milestone phase; its protocol obligations are fixed here.
+Tests use the trace to verify exact mount, update, movement, failure, and unmount sequences.
+`@lilium/renderer-console` is private conformance infrastructure for the first milestone; its
+protocol obligations are fixed here, while publication would require a later explicit API decision.
 
 ## Browser adapter proof
 
