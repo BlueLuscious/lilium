@@ -42,6 +42,8 @@ See [Template ABI](template-abi.md).
 
 The `.lily` compiler may optimize templates, but compiled and programmatically-created definitions must obey the same public contracts. Compiler optimizations must not change observable behavior.
 
+See [Lily Compiler Boundary](lily-compiler-boundary.md).
+
 ### Target independence
 
 Core reactivity and ownership do not depend on DOM APIs. Templates depend on an abstract renderer protocol. Target-specific behavior belongs to a renderer adapter.

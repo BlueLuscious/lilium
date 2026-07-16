@@ -38,11 +38,13 @@ The universal execution, host-session, placement, cleanup, and conformance model
 [Renderer Protocol](../architecture/renderer-protocol.md). Renderer and its host adapters remain
 proposed until their implementation epics are approved.
 
+The first `.lily` grammar, compiler result, diagnostics, deterministic ESM, and source-map model is
+accepted in [Lily Compiler Boundary](../architecture/lily-compiler-boundary.md). Compiler
+implementation follows the programmatic Template and Renderer milestone.
+
 ## Deferred foundation decisions
 
 - Decide whether `@lilium/renderer-console` is publishable or only a conformance fixture.
-- Define compiler output ownership between component and template packages.
-- Choose the minimum `.lily` compiler milestone.
 - Decide whether the browser defaults require a facade package.
 - Decide whether project diagnostics belong to `@lilium/cli`, the facade package, or another executable boundary.
 - Define CSR, SSR, serialization, and hydration responsibilities without coupling universal rendering to a host.

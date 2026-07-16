@@ -316,8 +316,9 @@ only the label-value binding reevaluates when `controller.count` changes.
 
 ## Conceptual compiler output
 
-The `.lily` source grammar is intentionally deferred. For a source component equivalent to the
-programmatic example, the compiler emits a normal ESM module targeting the same objects:
+The accepted [Lily Compiler Boundary](lily-compiler-boundary.md) defines the first source grammar.
+For a source component equivalent to the programmatic example, the compiler emits a normal ESM
+module targeting the same objects:
 
 ```ts
 import { Template } from "@lilium/template";

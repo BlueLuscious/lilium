@@ -19,7 +19,10 @@ The internal `TComponentInputValue<Inputs, Key>` resolver preserves `undefined` 
 
 `ComponentInputValuesType` is the immutable normalized value snapshot accepted by component creation and internal input updates. Every declared key is required. Optional declarations retain `undefined` in their value type, so clearing an input is explicit.
 
-The programmatic low-level API requires normalized snapshots. A future `.lily` compiler or higher-level authoring API may normalize omitted optional inputs before calling the component runtime.
+The programmatic low-level API requires normalized snapshots. Future `.lily` nested-component
+syntax or another higher-level authoring API may normalize omitted optional inputs before calling
+the component runtime; nested components are outside the
+[first compiler milestone](../../../architecture/lily-compiler-boundary.md#explicitly-deferred-source-features).
 
 Input signals are created while the component scope is active and close with that scope. The stable input object and each read wrapper remain the same objects across updates, but reads after disposal follow Core's disposed-signal failure behavior.
 

@@ -23,7 +23,9 @@ The accepted [Template ABI](../../architecture/template-abi.md) composes a
 `TemplatedComponentDefinition`. The headless component never receives an optional template member
 and never imports the template package.
 
-The future `.lily` compiler may emit headless component definitions, template definitions, or composed definitions while targeting these separate ABIs.
+The first accepted [`.lily` compiler boundary](../../architecture/lily-compiler-boundary.md) imports
+an existing headless definition and emits a Template definition plus composition. Inline setup and
+direct `Component.define()` generation remain deferred.
 
 ## External concepts
 

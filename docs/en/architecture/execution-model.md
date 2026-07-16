@@ -130,7 +130,7 @@ Programmatic authoring and compiled `.lily` output target the same [Template ABI
 The cross-package ownership and scheduling boundary is defined by
 [Rendering Integration](rendering-integration.md). Universal execution and host capabilities are
 defined by [Renderer Protocol](renderer-protocol.md), while the concrete compiler boundary remains
-deferred.
+separate and is defined by [Lily Compiler Boundary](lily-compiler-boundary.md).
 
 ## Renderer execution
 
