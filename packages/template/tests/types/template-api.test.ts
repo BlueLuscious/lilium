@@ -1,15 +1,16 @@
 import type { ComponentDefinition } from "@lilium/component";
 import type { ReadonlySignal } from "@lilium/core";
-import type {
-    ComponentTemplateStateType,
-    TemplateApi,
-    TemplateBinding,
-    TemplateDefinition,
-    TemplatedComponentDefinition,
-    TemplatePrimitive,
-    TemplateProjectionStateType,
-    TemplateProperty,
-    TemplateSlot,
+import {
+    type ComponentTemplateStateType,
+    Template,
+    type TemplateApi,
+    type TemplateBinding,
+    type TemplateDefinition,
+    type TemplatedComponentDefinition,
+    type TemplatePrimitive,
+    type TemplateProjectionStateType,
+    type TemplateProperty,
+    type TemplateSlot,
 } from "../../src/index.js";
 
 type CounterInputsType = {
@@ -36,7 +37,7 @@ type ParentStateType = {
     readonly label: ReadonlySignal<string>;
 };
 
-declare const Template: TemplateApi;
+declare const CompleteTemplate: TemplateApi;
 declare const CounterBehavior: ComponentDefinition<CounterInputsType, CounterControllerType>;
 declare const ActionBehavior: ComponentDefinition<ActionInputsType, ActionControllerType>;
 
@@ -44,7 +45,7 @@ const Stack = Template.primitive("Stack");
 const StackGap = Template.property<number>(Stack, "gap");
 const Label = Template.primitive("Label");
 const LabelValue = Template.property<string>(Label, "value");
-const ActionContent = Template.slot<ActionSlotInputsType>("content");
+const ActionContent = CompleteTemplate.slot<ActionSlotInputsType>("content");
 
 const CounterView = Template.define<
     ComponentTemplateStateType<CounterInputsType, CounterControllerType>
@@ -65,19 +66,19 @@ const CounterView = Template.define<
         }),
     ],
 });
-const Counter = Template.compose(CounterBehavior, CounterView);
+const Counter = CompleteTemplate.compose(CounterBehavior, CounterView);
 
 const ActionView = Template.define<
     ComponentTemplateStateType<ActionInputsType, ActionControllerType>
 >({
     roots: [
-        Template.outlet(ActionContent, {
+        CompleteTemplate.outlet(ActionContent, {
             inputs: ({ inputs }) => ({ active: inputs.label.get().length > 0 }),
             fallback: [Template.node(Label, { properties: [Template.value(LabelValue, "Empty")] })],
         }),
     ],
 });
-const Action = Template.compose(ActionBehavior, ActionView);
+const Action = CompleteTemplate.compose(ActionBehavior, ActionView);
 const ActionProjection = Template.define<
     TemplateProjectionStateType<ParentStateType, ActionSlotInputsType>
 >({
@@ -93,14 +94,18 @@ const ActionProjection = Template.define<
 });
 const ParentView = Template.define<ParentStateType>({
     roots: [
-        Template.component(Action, {
+        CompleteTemplate.component(Action, {
             inputs: ({ label }) => ({ label: label.get() }),
             projections: [{ slot: ActionContent, template: ActionProjection }],
         }),
     ],
 });
 
-const api: TemplateApi = Template;
+const api: TemplateApi = CompleteTemplate;
+const implementedApi: Pick<
+    TemplateApi,
+    "binding" | "define" | "node" | "primitive" | "property" | "value"
+> = Template;
 const primitive: TemplatePrimitive = Stack;
 const property: TemplateProperty<typeof Label, string> = LabelValue;
 const slot: TemplateSlot<ActionSlotInputsType> = ActionContent;
@@ -114,7 +119,7 @@ const binding: TemplateBinding<ParentStateType, typeof Label, string, undefined>
 // @ts-expect-error Static property values must match their property capability.
 Template.value(LabelValue, 1);
 
-Template.component(Action, {
+CompleteTemplate.component(Action, {
     // @ts-expect-error Nested component input evaluators must return complete snapshots.
     inputs: () => ({}),
 });
@@ -126,6 +131,7 @@ void api;
 void binding;
 void composition;
 void definition;
+void implementedApi;
 void primitive;
 void property;
 void slot;

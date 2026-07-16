@@ -19,8 +19,9 @@ import type { TemplateOutletOptionsType } from "../../slot/types/template-outlet
 
 /**
  * @description Stateless object API for declaring target-independent immutable template programs.
- * @remarks The future frozen `Template` value implements this complete contract. Every operation
- * is synchronous and captures no runtime, renderer, host, owner, or mounted occurrence.
+ * @remarks The frozen `Template` value implements this contract incrementally as each feature
+ * gains real behavior. Every operation is synchronous and captures no runtime, renderer, host,
+ * owner, or mounted occurrence.
  */
 export interface TemplateApi {
     /**

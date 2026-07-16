@@ -1,4 +1,5 @@
 export type { TemplateApi } from "./api/index.js";
+export { Template } from "./api/index.js";
 export type {
     TemplateBinding,
     TemplateBindingEqualityType,
