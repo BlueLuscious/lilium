@@ -171,11 +171,13 @@ A headless component may be exported and used without a template. The same compo
 composed with multiple templates, and the same compatible template may be composed with multiple
 component definitions. Neither definition gains an optional reference to the other.
 
-A nested component declaration references one `TemplatedComponentDefinition` and one synchronous
-input evaluator. The evaluator receives the parent template state and returns a complete
-`ComponentInputValuesType<ChildInputs>` snapshot, including `undefined` for cleared optional keys.
-Renderer tracks that evaluator as one render binding and forwards every accepted snapshot through
-the Component integration capability. Child setup never reruns.
+A nested component declaration references one `TemplatedComponentDefinition` and one complete
+input declaration. Static inputs are copied into an immutable snapshot and applied once during
+instantiation. Dynamic inputs retain a synchronous evaluator that receives the parent template
+state and returns a complete `ComponentInputValuesType<ChildInputs>` snapshot, including
+`undefined` for cleared optional keys. Renderer tracks only the dynamic form as one render binding
+and forwards every accepted snapshot through the Component integration capability. Child setup
+never reruns.
 
 Nested headless `ComponentDefinition` values cannot appear directly in visual structure because
 they provide no template to instantiate. They must first be composed with a template.

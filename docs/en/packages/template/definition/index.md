@@ -19,9 +19,13 @@ Normalization and reference ordering follow the canonical
 
 1. `define()` validates a non-array options record and root array.
 2. Every root, property instruction, and child must be a genuine declaration created by the same package instance.
-3. A fresh counter assigns depth-first references to each node and then its bindings before visiting children.
+3. A fresh counter assigns depth-first references to each node or component and to node bindings before visiting node children.
 4. Template copies and freezes every declaration container and array.
-5. Primitive, property, evaluator, equality, and application value references remain unchanged.
+5. Primitive, property, composition, evaluator, equality, and application value references remain unchanged.
+
+Nested component normalization copies its input declaration but does not traverse the composed
+child definition. This preserves independent definition identities and keeps parent reference
+allocation local to the parent program.
 
 An active-path identity set rejects recursive declaration graphs without rejecting intentional
 reuse of one declaration at multiple structural positions.

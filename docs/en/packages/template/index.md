@@ -1,14 +1,15 @@
 # `@lilium/template`
 
-Status: **Definitions and bindings implemented**
+Status: **Component composition implemented**
 
 `@lilium/template` defines the target-independent immutable presentation protocol shared by
 programmatic authors, future `.lily` compiler output, and Renderer. It depends only on public Core
 and Component package roots.
 
 The package exports a frozen `Template` value with implemented primitive, property, static value,
-binding, node, and definition operations. Component and Slot operations remain contract-only until
-their implementation phases; the facade does not publish placeholder methods.
+binding, node, definition, nested component, and component-template composition operations. Slot
+operations remain contract-only until their implementation phase; the facade does not publish
+placeholder methods.
 
 ## Features
 
@@ -39,6 +40,7 @@ src/
     types/
   component/
     contracts/
+    runtime/
     types/
   slot/
     contracts/

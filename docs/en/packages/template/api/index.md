@@ -1,6 +1,6 @@
 # Template API
 
-Status: **Definitions and bindings available**
+Status: **Component composition available**
 
 `TemplateApi` is the complete contract for the future frozen `Template` object. It is stateless,
 synchronous, and independent from Renderer and host implementations.
@@ -13,10 +13,10 @@ synchronous, and independent from Renderer and host implementations.
 | `value()` | Declare a static primitive property value. | Implemented |
 | `binding()` | Declare a dynamic property evaluator and equality operation. | Implemented |
 | `node()` | Declare a primitive node with ordered properties and children. | Implemented |
-| `component()` | Declare a nested templated component and complete input evaluator. | Component phase |
+| `component()` | Declare a nested templated component with static or dynamic complete inputs. | Implemented |
 | `outlet()` | Declare a slot outlet, slot-input evaluator, and optional fallback. | Slot phase |
 | `define()` | Validate and normalize a complete reusable template program. | Implemented |
-| `compose()` | Compose independent compatible Component and Template definitions. | Component phase |
+| `compose()` | Compose independent compatible Component and Template definitions. | Implemented |
 
 The root exports `TemplateApi` as the complete target contract and `Template` as the frozen surface
 whose methods already have real immutable behavior. New methods join the same object only when
