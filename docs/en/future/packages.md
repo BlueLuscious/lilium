@@ -4,15 +4,15 @@ This document records packages that do not currently exist. Moving a package int
 
 ## Approved implementation milestones
 
-- `@lilium/template`: target-independent template, binding, and component-template composition model.
 - `@lilium/renderer`: universal renderer and host protocol.
 - `@lilium/renderer-console`: private renderer conformance adapter and diagnostic fixture.
 - `@lilium/compiler`: `.lily` parser, analysis, and code generation.
 - `@lilium/renderer-dom`: browser host implementation.
 
 Creation order, prerequisites, and package gates are defined once in
-[Package Boundaries](../architecture/package-boundaries.md). These packages remain outside the
-workspace until their respective implementation epic begins.
+[Package Boundaries](../architecture/package-boundaries.md). These remaining packages stay outside
+the workspace until their respective implementation epic begins. The active Template package is
+documented under [`docs/en/packages/template/`](../packages/template/index.md).
 
 ## Post-MVP candidates
 

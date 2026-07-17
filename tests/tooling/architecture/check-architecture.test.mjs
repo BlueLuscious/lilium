@@ -9,22 +9,27 @@ function writeJson(path, value) {
     writeFileSync(path, JSON.stringify(value));
 }
 
-function createPackage(root, name, dependencies = {}) {
+function createPackage(root, name, dependencies = {}, integration = true) {
     const packageRoot = join(root, "packages", name);
     mkdirSync(join(packageRoot, "src"), { recursive: true });
     writeFileSync(join(packageRoot, "src", "index.ts"), "export {};\n");
+    const exports = {
+        ".": {
+            import: "./dist/index.js",
+            types: "./dist/index.d.ts",
+        },
+    };
+
+    if (integration) {
+        exports["./integration"] = {
+            import: "./dist/integration/index.js",
+            types: "./dist/integration/index.d.ts",
+        };
+    }
+
     writeJson(join(packageRoot, "package.json"), {
         dependencies,
-        exports: {
-            ".": {
-                import: "./dist/index.js",
-                types: "./dist/index.d.ts",
-            },
-            "./integration": {
-                import: "./dist/integration/index.js",
-                types: "./dist/integration/index.d.ts",
-            },
-        },
+        exports,
     });
     writeJson(join(packageRoot, "tsconfig.json"), {
         compilerOptions: { lib: ["ES2022"], noEmitOnError: true, types: [] },
@@ -39,6 +44,15 @@ function createRepository(context) {
     context.after(() => rmSync(root, { force: true, recursive: true }));
     createPackage(root, "core");
     createPackage(root, "component", { "@lilium/core": "workspace:*" });
+    createPackage(
+        root,
+        "template",
+        {
+            "@lilium/component": "workspace:*",
+            "@lilium/core": "workspace:*",
+        },
+        false,
+    );
     return root;
 }
 
@@ -76,6 +90,20 @@ describe("architecture checker", () => {
         const violations = checkArchitecture(root);
         assert.equal(
             violations.some((violation) => violation.includes("root features cannot import")),
+            true,
+        );
+    });
+
+    test("rejects integration imports from Template declarations", (context) => {
+        const root = createRepository(context);
+        writeFileSync(
+            join(root, "packages", "template", "src", "index.ts"),
+            'import { CoreIntegration } from "@lilium/core/integration";\nvoid CoreIntegration;\n',
+        );
+
+        const violations = checkArchitecture(root);
+        assert.equal(
+            violations.some((violation) => violation.includes("template cannot depend")),
             true,
         );
     });

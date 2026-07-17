@@ -8,7 +8,7 @@ Status: **Foundation and implementation milestones accepted**
 | --- | --- | --- |
 | `@lilium/core` | Reactivity, ownership, scheduling, and context. | None. |
 | `@lilium/component` | Headless component definitions, reactive inputs, setup, and controllers. | `@lilium/core`. |
-| `@lilium/template` | Template definitions, bindings, and component-template composition. | `@lilium/core`, `@lilium/component`. |
+| `@lilium/template` | Immutable definitions, bindings, component composition, slots, and projections. | `@lilium/core`, `@lilium/component`. |
 | `@lilium/renderer` | Universal component/template execution and host renderer protocol. | `@lilium/core`, `@lilium/component`, `@lilium/template`. |
 | `@lilium/renderer-dom` | DOM host, browser primitives, properties, callbacks, and mounting. | `@lilium/renderer`. |
 | `@lilium/compiler` | Purely parses `.lily` source text and emits code targeting public Component and Template ABIs. | Build-time public contracts only. |

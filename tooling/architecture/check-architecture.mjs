@@ -20,6 +20,13 @@ const packagePolicies = Object.freeze([
             "./integration": "./dist/integration/index",
         }),
     }),
+    Object.freeze({
+        name: "template",
+        allowedLiliumDependencies: Object.freeze(["@lilium/core", "@lilium/component"]),
+        exports: Object.freeze({
+            ".": "./dist/index",
+        }),
+    }),
 ]);
 
 /**

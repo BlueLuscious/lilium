@@ -1,6 +1,6 @@
 # Template ABI
 
-Status: **Foundation accepted**
+Status: **First public ABI implemented and verified**
 
 This document defines the canonical target-independent Template ABI for programmatic authoring and
 compiled `.lily` output. It defines immutable presentation declarations only. Runtime execution and
@@ -24,7 +24,7 @@ families after the static, binding, component, and slot lifecycles are implement
 
 ## Public object model
 
-`@lilium/template` will export one frozen stateless `Template` object implementing `TemplateApi`.
+`@lilium/template` exports one frozen stateless `Template` object implementing `TemplateApi`.
 Its operations create normalized immutable definition objects; they never capture a runtime,
 renderer, host, owner, or mounted occurrence.
 
@@ -52,11 +52,12 @@ The facade operations are conceptually:
 - `Template.slot()` creates a named slot identity;
 - `Template.node()`, `Template.value()`, `Template.binding()`, `Template.component()`, and
   `Template.outlet()` create declaration records;
+- `Template.projection()` creates a typed parent-owned projection declaration;
 - `Template.define()` validates, copies, normalizes, and freezes one complete program;
 - `Template.compose()` creates a separate component-template composition.
 
-Concrete overloads and generic spelling will be finalized with the implementation contracts, but
-these objects and semantic operations are fixed by this ABI.
+Concrete overloads and generic spelling are defined by the public package contracts. These objects
+and semantic operations form the verified first Template ABI.
 
 ## Immutable program
 
@@ -171,22 +172,26 @@ A headless component may be exported and used without a template. The same compo
 composed with multiple templates, and the same compatible template may be composed with multiple
 component definitions. Neither definition gains an optional reference to the other.
 
-A nested component declaration references one `TemplatedComponentDefinition` and one synchronous
-input evaluator. The evaluator receives the parent template state and returns a complete
-`ComponentInputValuesType<ChildInputs>` snapshot, including `undefined` for cleared optional keys.
-Renderer tracks that evaluator as one render binding and forwards every accepted snapshot through
-the Component integration capability. Child setup never reruns.
+A nested component declaration references one `TemplatedComponentDefinition` and one complete
+input declaration. Static inputs are copied into an immutable snapshot and applied once during
+instantiation. Dynamic inputs retain a synchronous evaluator that receives the parent template
+state and returns a complete `ComponentInputValuesType<ChildInputs>` snapshot, including
+`undefined` for cleared optional keys. Renderer tracks only the dynamic form as one render binding
+and forwards every accepted snapshot through the Component integration capability. Child setup
+never reruns.
 
 Nested headless `ComponentDefinition` values cannot appear directly in visual structure because
 they provide no template to instantiate. They must first be composed with a template.
 
 ## Slots and projection
 
-A `TemplateSlot<Inputs>` is a stable object identity with an immutable diagnostic name. A child
-template places that identity through one slot-outlet declaration. A composed component exposes
-its accepted slots as an immutable name-to-identity map for programmatic authoring, compiler
-analysis, and diagnostics. Duplicate names or duplicate outlets for a single-occurrence slot are
-definition errors.
+A `TemplateSlot<Inputs>` is a stable object identity with an immutable diagnostic name. Omitting
+the name creates a new identity named `"default"`; it does not reuse a package-global singleton.
+A child template places that identity through one slot-outlet declaration. A composed component
+exposes its accepted slots as an immutable name-to-identity map for programmatic authoring,
+compiler analysis, and diagnostics. `Template.define()` rejects repeated slot identities and
+distinct slot identities with the same normalized name across the complete definition, including
+fallback fragments.
 
 An outlet defines:
 
@@ -195,7 +200,10 @@ An outlet defines:
 - an optional fallback fragment evaluated against child state.
 
 A parent nested-component declaration may provide one projection definition for each accepted slot
-identity. Projection content evaluates against a frozen `TemplateProjectionStateType` containing:
+identity. `Template.projection()` preserves the slot-input-to-projection-state type relationship
+and creates a genuine immutable declaration. `Template.component()` copies projections in
+declaration order and rejects repeated, structurally imitated, or unaccepted declarations.
+Projection content evaluates against a frozen `TemplateProjectionStateType` containing:
 
 - `parent`, the supplying parent template state;
 - `slot`, a stable object of read-only reactive slot-input signals.
