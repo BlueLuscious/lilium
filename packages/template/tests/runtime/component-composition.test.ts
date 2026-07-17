@@ -164,7 +164,7 @@ describe("template component composition", () => {
         assert.equal("lifecycle" in composition, false);
     });
 
-    test("rejects foreign definitions, compositions, inputs, and premature projections", () => {
+    test("rejects foreign definitions, compositions, and inputs", () => {
         const { behavior, composition, view } = createChildDefinitions();
 
         assert.throws(
@@ -192,14 +192,6 @@ describe("template component composition", () => {
         assert.throws(
             () => Template.component(composition, { inputs: null as never }),
             /component input snapshot must be a non-array object/i,
-        );
-        assert.throws(
-            () =>
-                Template.component(composition, {
-                    inputs: { optional: undefined, payload: { mutable: true }, value: 1 },
-                    projections: [],
-                }),
-            /projections are unavailable/i,
         );
     });
 });

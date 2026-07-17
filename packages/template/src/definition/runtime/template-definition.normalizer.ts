@@ -4,6 +4,9 @@ import type { TemplateComponentInputType } from "../../component/types/template-
 import type { TemplateNode } from "../../primitive/contracts/template-node.contract.js";
 import type { TemplatePrimitive } from "../../primitive/contracts/template-primitive.contract.js";
 import type { TemplatePropertyInstructionType } from "../../primitive/types/template-property-instruction.type.js";
+import type { TemplateOutlet } from "../../slot/contracts/template-outlet.contract.js";
+import type { TemplateProjection } from "../../slot/contracts/template-projection.contract.js";
+import type { TemplateSlot } from "../../slot/contracts/template-slot.contract.js";
 import type { TemplateDefinition } from "../contracts/template-definition.contract.js";
 import type { TTemplateNormalizationContext } from "../types/internal/template-normalization-context.type.js";
 import type { TemplateDefinitionOptionsType } from "../types/template-definition-options.type.js";
@@ -53,6 +56,8 @@ export class TemplateDefinitionNormalizer {
         const context: TTemplateNormalizationContext = {
             active: new WeakSet<object>(),
             nextReference: 0,
+            slotIdentities: new Set<object>(),
+            slotsByName: new Map<string, TemplateSlot<object>>(),
         };
         const roots = Object.freeze(
             candidateRoots.map((instruction) =>
@@ -60,7 +65,8 @@ export class TemplateDefinitionNormalizer {
             ),
         );
         const normalized = Object.freeze({ roots }) as unknown as TemplateDefinition<State>;
-        this.#definitions.register(normalized);
+        const slots = this.#createSlotMap(context.slotsByName);
+        this.#definitions.register(normalized, slots);
         return normalized;
     }
 
@@ -81,6 +87,10 @@ export class TemplateDefinitionNormalizer {
 
         if (this.#declarations.isComponent(candidate)) {
             return this.#normalizeComponent<State>(candidate, context);
+        }
+
+        if (this.#declarations.isOutlet(candidate)) {
+            return this.#normalizeOutlet<State>(candidate, context);
         }
 
         throw new TypeError("A template fragment can contain only genuine Template declarations.");
@@ -150,14 +160,35 @@ export class TemplateDefinitionNormalizer {
         const reference = context.nextReference;
         context.nextReference += 1;
         const inputs = this.#normalizeComponentInputs<State>(candidate.inputs);
+        const projections = this.#normalizeProjections<State>(candidate.projections);
 
         return Object.freeze({
             kind: "component" as const,
             reference,
             component: candidate.component,
             inputs,
-            projections: Object.freeze([]),
+            projections,
         });
+    }
+
+    /**
+     * @description Copies ordered projection records without entering their independent definitions.
+     * @typeParam State - Read-only parent template occurrence state.
+     * @param projections - Validated projections retained by a genuine component declaration.
+     * @returns A frozen ordered array containing fresh immutable projection records.
+     */
+    #normalizeProjections<State extends object>(
+        projections: readonly TemplateProjection<object, object>[],
+    ): readonly TemplateProjection<State, object>[] {
+        return Object.freeze(
+            projections.map(
+                (projection) =>
+                    Object.freeze({
+                        slot: projection.slot,
+                        template: projection.template,
+                    }) as TemplateProjection<State, object>,
+            ),
+        );
     }
 
     /**
@@ -180,6 +211,85 @@ export class TemplateDefinitionNormalizer {
             kind: "value" as const,
             value: Object.freeze({ ...inputs.value }),
         });
+    }
+
+    /**
+     * @description Copies one genuine outlet and recursively normalizes its fallback fragment.
+     * @typeParam State - Read-only receiving child template occurrence state.
+     * @param candidate - Genuine unnormalized slot outlet declaration.
+     * @param context - State isolated to the active definition normalization pass.
+     * @returns A frozen normalized outlet with a deterministic reference.
+     */
+    #normalizeOutlet<State extends object>(
+        candidate: TemplateOutlet<object, object, undefined>,
+        context: TTemplateNormalizationContext,
+    ): TemplateOutlet<State, object, TemplateReferenceType> {
+        if (context.active.has(candidate)) {
+            throw new TypeError("A template definition cannot contain cyclic declarations.");
+        }
+
+        this.#registerOutlet(candidate.slot, context);
+        context.active.add(candidate);
+
+        try {
+            const reference = context.nextReference;
+            context.nextReference += 1;
+            const fallback = Object.freeze(
+                candidate.fallback.map((instruction) =>
+                    this.#normalizeInstruction<State>(instruction, context),
+                ),
+            );
+            return Object.freeze({
+                kind: "outlet" as const,
+                reference,
+                slot: candidate.slot,
+                inputs: candidate.inputs,
+                fallback,
+            });
+        } finally {
+            context.active.delete(candidate);
+        }
+    }
+
+    /**
+     * @description Registers one outlet slot while enforcing definition-level uniqueness.
+     * @param slot - Genuine slot identity placed by the current outlet.
+     * @param context - State isolated to the active definition normalization pass.
+     * @returns Nothing.
+     */
+    #registerOutlet(slot: TemplateSlot<object>, context: TTemplateNormalizationContext): void {
+        if (context.slotIdentities.has(slot)) {
+            throw new TypeError(`Template definition contains duplicate outlet "${slot.name}".`);
+        }
+
+        if (context.slotsByName.has(slot.name)) {
+            throw new TypeError(`Template definition contains duplicate slot name "${slot.name}".`);
+        }
+
+        context.slotIdentities.add(slot);
+        context.slotsByName.set(slot.name, slot);
+    }
+
+    /**
+     * @description Creates one immutable own-property map from slots in traversal order.
+     * @param slotsByName - Validated slots indexed by their normalized names.
+     * @returns A frozen map safe for every accepted non-empty slot name.
+     */
+    #createSlotMap(
+        slotsByName: ReadonlyMap<string, TemplateSlot<object>>,
+    ): Readonly<Record<string, TemplateSlot<object>>> {
+        const slots: Record<string, TemplateSlot<object>> = {};
+
+        for (const [name, slot] of slotsByName) {
+            Object.defineProperty(slots, name, {
+                configurable: false,
+                enumerable: true,
+                value: slot,
+                writable: false,
+            });
+        }
+
+        return Object.freeze(slots);
     }
 
     /**

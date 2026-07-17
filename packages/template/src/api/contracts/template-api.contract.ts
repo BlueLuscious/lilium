@@ -14,8 +14,10 @@ import type { TemplateProperty } from "../../primitive/contracts/template-proper
 import type { TemplateStaticValue } from "../../primitive/contracts/template-static-value.contract.js";
 import type { TemplateNodeOptionsType } from "../../primitive/types/template-node-options.type.js";
 import type { TemplateOutlet } from "../../slot/contracts/template-outlet.contract.js";
+import type { TemplateProjection } from "../../slot/contracts/template-projection.contract.js";
 import type { TemplateSlot } from "../../slot/contracts/template-slot.contract.js";
 import type { TemplateOutletOptionsType } from "../../slot/types/template-outlet-options.type.js";
+import type { TemplateProjectionStateType } from "../../slot/types/template-projection-state.type.js";
 
 /**
  * @description Stateless object API for declaring target-independent immutable template programs.
@@ -104,7 +106,7 @@ export interface TemplateApi {
      * @typeParam ChildInputs - Complete child component input value shape.
      * @typeParam ChildController - Public child controller object.
      * @param component - Existing immutable component-template composition.
-     * @param options - Complete static snapshot or lazy evaluator declaration.
+     * @param options - Complete inputs and optional ordered projections.
      * @returns An immutable unnormalized nested-component declaration.
      */
     component<
@@ -128,6 +130,19 @@ export interface TemplateApi {
         slot: TemplateSlot<Inputs>,
         options: TemplateOutletOptionsType<State, Inputs>,
     ): TemplateOutlet<State, Inputs, undefined>;
+
+    /**
+     * @description Declares parent-owned content projected into one typed child slot.
+     * @typeParam ParentState - Read-only state of the supplying parent template.
+     * @typeParam SlotInputs - Complete input shape supplied by the receiving slot.
+     * @param slot - Genuine child slot identity receiving projected content.
+     * @param template - Genuine template evaluated against parent and reactive slot state.
+     * @returns A genuine immutable projection declaration.
+     */
+    projection<ParentState extends object, SlotInputs extends object>(
+        slot: TemplateSlot<SlotInputs>,
+        template: TemplateDefinition<TemplateProjectionStateType<ParentState, SlotInputs>>,
+    ): TemplateProjection<ParentState, SlotInputs>;
 
     /**
      * @description Validates, copies, normalizes, and freezes one complete template program.

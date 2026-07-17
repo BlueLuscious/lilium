@@ -16,6 +16,11 @@ import type { TemplateStaticValue } from "../../primitive/contracts/template-sta
 import type { TemplateIdentityRegistry } from "../../primitive/runtime/template-identity.registry.js";
 import type { TemplateNodeOptionsType } from "../../primitive/types/template-node-options.type.js";
 import type { TemplatePropertyInstructionType } from "../../primitive/types/template-property-instruction.type.js";
+import type { TemplateOutlet } from "../../slot/contracts/template-outlet.contract.js";
+import type { TemplateSlot } from "../../slot/contracts/template-slot.contract.js";
+import type { TemplateProjectionFactory } from "../../slot/runtime/template-projection.factory.js";
+import type { TemplateSlotRegistry } from "../../slot/runtime/template-slot.registry.js";
+import type { TemplateOutletOptionsType } from "../../slot/types/template-outlet-options.type.js";
 import type { TemplateInstructionType } from "../types/template-instruction.type.js";
 
 /**
@@ -27,6 +32,12 @@ export class TemplateDeclarationFactory {
     /** @description Registry validating primitive and property capability identities. */
     readonly #identities: TemplateIdentityRegistry;
 
+    /** @description Factory validating and copying component projection declarations. */
+    readonly #projections: TemplateProjectionFactory;
+
+    /** @description Registry validating slot identities used by outlets. */
+    readonly #slots: TemplateSlotRegistry;
+
     /** @description Genuine dynamic binding declarations created by this factory. */
     readonly #bindings = new WeakSet<object>();
 
@@ -36,15 +47,26 @@ export class TemplateDeclarationFactory {
     /** @description Genuine primitive node declarations created by this factory. */
     readonly #nodes = new WeakSet<object>();
 
+    /** @description Genuine slot outlet declarations created by this factory. */
+    readonly #outlets = new WeakSet<object>();
+
     /** @description Genuine static value declarations created by this factory. */
     readonly #values = new WeakSet<object>();
 
     /**
-     * @description Constructs one declaration factory over the package identity registry.
+     * @description Constructs one declaration factory over package identity services.
      * @param identities - Registry validating primitive and property capabilities.
+     * @param slots - Registry validating slot identities.
+     * @param projections - Factory validating component projection declarations.
      */
-    constructor(identities: TemplateIdentityRegistry) {
+    constructor(
+        identities: TemplateIdentityRegistry,
+        slots: TemplateSlotRegistry,
+        projections: TemplateProjectionFactory,
+    ) {
         this.#identities = identities;
+        this.#slots = slots;
+        this.#projections = projections;
     }
 
     /**
@@ -132,23 +154,60 @@ export class TemplateDeclarationFactory {
     ): TemplateComponent<ParentState, undefined> {
         this.#assertRecord(options, "component options");
         const inputCandidate = Reflect.get(options, "inputs");
-        const projections = Reflect.get(options, "projections");
-
-        if (projections !== undefined) {
-            throw new TypeError(
-                "Template component projections are unavailable until the Slot feature is implemented.",
-            );
-        }
-
         const inputs = this.#createComponentInputs<ParentState, ChildInputs>(inputCandidate);
+        const projections = this.#projections.copy<ParentState, ChildInputs, ChildController>(
+            component,
+            Reflect.get(options, "projections"),
+        );
         const declaration = Object.freeze({
             kind: "component" as const,
             reference: undefined,
             component,
             inputs,
-            projections: Object.freeze([]),
+            projections,
         }) as TemplateComponent<ParentState, undefined>;
         this.#components.add(declaration);
+        return declaration;
+    }
+
+    /**
+     * @description Creates one frozen slot outlet with an optional child-owned fallback fragment.
+     * @typeParam State - Read-only state of the receiving child template.
+     * @typeParam Inputs - Complete value shape supplied to projected content.
+     * @param slot - Genuine slot identity placed by this outlet.
+     * @param options - Slot-input evaluator and optional fallback declarations.
+     * @returns An immutable genuine unnormalized slot outlet declaration.
+     */
+    createOutlet<State extends object, Inputs extends object>(
+        slot: TemplateSlot<Inputs>,
+        options: TemplateOutletOptionsType<State, Inputs>,
+    ): TemplateOutlet<State, Inputs, undefined> {
+        this.#slots.assertSlot(slot);
+        this.#assertRecord(options, "outlet options");
+        const inputs = Reflect.get(options, "inputs");
+
+        if (typeof inputs !== "function") {
+            throw new TypeError("A template outlet input evaluator must be a function.");
+        }
+
+        const fallbackCandidates = this.#readArray(options, "fallback", "outlet fallback");
+
+        for (const instruction of fallbackCandidates) {
+            this.assertInstruction(instruction);
+        }
+
+        const fallback = Object.freeze([...fallbackCandidates]) as readonly TemplateInstructionType<
+            State,
+            undefined
+        >[];
+        const declaration = Object.freeze({
+            kind: "outlet" as const,
+            reference: undefined,
+            slot,
+            inputs,
+            fallback,
+        }) as TemplateOutlet<State, Inputs, undefined>;
+        this.#outlets.add(declaration);
         return declaration;
     }
 
@@ -169,8 +228,8 @@ export class TemplateDeclarationFactory {
     ): TemplateNode<State, Primitive, undefined> {
         this.#identities.assertPrimitive(primitive);
         this.#assertOptionalRecord(options, "node options");
-        const propertyCandidates = this.#readArray(options, "properties");
-        const childCandidates = this.#readArray(options, "children");
+        const propertyCandidates = this.#readArray(options, "properties", "node properties");
+        const childCandidates = this.#readArray(options, "children", "node children");
 
         for (const instruction of propertyCandidates) {
             this.#assertPropertyInstruction(instruction, primitive);
@@ -221,7 +280,11 @@ export class TemplateDeclarationFactory {
     assertInstruction(
         instruction: unknown,
     ): asserts instruction is TemplateInstructionType<object, undefined> {
-        if (!this.isNode(instruction) && !this.isComponent(instruction)) {
+        if (
+            !this.isNode(instruction) &&
+            !this.isComponent(instruction) &&
+            !this.isOutlet(instruction)
+        ) {
             throw new TypeError(
                 "A template fragment can contain only genuine Template declarations.",
             );
@@ -244,6 +307,15 @@ export class TemplateDeclarationFactory {
      */
     isComponent(value: unknown): value is TemplateComponent<object, undefined> {
         return typeof value === "object" && value !== null && this.#components.has(value);
+    }
+
+    /**
+     * @description Reports whether a candidate is a genuine slot outlet declaration.
+     * @param value - Candidate instruction encountered during normalization.
+     * @returns Whether the candidate was created by this declaration factory.
+     */
+    isOutlet(value: unknown): value is TemplateOutlet<object, object, undefined> {
+        return typeof value === "object" && value !== null && this.#outlets.has(value);
     }
 
     /**
@@ -312,9 +384,10 @@ export class TemplateDeclarationFactory {
      * @description Reads and copies one optional declaration array from an options record.
      * @param options - Optional caller-owned options record.
      * @param key - Array property to read.
+     * @param description - Declaration family used in deterministic validation errors.
      * @returns A shallow copy of the supplied array or a new empty array.
      */
-    #readArray(options: object | undefined, key: string): unknown[] {
+    #readArray(options: object | undefined, key: string, description: string): unknown[] {
         if (options === undefined) {
             return [];
         }
@@ -326,7 +399,7 @@ export class TemplateDeclarationFactory {
         }
 
         if (!Array.isArray(candidate)) {
-            throw new TypeError(`Template node ${key} must be an array.`);
+            throw new TypeError(`Template ${description} must be an array.`);
         }
 
         return [...candidate];

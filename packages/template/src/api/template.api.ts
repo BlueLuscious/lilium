@@ -18,16 +18,36 @@ import type { TemplateProperty } from "../primitive/contracts/template-property.
 import type { TemplateStaticValue } from "../primitive/contracts/template-static-value.contract.js";
 import { TemplateIdentityRegistry } from "../primitive/runtime/template-identity.registry.js";
 import type { TemplateNodeOptionsType } from "../primitive/types/template-node-options.type.js";
+import type { TemplateOutlet } from "../slot/contracts/template-outlet.contract.js";
+import type { TemplateProjection } from "../slot/contracts/template-projection.contract.js";
+import type { TemplateSlot } from "../slot/contracts/template-slot.contract.js";
+import { TemplateProjectionFactory } from "../slot/runtime/template-projection.factory.js";
+import { TemplateSlotRegistry } from "../slot/runtime/template-slot.registry.js";
+import type { TemplateOutletOptionsType } from "../slot/types/template-outlet-options.type.js";
+import type { TemplateProjectionStateType } from "../slot/types/template-projection-state.type.js";
 import type { TemplateApi } from "./contracts/template-api.contract.js";
 
 /** @description Package-local nominal registry shared by every Template identity operation. */
 const templateIdentities = new TemplateIdentityRegistry();
 
-/** @description Package-local factory shared by every Template declaration operation. */
-const templateDeclarations = new TemplateDeclarationFactory(templateIdentities);
+/** @description Package-local nominal registry shared by slot declaration operations. */
+const templateSlots = new TemplateSlotRegistry();
 
 /** @description Package-local nominal registry shared by definition and composition operations. */
 const templateDefinitionIdentities = new TemplateDefinitionRegistry();
+
+/** @description Package-local projection validator shared by component declarations. */
+const templateProjections = new TemplateProjectionFactory(
+    templateSlots,
+    templateDefinitionIdentities,
+);
+
+/** @description Package-local factory shared by every Template declaration operation. */
+const templateDeclarations = new TemplateDeclarationFactory(
+    templateIdentities,
+    templateSlots,
+    templateProjections,
+);
 
 /** @description Package-local normalizer shared by every Template definition operation. */
 const templateDefinitions = new TemplateDefinitionNormalizer(
@@ -42,8 +62,8 @@ const templateComponents: TemplateComponentComposer = new TemplateComponentCompo
 
 /**
  * @description Frozen stateless public facade for implemented Template declaration features.
- * @remarks Definitions, bindings, and Component composition have real behavior. Slot operations
- * join this object only when their identities, outlets, and projections are implemented.
+ * @remarks Every minimum declaration feature has real synchronous immutable behavior. This object
+ * creates no runtime occurrence, ownership resource, Renderer state, or host value.
  */
 export const Template = Object.freeze({
     /**
@@ -69,6 +89,16 @@ export const Template = Object.freeze({
         name?: string,
     ): TemplateProperty<Primitive, Value> {
         return templateIdentities.createProperty<Value, Primitive>(primitive, name);
+    },
+
+    /**
+     * @description Creates one stable named projection-point identity.
+     * @typeParam Inputs - Complete slot input value shape.
+     * @param name - Optional diagnostic name; omission selects the canonical default name.
+     * @returns A new typed slot identity.
+     */
+    slot<Inputs extends object = object>(name?: string): TemplateSlot<Inputs> {
+        return templateSlots.create<Inputs>(name);
     },
 
     /**
@@ -128,7 +158,7 @@ export const Template = Object.freeze({
      * @typeParam ChildInputs - Complete child component input value shape.
      * @typeParam ChildController - Public child controller object.
      * @param component - Existing immutable component-template composition.
-     * @param options - Complete static snapshot or lazy evaluator declaration.
+     * @param options - Complete inputs and optional ordered projections.
      * @returns An immutable unnormalized nested-component declaration.
      */
     component<
@@ -141,6 +171,36 @@ export const Template = Object.freeze({
     ): TemplateComponent<ParentState, undefined> {
         templateComponents.assertComposition(component);
         return templateDeclarations.createComponent(component, options);
+    },
+
+    /**
+     * @description Declares one slot outlet and optional child-owned fallback fragment.
+     * @typeParam State - Read-only state of the receiving child template.
+     * @typeParam Inputs - Complete slot-input value shape.
+     * @param slot - Genuine slot identity placed by this outlet.
+     * @param options - Slot-input evaluator and optional fallback declarations.
+     * @returns An immutable unnormalized slot outlet declaration.
+     */
+    outlet<State extends object, Inputs extends object>(
+        slot: TemplateSlot<Inputs>,
+        options: TemplateOutletOptionsType<State, Inputs>,
+    ): TemplateOutlet<State, Inputs, undefined> {
+        return templateDeclarations.createOutlet(slot, options);
+    },
+
+    /**
+     * @description Declares parent-owned content projected into one typed child slot.
+     * @typeParam ParentState - Read-only state of the supplying parent template.
+     * @typeParam SlotInputs - Complete input shape supplied by the receiving slot.
+     * @param slot - Genuine child slot identity receiving projected content.
+     * @param template - Genuine template evaluated against parent and reactive slot state.
+     * @returns A genuine immutable projection declaration.
+     */
+    projection<ParentState extends object, SlotInputs extends object>(
+        slot: TemplateSlot<SlotInputs>,
+        template: TemplateDefinition<TemplateProjectionStateType<ParentState, SlotInputs>>,
+    ): TemplateProjection<ParentState, SlotInputs> {
+        return templateProjections.create(slot, template);
     },
 
     /**
@@ -171,5 +231,15 @@ export const Template = Object.freeze({
     },
 }) satisfies Pick<
     TemplateApi,
-    "binding" | "component" | "compose" | "define" | "node" | "primitive" | "property" | "value"
+    | "binding"
+    | "component"
+    | "compose"
+    | "define"
+    | "node"
+    | "outlet"
+    | "primitive"
+    | "projection"
+    | "property"
+    | "slot"
+    | "value"
 >;

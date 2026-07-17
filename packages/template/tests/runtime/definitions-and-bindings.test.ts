@@ -237,8 +237,11 @@ describe("template definitions and bindings", () => {
             "compose",
             "define",
             "node",
+            "outlet",
             "primitive",
+            "projection",
             "property",
+            "slot",
             "value",
         ]);
     });

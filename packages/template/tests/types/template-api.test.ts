@@ -37,7 +37,6 @@ type ParentStateType = {
     readonly label: ReadonlySignal<string>;
 };
 
-declare const CompleteTemplate: TemplateApi;
 declare const CounterBehavior: ComponentDefinition<CounterInputsType, CounterControllerType>;
 declare const ActionBehavior: ComponentDefinition<ActionInputsType, ActionControllerType>;
 
@@ -45,7 +44,8 @@ const Stack = Template.primitive("Stack");
 const StackGap = Template.property<number>(Stack, "gap");
 const Label = Template.primitive("Label");
 const LabelValue = Template.property<string>(Label, "value");
-const ActionContent = CompleteTemplate.slot<ActionSlotInputsType>("content");
+const ActionContent = Template.slot<ActionSlotInputsType>("content");
+const DefaultContent = Template.slot();
 
 const CounterView = Template.define<
     ComponentTemplateStateType<CounterInputsType, CounterControllerType>
@@ -72,7 +72,7 @@ const ActionView = Template.define<
     ComponentTemplateStateType<ActionInputsType, ActionControllerType>
 >({
     roots: [
-        CompleteTemplate.outlet(ActionContent, {
+        Template.outlet(ActionContent, {
             inputs: ({ inputs }) => ({ active: inputs.label.get().length > 0 }),
             fallback: [Template.node(Label, { properties: [Template.value(LabelValue, "Empty")] })],
         }),
@@ -98,20 +98,17 @@ const ActionProjection = Template.define<
         }),
     ],
 });
+const ProjectedActionContent = Template.projection(ActionContent, ActionProjection);
 const ParentView = Template.define<ParentStateType>({
     roots: [
-        CompleteTemplate.component(Action, {
+        Template.component(Action, {
             inputs: ({ label }) => ({ label: label.get() }),
-            projections: [{ slot: ActionContent, template: ActionProjection }],
+            projections: [ProjectedActionContent],
         }),
     ],
 });
 
-const api: TemplateApi = CompleteTemplate;
-const implementedApi: Pick<
-    TemplateApi,
-    "binding" | "component" | "compose" | "define" | "node" | "primitive" | "property" | "value"
-> = Template;
+const api: TemplateApi = Template;
 const primitive: TemplatePrimitive = Stack;
 const property: TemplateProperty<typeof Label, string> = LabelValue;
 const slot: TemplateSlot<ActionSlotInputsType> = ActionContent;
@@ -130,6 +127,20 @@ Template.component(Action, {
     inputs: () => ({}),
 });
 
+Template.outlet(ActionContent, {
+    // @ts-expect-error Slot input evaluators must return complete snapshots.
+    inputs: () => ({}),
+});
+
+// @ts-expect-error Projection templates must match their slot input state.
+Template.projection(ActionContent, CounterView);
+
+Template.component(Action, {
+    inputs: { label: "Run" },
+    // @ts-expect-error Projections must be genuine declarations created by Template.projection().
+    projections: [{ slot: ActionContent, template: ActionProjection }],
+});
+
 Template.component(Action, {
     // @ts-expect-error Static nested component inputs must contain every declared key.
     inputs: {},
@@ -142,9 +153,10 @@ void api;
 void binding;
 void composition;
 void definition;
-void implementedApi;
+void DefaultContent;
 void NestedCounter;
 void primitive;
 void property;
+void ProjectedActionContent;
 void slot;
 void StaticAction;

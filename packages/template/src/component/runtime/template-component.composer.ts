@@ -38,10 +38,11 @@ export class TemplateComponentComposer {
     ): TemplatedComponentDefinition<Inputs, Controller> {
         this.#assertComponentDefinition(component);
         this.#definitions.assertDefinition(template);
+        const slots = this.#definitions.getSlots(template);
         const composition = Object.freeze({
             component,
             template,
-            slots: Object.freeze({}),
+            slots,
         }) as TemplatedComponentDefinition<Inputs, Controller>;
         this.#compositions.add(composition);
         return composition;
