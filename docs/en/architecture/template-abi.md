@@ -52,6 +52,7 @@ The facade operations are conceptually:
 - `Template.slot()` creates a named slot identity;
 - `Template.node()`, `Template.value()`, `Template.binding()`, `Template.component()`, and
   `Template.outlet()` create declaration records;
+- `Template.projection()` creates a typed parent-owned projection declaration;
 - `Template.define()` validates, copies, normalizes, and freezes one complete program;
 - `Template.compose()` creates a separate component-template composition.
 
@@ -184,11 +185,13 @@ they provide no template to instantiate. They must first be composed with a temp
 
 ## Slots and projection
 
-A `TemplateSlot<Inputs>` is a stable object identity with an immutable diagnostic name. A child
-template places that identity through one slot-outlet declaration. A composed component exposes
-its accepted slots as an immutable name-to-identity map for programmatic authoring, compiler
-analysis, and diagnostics. Duplicate names or duplicate outlets for a single-occurrence slot are
-definition errors.
+A `TemplateSlot<Inputs>` is a stable object identity with an immutable diagnostic name. Omitting
+the name creates a new identity named `"default"`; it does not reuse a package-global singleton.
+A child template places that identity through one slot-outlet declaration. A composed component
+exposes its accepted slots as an immutable name-to-identity map for programmatic authoring,
+compiler analysis, and diagnostics. `Template.define()` rejects repeated slot identities and
+distinct slot identities with the same normalized name across the complete definition, including
+fallback fragments.
 
 An outlet defines:
 
@@ -197,7 +200,10 @@ An outlet defines:
 - an optional fallback fragment evaluated against child state.
 
 A parent nested-component declaration may provide one projection definition for each accepted slot
-identity. Projection content evaluates against a frozen `TemplateProjectionStateType` containing:
+identity. `Template.projection()` preserves the slot-input-to-projection-state type relationship
+and creates a genuine immutable declaration. `Template.component()` copies projections in
+declaration order and rejects repeated, structurally imitated, or unaccepted declarations.
+Projection content evaluates against a frozen `TemplateProjectionStateType` containing:
 
 - `parent`, the supplying parent template state;
 - `slot`, a stable object of read-only reactive slot-input signals.
