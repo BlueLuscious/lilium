@@ -11,6 +11,7 @@ contain definition-local numeric ordinals.
 | `TemplateFragmentType<State, Reference>` | Ordered immutable instruction sequence. | Contains `TemplateInstructionType` values sharing one state and reference phase. |
 | `TemplateInstructionType<State, Reference>` | Union of node, nested component, and outlet instructions. | Connects the Primitive, Component, and Slot features. |
 | `TemplateReferenceType` | Definition-local structural ordinal. | Identifies normalized instructions and bindings, never runtime or host values. |
+| `TTemplateNormalizationContext` | Internal mutable state for one synchronous normalization pass. | Tracks the active path, next reference, and definition-local slot uniqueness. |
 
 Normalization and reference ordering follow the canonical
 [immutable program](../../../architecture/template-abi.md#immutable-program) decision.

@@ -23,3 +23,7 @@ The root exports `TemplateApi` as the complete target contract and `Template` as
 implementation. Every method creates immutable identities or declarations and performs no
 Renderer, ownership, or host work. See the
 [Template ABI public object model](../../../architecture/template-abi.md#public-object-model).
+
+The built distribution exports only the `Template` runtime value. Its verified method snapshot is
+`primitive`, `property`, `slot`, `value`, `binding`, `node`, `component`, `outlet`, `projection`,
+`define`, and `compose`; additions or removals require an explicit ABI decision.

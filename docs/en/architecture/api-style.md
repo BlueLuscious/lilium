@@ -43,14 +43,14 @@ Functions are used for:
 | `RenderedComponent<Inputs, Controller>` | Exposes one mounted component and complete root-input updates. |
 | `RenderedTemplate<State>` | Exposes one mounted standalone template and its stable state. |
 
-The immutable `Runtime`, `Context`, `Component`, and future `Template` facade objects are the
-canonical construction boundaries. Core and Component concrete values are exported only with
-their runtime implementations; Template remains accepted architecture until its package epic.
+The immutable `Runtime`, `Context`, `Component`, and `Template` facade objects are the canonical
+construction boundaries. Core and Component concrete values are exported only with their runtime
+implementations; Template exports immutable declaration behavior without an execution runtime.
 
-The Template and Renderer object models are accepted in [Template ABI](template-abi.md) and
-[Renderer Protocol](renderer-protocol.md), although their packages are not implemented yet. A
-higher-level browser-oriented `Application` facade remains a future package concept and does not
-belong to `@lilium/core`.
+The implemented Template object model is defined in [Template ABI](template-abi.md). The future
+Renderer object model remains accepted in [Renderer Protocol](renderer-protocol.md). A higher-level
+browser-oriented `Application` facade remains a future package concept and does not belong to
+`@lilium/core`.
 
 ## Encapsulation
 

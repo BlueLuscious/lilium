@@ -1,6 +1,6 @@
 # Template ABI
 
-Status: **Foundation accepted**
+Status: **First public ABI implemented and verified**
 
 This document defines the canonical target-independent Template ABI for programmatic authoring and
 compiled `.lily` output. It defines immutable presentation declarations only. Runtime execution and
@@ -24,7 +24,7 @@ families after the static, binding, component, and slot lifecycles are implement
 
 ## Public object model
 
-`@lilium/template` will export one frozen stateless `Template` object implementing `TemplateApi`.
+`@lilium/template` exports one frozen stateless `Template` object implementing `TemplateApi`.
 Its operations create normalized immutable definition objects; they never capture a runtime,
 renderer, host, owner, or mounted occurrence.
 
@@ -56,8 +56,8 @@ The facade operations are conceptually:
 - `Template.define()` validates, copies, normalizes, and freezes one complete program;
 - `Template.compose()` creates a separate component-template composition.
 
-Concrete overloads and generic spelling will be finalized with the implementation contracts, but
-these objects and semantic operations are fixed by this ABI.
+Concrete overloads and generic spelling are defined by the public package contracts. These objects
+and semantic operations form the verified first Template ABI.
 
 ## Immutable program
 

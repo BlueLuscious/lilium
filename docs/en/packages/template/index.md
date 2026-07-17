@@ -1,6 +1,6 @@
 # `@lilium/template`
 
-Status: **Slots and projection implemented**
+Status: **First public ABI hardened**
 
 `@lilium/template` defines the target-independent immutable presentation protocol shared by
 programmatic authors, future `.lily` compiler output, and Renderer. It depends only on public Core
@@ -51,3 +51,14 @@ src/
 The package contains no runtime occurrences, rendering operations, host handles, ownership
 scopes, DOM types, compiler implementation, or mutable virtual tree. The canonical semantics are
 defined once by the [Template ABI](../../architecture/template-abi.md).
+
+## Public boundary
+
+The package root exposes `Template` as its only runtime value. Every public contract and type is a
+type-only root export. No feature, runtime, contract, integration, or internal subpath is exported.
+Programmatic authors and generated `.lily` modules therefore require only `@lilium/template`,
+`@lilium/component`, and their own primitive modules.
+
+Built-package tests freeze the exact `Template` method snapshot, reject implementation subpaths,
+and execute a complete declaration composition through public package roots. Cross-package type
+tests verify the generic relationships with public Core and Component exports.
