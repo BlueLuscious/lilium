@@ -53,6 +53,16 @@ function createRepository(context) {
         },
         false,
     );
+    createPackage(
+        root,
+        "renderer",
+        {
+            "@lilium/component": "workspace:*",
+            "@lilium/core": "workspace:*",
+            "@lilium/template": "workspace:*",
+        },
+        false,
+    );
     return root;
 }
 
@@ -106,6 +116,16 @@ describe("architecture checker", () => {
             violations.some((violation) => violation.includes("template cannot depend")),
             true,
         );
+    });
+
+    test("accepts authorized Renderer integration imports", (context) => {
+        const root = createRepository(context);
+        writeFileSync(
+            join(root, "packages", "renderer", "src", "index.ts"),
+            'import { ComponentIntegration } from "@lilium/component/integration";\nimport { CoreIntegration } from "@lilium/core/integration";\nvoid ComponentIntegration;\nvoid CoreIntegration;\n',
+        );
+
+        assert.deepEqual(checkArchitecture(root), []);
     });
 
     test("reports invalid compiler and export boundaries", (context) => {

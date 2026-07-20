@@ -1,0 +1,48 @@
+{
+  "name": "@lilium/renderer",
+  "version": "0.1.0",
+  "description": "Target-independent Template execution and host rendering protocol for Lilium.",
+  "author": "BlueLuscious",
+  "license": "ISC",
+  "homepage": "https://github.com/BlueLuscious/lilium/tree/master/docs/en/packages/renderer",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BlueLuscious/lilium.git",
+    "directory": "packages/renderer"
+  },
+  "bugs": {
+    "url": "https://github.com/BlueLuscious/lilium/issues"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "pnpm run clean && tsc",
+    "clean": "node ../../tooling/cli/clean-package-distribution.mjs",
+    "test": "pnpm --filter @lilium/core run build && pnpm --filter @lilium/component run build && pnpm --filter @lilium/template run build && pnpm run build && pnpm run test:types",
+    "test:types": "tsc -p tsconfig.test.json",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@lilium/component": "workspace:*",
+    "@lilium/core": "workspace:*",
+    "@lilium/template": "workspace:*"
+  },
+  "keywords": [
+    "frontend",
+    "host-agnostic",
+    "lilium",
+    "renderer",
+    "typescript"
+  ]
+}

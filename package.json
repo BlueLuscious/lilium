@@ -23,6 +23,7 @@
     "build": "pnpm --recursive --if-present run build",
     "build:component": "pnpm --filter @lilium/component... run build",
     "build:core": "pnpm --filter @lilium/core run build",
+    "build:renderer": "pnpm --filter @lilium/renderer... run build",
     "build:template": "pnpm --filter @lilium/template... run build",
     "check": "pnpm run check:code && pnpm run check:jsdoc && pnpm run check:docs && pnpm run check:architecture",
     "check:architecture": "node tooling/cli/check-architecture.mjs",
@@ -39,6 +40,7 @@
     "verify": "pnpm run check && pnpm run test",
     "watch:component": "pnpm --filter @lilium/component run watch",
     "watch:core": "pnpm --filter @lilium/core run watch",
+    "watch:renderer": "pnpm --filter @lilium/renderer run watch",
     "watch:template": "pnpm --filter @lilium/template run watch"
   },
   "keywords": [
