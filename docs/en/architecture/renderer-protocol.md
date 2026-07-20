@@ -1,6 +1,6 @@
 # Renderer Protocol
 
-Status: **Foundation accepted**
+Status: **Foundation accepted; public contracts declared**
 
 This document defines the universal Renderer and host protocol that executes the accepted
 [Template ABI](template-abi.md). The protocol is synchronous, target-independent, instruction-
