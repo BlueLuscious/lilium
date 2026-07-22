@@ -4,4 +4,6 @@
 export type RendererCompatibilityIssueType =
     | "missing-primitive"
     | "missing-property"
-    | "children-unsupported";
+    | "children-unsupported"
+    | "primitive-mismatch"
+    | "property-mismatch";

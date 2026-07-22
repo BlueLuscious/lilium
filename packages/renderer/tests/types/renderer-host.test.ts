@@ -8,6 +8,7 @@ import type {
     RendererPrimitiveCapability,
     RendererPropertyCapability,
     RendererProtocolError,
+    RendererRootClaimError,
 } from "../../src/index.js";
 
 type RootType = {
@@ -68,9 +69,11 @@ declare const invalidHost: RendererHost<RootType, ParentHandleType, { readonly f
 
 declare const compatibilityError: RendererCompatibilityError;
 declare const protocolError: RendererProtocolError;
+declare const rootClaimError: RendererRootClaimError;
 
 const compatibilityName: "RendererCompatibilityError" = compatibilityError.name;
 const protocolName: "RendererProtocolError" = protocolError.name;
+const rootClaimName: "RendererRootClaimError" = rootClaimError.name;
 
 void compatibilityName;
 void host;
@@ -78,3 +81,4 @@ void invalidHost;
 void Label;
 void protocolName;
 void resolvedGroup;
+void rootClaimName;

@@ -10,6 +10,7 @@ export type {
     RendererCompatibilitySubjectType,
     RendererHostOperationType,
     RendererProtocolError,
+    RendererRootClaimError,
 } from "./error/index.js";
 export type {
     RendererAttachmentType,

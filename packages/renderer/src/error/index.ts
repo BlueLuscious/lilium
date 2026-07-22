@@ -1,4 +1,8 @@
-export type { RendererCompatibilityError, RendererProtocolError } from "./contracts/index.js";
+export type {
+    RendererCompatibilityError,
+    RendererProtocolError,
+    RendererRootClaimError,
+} from "./contracts/index.js";
 export type {
     RendererCompatibilityIssueType,
     RendererCompatibilitySubjectType,

@@ -29,7 +29,8 @@
   "scripts": {
     "build": "pnpm run clean && tsc",
     "clean": "node ../../tooling/cli/clean-package-distribution.mjs",
-    "test": "pnpm --filter @lilium/core run build && pnpm --filter @lilium/component run build && pnpm --filter @lilium/template run build && pnpm run build && pnpm run test:types",
+    "test": "pnpm --filter @lilium/core run build && pnpm --filter @lilium/component run build && pnpm --filter @lilium/template run build && pnpm run build && pnpm run test:types && pnpm run test:runtime",
+    "test:runtime": "tsx --test tests/runtime/**/*.test.ts",
     "test:types": "tsc -p tsconfig.test.json",
     "watch": "tsc -w"
   },
