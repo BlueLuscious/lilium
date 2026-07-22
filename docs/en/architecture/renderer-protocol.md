@@ -1,6 +1,6 @@
 # Renderer Protocol
 
-Status: **Foundation accepted; static instruction execution implemented**
+Status: **Foundation accepted; reactive and Component execution implemented**
 
 This document defines the universal Renderer and host protocol that executes the accepted
 [Template ABI](template-abi.md). The protocol is synchronous, target-independent, instruction-
@@ -207,17 +207,24 @@ During initial instantiation Renderer:
 7. Places the completed root values into the external root in declaration order.
 8. Publishes the rendered application only after all root values are attached successfully.
 
-The implemented static subset accepts the exact Template identity retained by session preflight,
-creates each primitive while detached, applies only `TemplateStaticValue` declarations, constructs
-child fragments, and then places children and roots in declaration order. Dynamic bindings remain
-unevaluated until Core integration is installed. Component and outlet execution is rejected before
-host creation until their Phase 03 ownership model is available.
+The implemented executor accepts the exact Template or templated Component identity retained by
+session preflight, creates each primitive while detached, applies `TemplateStaticValue`
+declarations, creates Core render bindings for dynamic values, constructs child fragments, and
+then places children and roots in declaration order. Template equality executes through Core's
+untracked integration authority and suppresses equal host writes.
+
+Nested and root Components are created only through Component integration. Their visual Template
+work executes under the dedicated attachment scope, while complete dynamic input snapshots flow
+through one parent render binding. Outlets choose the supplied projection or child-owned fallback.
+Projected content owns a parent attachment child scope plus an idempotent receiving-child lease,
+and slot-input snapshots update stable private Core signals in one batch.
 
 Each private primitive occurrence owns one stable handle, its creating capability, and its current
 attachment metadata. Fragment occurrences own ordered primitive roots without synthetic host
 wrappers. A Template occurrence retains the application state and a definition-local
-reference-to-occurrence map for later binding target resolution. None of these objects is exported
-from the package root.
+reference-to-occurrence maps for primitive and Component lookup. Fragment roots may be primitives,
+nested Components, projected Templates, or fallbacks through one private placeable contract. None
+of these objects is exported from the package root.
 
 Fragments, templates, components, and slots do not require synthetic host wrapper values. A
 rendered occurrence owns an ordered set of top-level host handles that can be placed into its
