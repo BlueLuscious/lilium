@@ -35,6 +35,34 @@ export type TestHostCountersType = {
     readonly propertyResolutions: Map<TemplateProperty, number>;
 };
 
+export type TestHostTraceEntryType =
+    | Readonly<{
+          operation: "create";
+          primitive: TemplatePrimitive<object>;
+          value: TestHandleType;
+      }>
+    | Readonly<{
+          operation: "write";
+          property: TemplateProperty;
+          value: TestHandleType;
+          candidate: unknown;
+      }>
+    | Readonly<{
+          operation: "place";
+          value: TestHandleType;
+          parent: TestHandleType;
+          before: TestHandleType | null;
+      }>
+    | Readonly<{
+          operation: "remove";
+          value: TestHandleType;
+          parent: TestHandleType;
+      }>
+    | Readonly<{
+          operation: "release";
+          value: TestHandleType;
+      }>;
+
 export type TestHostFixtureType = {
     readonly host: RendererHost<TestRootType, TestHandleType, TestHandleType>;
     readonly counters: TestHostCountersType;
@@ -46,6 +74,11 @@ export type TestHostFixtureType = {
         TemplateProperty,
         RendererPropertyCapability<TestHandleType, TemplatePrimitive<object>, unknown>
     >;
+    readonly roots: readonly TestHandleType[];
+    readonly children: ReadonlyMap<TestHandleType, readonly TestHandleType[]>;
+    readonly primitivesByValue: ReadonlyMap<TestHandleType, TemplatePrimitive<object>>;
+    readonly writes: ReadonlyMap<TestHandleType, ReadonlyMap<TemplateProperty, unknown>>;
+    readonly trace: readonly TestHostTraceEntryType[];
 };
 
 export function createTestHost(support: readonly TestPrimitiveSupportType[]): TestHostFixtureType {
@@ -68,6 +101,11 @@ export function createTestHost(support: readonly TestPrimitiveSupportType[]): Te
         TemplateProperty,
         RendererPropertyCapability<TestHandleType, TemplatePrimitive<object>, unknown>
     >();
+    const roots: TestHandleType[] = [];
+    const children = new Map<TestHandleType, TestHandleType[]>();
+    const primitivesByValue = new Map<TestHandleType, TemplatePrimitive<object>>();
+    const writes = new Map<TestHandleType, Map<TemplateProperty, unknown>>();
+    const trace: TestHostTraceEntryType[] = [];
     let nextHandle = 1;
 
     for (const primitiveSupport of support) {
@@ -83,8 +121,22 @@ export function createTestHost(support: readonly TestPrimitiveSupportType[]): Te
                 unknown
             > = {
                 property: propertySupport.provided ?? propertySupport.requested,
-                write() {
+                write(value, candidate) {
                     counters.write += 1;
+                    let valueWrites = writes.get(value);
+
+                    if (valueWrites === undefined) {
+                        valueWrites = new Map();
+                        writes.set(value, valueWrites);
+                    }
+
+                    valueWrites.set(propertySupport.requested, candidate);
+                    trace.push({
+                        operation: "write",
+                        property: propertySupport.requested,
+                        value,
+                        candidate,
+                    });
                 },
             };
 
@@ -101,7 +153,11 @@ export function createTestHost(support: readonly TestPrimitiveSupportType[]): Te
             acceptsChildren: primitiveSupport.acceptsChildren ?? false,
             create() {
                 counters.create += 1;
-                return { id: nextHandle++ };
+                const value = { id: nextHandle++ };
+                primitivesByValue.set(value, primitiveSupport.requested);
+                children.set(value, []);
+                trace.push({ operation: "create", primitive: primitiveSupport.requested, value });
+                return value;
             },
             resolveProperty(property) {
                 counters.propertyResolutions.set(
@@ -110,8 +166,9 @@ export function createTestHost(support: readonly TestPrimitiveSupportType[]): Te
                 );
                 return propertyCapabilities.get(property) as never;
             },
-            release() {
+            release(value) {
                 counters.release += 1;
+                trace.push({ operation: "release", value });
             },
         };
 
@@ -121,9 +178,12 @@ export function createTestHost(support: readonly TestPrimitiveSupportType[]): Te
     const host: RendererHost<TestRootType, TestHandleType, TestHandleType> = {
         open() {
             counters.open += 1;
+            const root = { id: 0 };
+            roots.push(root);
+            children.set(root, []);
 
             return {
-                root: { id: 0 },
+                root,
                 resolvePrimitive(primitive) {
                     counters.primitiveResolutions.set(
                         primitive,
@@ -131,11 +191,59 @@ export function createTestHost(support: readonly TestPrimitiveSupportType[]): Te
                     );
                     return primitives.get(primitive) as never;
                 },
-                place() {
+                place(value, destination, current) {
+                    const destinationChildren = children.get(destination.parent);
+
+                    if (destinationChildren === undefined) {
+                        throw new TypeError("The test host destination parent is unknown.");
+                    }
+
+                    if (
+                        destination.before !== null &&
+                        !destinationChildren.includes(destination.before)
+                    ) {
+                        throw new TypeError("The test host placement anchor is not a child.");
+                    }
+
+                    if (destination.before === value) {
+                        throw new TypeError("The test host cannot place a value before itself.");
+                    }
+
+                    if (current !== undefined) {
+                        const currentChildren = children.get(current.parent);
+                        const currentIndex = currentChildren?.indexOf(value) ?? -1;
+
+                        if (currentChildren === undefined || currentIndex < 0) {
+                            throw new TypeError("The test host current attachment is invalid.");
+                        }
+
+                        currentChildren.splice(currentIndex, 1);
+                    }
+
+                    const insertionIndex =
+                        destination.before === null
+                            ? destinationChildren.length
+                            : destinationChildren.indexOf(destination.before);
+                    destinationChildren.splice(insertionIndex, 0, value);
                     counters.place += 1;
+                    trace.push({
+                        operation: "place",
+                        value,
+                        parent: destination.parent,
+                        before: destination.before,
+                    });
                 },
-                remove() {
+                remove(value, current) {
+                    const currentChildren = children.get(current.parent);
+                    const currentIndex = currentChildren?.indexOf(value) ?? -1;
+
+                    if (currentChildren === undefined || currentIndex < 0) {
+                        throw new TypeError("The test host current attachment is invalid.");
+                    }
+
+                    currentChildren.splice(currentIndex, 1);
                     counters.remove += 1;
+                    trace.push({ operation: "remove", value, parent: current.parent });
                 },
                 close() {
                     counters.close += 1;
@@ -144,7 +252,17 @@ export function createTestHost(support: readonly TestPrimitiveSupportType[]): Te
         },
     };
 
-    return { host, counters, primitives, properties };
+    return {
+        host,
+        counters,
+        primitives,
+        properties,
+        roots,
+        children,
+        primitivesByValue,
+        writes,
+        trace,
+    };
 }
 
 export function mutationCount(counters: TestHostCountersType): number {

@@ -20,6 +20,8 @@ export class RendererSession<Parent extends object, Value extends Parent> {
     #state: TRendererSessionState = "open";
     /** @description Validated capabilities available only while the session is ready. */
     #capabilities: RendererCapabilityRegistry<Parent, Value> | undefined;
+    /** @description Exact Template or templated Component identity accepted by preflight. */
+    #preflightTarget: object | undefined;
 
     /**
      * @description Creates one open wrapper around a validated host session.
@@ -65,7 +67,7 @@ export class RendererSession<Parent extends object, Value extends Parent> {
      */
     preflightTemplate<State extends object>(definition: TemplateDefinition<State>): void {
         const collector = new RendererRequirementCollector();
-        this.#preflight(collector.collectTemplate(definition));
+        this.#preflight(definition, collector.collectTemplate(definition));
     }
 
     /**
@@ -79,7 +81,22 @@ export class RendererSession<Parent extends object, Value extends Parent> {
         definition: TemplatedComponentDefinition<Inputs, Controller>,
     ): void {
         const collector = new RendererRequirementCollector();
-        this.#preflight(collector.collectComponent(definition));
+        this.#preflight(definition, collector.collectComponent(definition));
+    }
+
+    /**
+     * @description Verifies that execution uses the exact identity accepted by this session.
+     * @param target - Template or templated Component identity about to execute.
+     * @returns Nothing when the session is ready for this exact target.
+     */
+    assertPreflighted(target: object): void {
+        this.#assertReady();
+
+        if (this.#preflightTarget !== target) {
+            throw new TypeError(
+                "Renderer can execute only the exact identity accepted by preflight.",
+            );
+        }
     }
 
     /**
@@ -93,6 +110,7 @@ export class RendererSession<Parent extends object, Value extends Parent> {
 
         this.#state = "closed";
         this.#capabilities = undefined;
+        this.#preflightTarget = undefined;
 
         try {
             const result: unknown = this.#host.close();
@@ -107,10 +125,12 @@ export class RendererSession<Parent extends object, Value extends Parent> {
 
     /**
      * @description Runs one capability preflight and closes the session after any failure.
+     * @param target - Exact Template or templated Component identity being accepted.
      * @param requirements - Ordered unique reachable capability requirements.
      * @returns Nothing after transitioning to ready state.
      */
     #preflight(
+        target: object,
         requirements: Parameters<RendererCapabilityPreflight<Parent, Value>["run"]>[0],
     ): void {
         if (this.#state !== "open") {
@@ -119,6 +139,7 @@ export class RendererSession<Parent extends object, Value extends Parent> {
 
         try {
             this.#capabilities = new RendererCapabilityPreflight(this.#host).run(requirements);
+            this.#preflightTarget = target;
             this.#state = "ready";
         } catch (error) {
             try {
