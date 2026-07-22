@@ -12,8 +12,13 @@ failure propagates after terminalization and owned cleanup.
 Later dependency invalidations are deduplicated and scheduled by Core in the accepted render phase.
 The consumer cannot choose that phase, flush work, or invoke the binding directly.
 
+`untrack(operation)` executes one synchronous operation with dependency collection suspended and
+returns its exact result. Renderer uses it for Template equality operations so signals read by
+equality do not become binding dependencies. This grants no tracker or graph access.
+
 The runtime rejects foreign structural runtime implementations, disposed Core runtimes, non-function
-operations, non-function terminalizers, and non-`undefined` callback results.
+operations, non-function terminalizers, non-function untracked operations, and non-`undefined`
+binding callback results.
 
 The operation and finalizer are described by
 [`RenderBindingFunctionType`](../types/render-binding-function.md) and

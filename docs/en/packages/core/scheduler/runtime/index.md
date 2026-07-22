@@ -6,7 +6,11 @@
 
 The scheduler stores current- and next-cycle FIFO arrays for `render` and `effect`. A pending map deduplicates jobs by object identity. Each enqueue creates a [`TSchedulerQueueEntry`](../types/internal/scheduler-queue-entry.md), allowing cancellation of one appearance without invalidating a later enqueue of the same job.
 
-Before a flush, jobs enter the current cycle. While flushing, work for a phase that has not started joins the current cycle; work for the active or completed phase enters the next cycle. A running job is removed from the pending map before execution, so it may enqueue one later appearance without recursive execution.
+Before a flush, jobs enter the current cycle. While flushing, work for a phase that has not started
+joins the current cycle; work for the active or completed phase enters the next cycle. If render
+work reenters during render, currently eligible effects are deferred so the next render cycle
+drains first. A running job is removed from the pending map before execution, so it may enqueue one
+later appearance without recursive execution.
 
 ## Ownership and failures
 

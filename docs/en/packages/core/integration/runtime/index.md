@@ -6,6 +6,9 @@ The integration runtime consists of three internal concrete objects:
 - `RenderBindingLifecycle` is the internal reactive consumer and render-phase scheduler job;
 - `RenderBinding` is the protected frozen public wrapper exposing only `dispose()`.
 
+`RenderBindingRuntime.untrack()` delegates one validated synchronous operation to the private
+tracker suspension boundary. It returns only the callback result and never exposes tracker state.
+
 ## Creation flow
 
 1. `CoreIntegration` verifies the supplied public runtime and resolves its private context.
@@ -19,7 +22,8 @@ The integration runtime consists of three internal concrete objects:
 
 An accepted source write invalidates the lifecycle through Core tracking. Scheduler identity
 deduplication keeps one pending appearance, batching delays its flush, and the fixed `render` phase
-runs it before eligible effects. Successful execution atomically replaces dynamic dependencies.
+runs it before eligible effects. Reentrant render work drains before those effects in a later
+cycle. Successful execution atomically replaces dynamic dependencies.
 
 ## Failure flow
 
