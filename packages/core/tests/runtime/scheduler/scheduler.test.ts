@@ -53,9 +53,9 @@ describe("scheduler runtime", () => {
 
         assert.deepEqual(order, [
             "render:initial",
+            "render:next",
             "effect:initial",
             "effect:joined",
-            "render:next",
         ]);
     });
 

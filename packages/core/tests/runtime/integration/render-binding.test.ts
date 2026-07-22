@@ -7,6 +7,30 @@ import type { ReactiveRuntime } from "../../../src/reactivity/contracts/reactive
 import type { Signal } from "../../../src/reactivity/contracts/signal/signal.contract.js";
 
 describe("render binding integration", () => {
+    test("executes integration operations without collecting reactive dependencies", () => {
+        const runtime = Runtime.create();
+        const bindings = CoreIntegration.createRuntime(runtime);
+        const tracked = runtime.signal(0);
+        const ignored = runtime.signal(0);
+        let executions = 0;
+
+        bindings.create(
+            () => {
+                tracked.get();
+                bindings.untrack(() => ignored.get());
+                executions += 1;
+            },
+            () => assert.fail("Successful render work cannot terminalize."),
+        );
+
+        ignored.set(1);
+        assert.equal(executions, 1);
+        tracked.set(1);
+        assert.equal(executions, 2);
+        assert.throws(() => bindings.untrack(null as never), /must be a function/i);
+        runtime.dispose();
+    });
+
     test("evaluates synchronously and replaces dynamic dependencies", () => {
         const runtime = Runtime.create();
         const bindings = CoreIntegration.createRuntime(runtime);

@@ -128,6 +128,19 @@ export class SchedulerRuntime implements IScheduler {
                 cycleCount += 1;
                 this.#activePhase = "render";
                 this.#drain(this.#currentRenderEntries);
+
+                if (this.#hasLiveNextRenderEntries()) {
+                    this.#deferCurrentEffects();
+
+                    if (cycleCount >= SCHEDULER_CYCLE_LIMIT) {
+                        this.#reportCycleLimit();
+                        break;
+                    }
+
+                    this.#advanceCycle();
+                    continue;
+                }
+
                 this.#activePhase = "effect";
                 this.#drain(this.#currentEffectEntries);
 
@@ -136,13 +149,7 @@ export class SchedulerRuntime implements IScheduler {
                 }
 
                 if (cycleCount >= SCHEDULER_CYCLE_LIMIT) {
-                    const owner = this.#firstNextOwner();
-                    this.#clear();
-                    this.#ownership.executeOwned(owner, () => {
-                        throw new Error(
-                            `Reactive scheduler exceeded the ${SCHEDULER_CYCLE_LIMIT}-cycle flush limit.`,
-                        );
-                    });
+                    this.#reportCycleLimit();
                     break;
                 }
 
@@ -155,6 +162,29 @@ export class SchedulerRuntime implements IScheduler {
             this.#activePhase = null;
             this.#flushing = false;
         }
+    }
+
+    /**
+     * @description Defers eligible effects when reentrant render work requires another cycle.
+     * @returns Nothing after preserving effect FIFO order in the next-cycle queue.
+     */
+    #deferCurrentEffects(): void {
+        this.#nextEffectEntries = [...this.#currentEffectEntries, ...this.#nextEffectEntries];
+        this.#currentEffectEntries = [];
+    }
+
+    /**
+     * @description Clears pending work and routes one scheduler cycle-limit failure.
+     * @returns Nothing when a boundary handles the routed failure.
+     */
+    #reportCycleLimit(): void {
+        const owner = this.#firstNextOwner();
+        this.#clear();
+        this.#ownership.executeOwned(owner, () => {
+            throw new Error(
+                `Reactive scheduler exceeded the ${SCHEDULER_CYCLE_LIMIT}-cycle flush limit.`,
+            );
+        });
     }
 
     /**
@@ -232,6 +262,16 @@ export class SchedulerRuntime implements IScheduler {
      */
     #hasNextEntries(): boolean {
         return this.#nextRenderEntries.length > 0 || this.#nextEffectEntries.length > 0;
+    }
+
+    /**
+     * @description Reports whether a live render appearance requires another scheduler cycle.
+     * @returns Whether at least one non-cancelled next-cycle render remains pending.
+     */
+    #hasLiveNextRenderEntries(): boolean {
+        return this.#nextRenderEntries.some(
+            (entry) => !entry.cancelled && this.#pending.get(entry.job) === entry,
+        );
     }
 
     /**

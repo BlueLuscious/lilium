@@ -80,4 +80,20 @@ export class RenderBindingRuntime implements RenderBindingRuntimeContract {
 
         return lifecycle === undefined ? undefined : RenderBindingImplementation.create(lifecycle);
     }
+
+    /**
+     * @description Executes one synchronous adapter operation with dependency tracking suspended.
+     * @typeParam T - Value returned by the untracked operation.
+     * @param operation - Integration operation that must not collect reactive dependencies.
+     * @returns The exact operation result.
+     */
+    untrack<T>(operation: () => T): T {
+        this.#context.assertOpen("execute untracked integration work");
+
+        if (typeof operation !== "function") {
+            throw new TypeError("An untracked integration operation must be a function.");
+        }
+
+        return this.#context.tracker.untrack(operation);
+    }
 }
