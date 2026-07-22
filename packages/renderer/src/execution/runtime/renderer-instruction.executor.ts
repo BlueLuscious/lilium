@@ -1,90 +1,279 @@
+import type { ComponentInputValuesType } from "@lilium/component";
+import {
+    ComponentIntegration,
+    type ComponentOccurrence,
+    type ComponentOccurrenceRuntime,
+} from "@lilium/component/integration";
+import type { ReactiveRuntime, Scope } from "@lilium/core";
+import {
+    CoreIntegration,
+    type RenderBinding,
+    type RenderBindingRuntime,
+    type RenderBindingTerminalFunctionType,
+} from "@lilium/core/integration";
 import type {
+    ComponentTemplateStateType,
+    TemplateComponent,
     TemplateDefinition,
+    TemplatedComponentDefinition,
     TemplateFragmentType,
     TemplateNode,
+    TemplateOutlet,
     TemplatePrimitive,
+    TemplateProjectionStateType,
+    TemplateSlotInputValuesType,
 } from "@lilium/template";
 import { RendererHostProtocolValidator } from "../../host/runtime/renderer-host-protocol.validator.js";
 import type { RendererSession } from "../../session/runtime/renderer-session.js";
+import type { IRendererPlaceableOccurrence } from "../contracts/internal/renderer-placeable-occurrence.contract.js";
+import type { TRendererProjectionRequest } from "../types/internal/renderer-projection-request.type.js";
+import { RendererComponentOccurrence } from "./renderer-component.occurrence.js";
 import { RendererFragmentOccurrence } from "./renderer-fragment.occurrence.js";
 import { RendererPrimitiveOccurrence } from "./renderer-primitive.occurrence.js";
+import { RendererSlotInputStore } from "./renderer-slot-input.store.js";
 import { RendererTemplateOccurrence } from "./renderer-template.occurrence.js";
 
 /**
- * @description Executes normalized static Template instructions through one ready Renderer session.
+ * @description Executes normalized Template instructions through Core and Component bridges.
  * @typeParam Parent - Host value shape that can contain rendered values.
  * @typeParam Value - Concrete opaque host value shape created by primitive capabilities.
  */
 export class RendererInstructionExecutor<Parent extends object, Value extends Parent> {
     /** @description Ready session whose preflight and host operations constrain execution. */
     readonly #session: RendererSession<Parent, Value>;
+    /** @description Reactive runtime coordinating batching, signals, and occurrence ownership. */
+    readonly #runtime: ReactiveRuntime;
+    /** @description Narrow Core bridge used for tracked bindings and untracked equality. */
+    readonly #bindings: RenderBindingRuntime;
+    /** @description Narrow Component bridge used for protected headless occurrences. */
+    readonly #components: ComponentOccurrenceRuntime;
+    /** @description Owner finalizer delegated to every Core render binding. */
+    readonly #terminalize: RenderBindingTerminalFunctionType;
     /** @description Shared validator for synchronous host mutation results. */
     readonly #protocol: RendererHostProtocolValidator = new RendererHostProtocolValidator();
 
     /**
-     * @description Creates one static instruction executor for a ready Renderer session.
+     * @description Creates one instruction executor bound to genuine Core integration services.
      * @param session - Session already preflighted for the definition that will execute.
+     * @param runtime - Genuine live Core runtime owning all reactive and scope resources.
+     * @param terminalize - Finalizer invoked after failed dynamic binding work unwinds.
      */
-    constructor(session: RendererSession<Parent, Value>) {
+    constructor(
+        session: RendererSession<Parent, Value>,
+        runtime: ReactiveRuntime,
+        terminalize: RenderBindingTerminalFunctionType,
+    ) {
+        if (typeof terminalize !== "function") {
+            throw new TypeError("A Renderer binding terminalizer must be a function.");
+        }
+
         this.#session = session;
+        this.#runtime = runtime;
+        this.#bindings = CoreIntegration.createRuntime(runtime);
+        this.#components = ComponentIntegration.createRuntime(runtime);
+        this.#terminalize = terminalize;
     }
 
     /**
-     * @description Constructs a static Template detached and then places its roots explicitly.
+     * @description Constructs one preflighted Template and places its roots in one Core batch.
      * @typeParam State - Read-only state retained by the Template occurrence.
      * @param definition - Exact normalized Template identity accepted during preflight.
-     * @param state - Exact application state retained for later reactive integration.
-     * @returns Private Template occurrence owning every created host value.
+     * @param state - Exact application state used by dynamic declarations.
+     * @param owner - Attachment scope owning bindings, nested occurrences, and host resources.
+     * @returns Private Template occurrence owning every created instruction occurrence.
      */
     executeTemplate<State extends object>(
         definition: TemplateDefinition<State>,
         state: State,
+        owner: Scope,
     ): RendererTemplateOccurrence<State, Parent, Value> {
         this.#session.assertPreflighted(definition);
-        this.#assertStaticFragment(definition.roots);
+        let occurrence: RendererTemplateOccurrence<State, Parent, Value> | undefined;
 
-        const primitives = new Map<number, RendererPrimitiveOccurrence<Parent, Value>>();
-        const roots = this.#constructFragment(definition.roots, primitives);
-        const occurrence = new RendererTemplateOccurrence(state, roots, primitives);
+        this.#runtime.batch(() => {
+            owner.run(() => {
+                occurrence = this.#constructDefinition(definition, state, owner, new Map());
+                occurrence.place(this.#session.host.root, null);
+            });
+        });
 
-        occurrence.place(this.#session.host.root, null);
+        if (occurrence === undefined) {
+            throw new Error("Renderer Template execution did not produce an occurrence.");
+        }
+
         return occurrence;
     }
 
     /**
-     * @description Constructs every primitive root in one fragment without placing the fragment.
+     * @description Creates one preflighted root Component and places its visual in one Core batch.
+     * @typeParam Inputs - Declarative input shape of the root Component.
+     * @typeParam Controller - Public controller shape of the root Component.
+     * @param definition - Exact templated Component identity accepted during preflight.
+     * @param inputs - Complete initial root Component input snapshot.
+     * @param owner - Application scope owning Component setup and its visual attachment.
+     * @returns Private rendered Component occurrence with a typed protected bridge capability.
+     */
+    executeComponent<Inputs extends object, Controller extends object>(
+        definition: TemplatedComponentDefinition<Inputs, Controller>,
+        inputs: ComponentInputValuesType<Inputs>,
+        owner: Scope,
+    ): RendererComponentOccurrence<Parent, Value, Inputs, Controller> {
+        this.#session.assertPreflighted(definition);
+        let rendered: RendererComponentOccurrence<Parent, Value, Inputs, Controller> | undefined;
+
+        this.#runtime.batch(() => {
+            owner.run(() => {
+                const component = this.#components.create(definition.component, { inputs, owner });
+
+                if (component === undefined) {
+                    throw new Error("Root Component setup was handled before visual execution.");
+                }
+
+                const state: ComponentTemplateStateType<Inputs, Controller> = Object.freeze({
+                    inputs: component.instance.inputs,
+                    controller: component.instance.controller,
+                });
+                let visual:
+                    | RendererTemplateOccurrence<
+                          ComponentTemplateStateType<Inputs, Controller>,
+                          Parent,
+                          Value
+                      >
+                    | undefined;
+                component.attachment.run(() => {
+                    visual = this.#constructDefinition(
+                        definition.template,
+                        state,
+                        component.attachment,
+                        new Map(),
+                    );
+                });
+
+                if (visual === undefined) {
+                    throw new Error("Root Component visual execution produced no occurrence.");
+                }
+
+                rendered = new RendererComponentOccurrence(component, visual);
+                rendered.place(this.#session.host.root, null);
+            });
+        });
+
+        if (rendered === undefined) {
+            throw new Error("Renderer root Component execution did not produce an occurrence.");
+        }
+
+        return rendered;
+    }
+
+    /**
+     * @description Constructs one Template definition without placing its root fragment.
+     * @typeParam State - Read-only state associated with this Template occurrence.
+     * @param definition - Normalized Template definition being instantiated.
+     * @param state - Exact state object evaluated by declarations in this definition.
+     * @param owner - Semantic attachment owner active for this definition.
+     * @param projections - Parent-supplied projections available to this Component visual.
+     * @returns Detached Template occurrence with complete local reference indexes.
+     */
+    #constructDefinition<State extends object>(
+        definition: TemplateDefinition<State>,
+        state: State,
+        owner: Scope,
+        projections: ReadonlyMap<object, TRendererProjectionRequest>,
+    ): RendererTemplateOccurrence<State, Parent, Value> {
+        const primitives = new Map<number, RendererPrimitiveOccurrence<Parent, Value>>();
+        const components = new Map<number, ComponentOccurrence<object, object>>();
+        const bindings: RenderBinding[] = [];
+        const roots = this.#constructFragment(
+            definition.roots,
+            state,
+            owner,
+            projections,
+            primitives,
+            components,
+            bindings,
+        );
+
+        return new RendererTemplateOccurrence(state, roots, primitives, components, bindings);
+    }
+
+    /**
+     * @description Constructs every ordered instruction in one fragment while it remains detached.
      * @typeParam State - Read-only state associated with the enclosing Template occurrence.
-     * @param fragment - Ordered normalized primitive declarations.
-     * @param primitives - Mutable occurrence index owned by the enclosing Template execution.
+     * @param fragment - Ordered normalized instruction declarations.
+     * @param state - Exact state object evaluated by declarations in this fragment.
+     * @param owner - Semantic attachment owner active for this fragment.
+     * @param projections - Projection requests available to outlet instructions.
+     * @param primitives - Mutable primitive index for the enclosing Template occurrence.
+     * @param components - Mutable Component index for the enclosing Template occurrence.
+     * @param bindings - Mutable direct-binding ledger for the enclosing Template occurrence.
      * @returns Ordered detached fragment occurrence.
      */
     #constructFragment<State extends object>(
         fragment: TemplateFragmentType<State>,
+        state: State,
+        owner: Scope,
+        projections: ReadonlyMap<object, TRendererProjectionRequest>,
         primitives: Map<number, RendererPrimitiveOccurrence<Parent, Value>>,
+        components: Map<number, ComponentOccurrence<object, object>>,
+        bindings: RenderBinding[],
     ): RendererFragmentOccurrence<Parent, Value> {
-        const roots: RendererPrimitiveOccurrence<Parent, Value>[] = [];
+        const roots: IRendererPlaceableOccurrence<Parent, Value>[] = [];
 
         for (const instruction of fragment) {
-            if (instruction.kind !== "node") {
-                throw new TypeError("Static instruction execution accepts only primitive nodes.");
+            if (instruction.kind === "node") {
+                roots.push(
+                    this.#constructNode(
+                        instruction,
+                        state,
+                        owner,
+                        projections,
+                        primitives,
+                        components,
+                        bindings,
+                    ),
+                );
+            } else if (instruction.kind === "component") {
+                roots.push(
+                    this.#constructComponent(instruction, state, owner, components, bindings),
+                );
+            } else {
+                roots.push(
+                    this.#constructOutlet(
+                        instruction,
+                        state,
+                        owner,
+                        projections,
+                        primitives,
+                        components,
+                        bindings,
+                    ),
+                );
             }
-
-            roots.push(this.#constructNode(instruction, primitives));
         }
 
         return new RendererFragmentOccurrence(roots);
     }
 
     /**
-     * @description Creates one detached primitive, applies static values, and places its children.
+     * @description Creates one primitive, connects properties, and places its completed children.
      * @typeParam State - Read-only state associated with the enclosing Template occurrence.
      * @param node - Normalized primitive node declaration.
-     * @param primitives - Mutable occurrence index owned by the enclosing Template execution.
+     * @param state - Exact state object evaluated by dynamic property bindings.
+     * @param owner - Semantic attachment owner active for nested instruction work.
+     * @param projections - Projection requests available to nested outlets.
+     * @param primitives - Mutable primitive index for the enclosing Template occurrence.
+     * @param components - Mutable Component index for the enclosing Template occurrence.
+     * @param bindings - Mutable direct-binding ledger for the enclosing Template occurrence.
      * @returns Primitive occurrence owning the created host handle.
      */
     #constructNode<State extends object>(
         node: TemplateNode<State, TemplatePrimitive<object>, number>,
+        state: State,
+        owner: Scope,
+        projections: ReadonlyMap<object, TRendererProjectionRequest>,
         primitives: Map<number, RendererPrimitiveOccurrence<Parent, Value>>,
+        components: Map<number, ComponentOccurrence<object, object>>,
+        bindings: RenderBinding[],
     ): RendererPrimitiveOccurrence<Parent, Value> {
         if (primitives.has(node.reference)) {
             throw new TypeError("A Template primitive reference can be instantiated only once.");
@@ -104,33 +293,225 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
         primitives.set(node.reference, occurrence);
 
         for (const property of node.properties) {
+            const propertyCapability = this.#session.capabilities.property(property.property);
+
             if (property.kind === "value") {
-                const propertyCapability = this.#session.capabilities.property(property.property);
                 const result: unknown = propertyCapability.write(candidate, property.value);
                 this.#protocol.assertVoid("write", result);
+                continue;
             }
+
+            let initialized = false;
+            let committed: unknown;
+            this.#createBinding(() => {
+                const next = property.evaluate(state);
+
+                if (initialized && this.#bindings.untrack(() => property.equal(committed, next))) {
+                    return;
+                }
+
+                const result: unknown = propertyCapability.write(candidate, next);
+                this.#protocol.assertVoid("write", result);
+                committed = next;
+                initialized = true;
+            }, bindings);
         }
 
-        const children = this.#constructFragment(node.children, primitives);
+        const children = this.#constructFragment(
+            node.children,
+            state,
+            owner,
+            projections,
+            primitives,
+            components,
+            bindings,
+        );
         children.place(candidate, null);
         return occurrence;
     }
 
     /**
-     * @description Rejects Component and outlet instructions before any host value is created.
-     * @typeParam State - Read-only state associated with the enclosing Template occurrence.
-     * @param fragment - Normalized fragment to validate recursively.
-     * @returns Nothing when every reachable instruction is a primitive node.
+     * @description Creates one protected Component occurrence and its attachment-owned visual.
+     * @typeParam State - Read-only state of the declaring parent Template occurrence.
+     * @param instruction - Normalized nested Component declaration.
+     * @param state - Supplying parent Template state.
+     * @param owner - Parent attachment owning this nested Component occurrence.
+     * @param components - Mutable Component index for the parent Template occurrence.
+     * @param bindings - Mutable direct-binding ledger for the parent Template occurrence.
+     * @returns Placeable nested Component visual occurrence.
      */
-    #assertStaticFragment<State extends object>(fragment: TemplateFragmentType<State>): void {
-        for (const instruction of fragment) {
-            if (instruction.kind !== "node") {
-                throw new TypeError(
-                    "Component and outlet execution requires Renderer reactive integration.",
-                );
-            }
-
-            this.#assertStaticFragment(instruction.children);
+    #constructComponent<State extends object>(
+        instruction: TemplateComponent<State, number>,
+        state: State,
+        owner: Scope,
+        components: Map<number, ComponentOccurrence<object, object>>,
+        bindings: RenderBinding[],
+    ): RendererComponentOccurrence<Parent, Value> {
+        if (components.has(instruction.reference)) {
+            throw new TypeError("A nested Component reference can be instantiated only once.");
         }
+
+        const composition = instruction.component as TemplatedComponentDefinition<object, object>;
+        let initialInputs: ComponentInputValuesType<object> | undefined;
+        let component: ComponentOccurrence<object, object> | undefined;
+
+        if (instruction.inputs.kind === "value") {
+            initialInputs = instruction.inputs.value as ComponentInputValuesType<object>;
+        } else {
+            const inputBinding = instruction.inputs;
+            this.#createBinding(() => {
+                const next = inputBinding.evaluate(state) as ComponentInputValuesType<object>;
+
+                if (component === undefined) {
+                    initialInputs = next;
+                } else {
+                    component.updateInputs(next);
+                }
+            }, bindings);
+        }
+
+        if (initialInputs === undefined) {
+            throw new Error("A nested Component input binding produced no initial snapshot.");
+        }
+
+        component = this.#components.create(composition.component, {
+            inputs: initialInputs,
+            owner,
+        });
+
+        if (component === undefined) {
+            throw new Error("Nested Component setup was handled before visual execution.");
+        }
+
+        const activeComponent = component;
+        const childState: ComponentTemplateStateType<object, object> = Object.freeze({
+            inputs: activeComponent.instance.inputs,
+            controller: activeComponent.instance.controller,
+        });
+        const childProjections = new Map<object, TRendererProjectionRequest>();
+
+        for (const projection of instruction.projections) {
+            childProjections.set(projection.slot, {
+                projection,
+                state,
+                owner,
+            });
+        }
+
+        let visual:
+            | RendererTemplateOccurrence<ComponentTemplateStateType<object, object>, Parent, Value>
+            | undefined;
+        activeComponent.attachment.run(() => {
+            visual = this.#constructDefinition(
+                composition.template,
+                childState,
+                activeComponent.attachment,
+                childProjections,
+            );
+        });
+
+        if (visual === undefined) {
+            throw new Error("Nested Component visual execution produced no occurrence.");
+        }
+
+        components.set(instruction.reference, activeComponent);
+        return new RendererComponentOccurrence(activeComponent, visual);
+    }
+
+    /**
+     * @description Constructs selected projected content or the child-owned fallback fragment.
+     * @typeParam State - Read-only state of the receiving child Template occurrence.
+     * @param instruction - Normalized slot outlet declaration.
+     * @param state - Receiving child Template state.
+     * @param owner - Receiving child attachment owner.
+     * @param projections - Parent-supplied projections available by exact slot identity.
+     * @param primitives - Mutable primitive index for fallback declarations in this definition.
+     * @param components - Mutable Component index for fallback declarations in this definition.
+     * @param bindings - Mutable direct-binding ledger for this receiving Template occurrence.
+     * @returns Placeable projected Template or child-owned fallback fragment.
+     */
+    #constructOutlet<State extends object>(
+        instruction: TemplateOutlet<State, object, number>,
+        state: State,
+        owner: Scope,
+        projections: ReadonlyMap<object, TRendererProjectionRequest>,
+        primitives: Map<number, RendererPrimitiveOccurrence<Parent, Value>>,
+        components: Map<number, ComponentOccurrence<object, object>>,
+        bindings: RenderBinding[],
+    ): IRendererPlaceableOccurrence<Parent, Value> {
+        const request = projections.get(instruction.slot);
+
+        if (request === undefined) {
+            return this.#constructFragment(
+                instruction.fallback,
+                state,
+                owner,
+                projections,
+                primitives,
+                components,
+                bindings,
+            );
+        }
+
+        const projectionOwner = request.owner.child();
+        owner.cleanup(() => {
+            projectionOwner.dispose();
+            return undefined;
+        });
+        let initialInputs: TemplateSlotInputValuesType<object> | undefined;
+        let store: RendererSlotInputStore<object> | undefined;
+        this.#createBinding(() => {
+            const next = instruction.inputs(state) as TemplateSlotInputValuesType<object>;
+
+            if (store === undefined) {
+                initialInputs = next;
+            } else {
+                store.update(next);
+            }
+        }, bindings);
+
+        if (initialInputs === undefined) {
+            throw new Error("A slot-input binding produced no initial snapshot.");
+        }
+        const activeInitialInputs = initialInputs;
+
+        let projection:
+            | RendererTemplateOccurrence<TemplateProjectionStateType<object, object>, Parent, Value>
+            | undefined;
+        projectionOwner.run(() => {
+            store = new RendererSlotInputStore(this.#runtime, activeInitialInputs);
+            const projectionState: TemplateProjectionStateType<object, object> = Object.freeze({
+                parent: request.state,
+                slot: store.inputs,
+            });
+            projection = this.#constructDefinition(
+                request.projection.template,
+                projectionState,
+                projectionOwner,
+                new Map(),
+            );
+        });
+
+        if (projection === undefined) {
+            throw new Error("Projected Template execution produced no occurrence.");
+        }
+
+        return projection;
+    }
+
+    /**
+     * @description Creates one owned Core render binding and records its protected handle.
+     * @param operation - Tracked synchronous Renderer operation.
+     * @param bindings - Mutable direct-binding ledger for the active Template occurrence.
+     * @returns Nothing after successful initial binding evaluation.
+     */
+    #createBinding(operation: () => void, bindings: RenderBinding[]): void {
+        const binding = this.#bindings.create(operation, this.#terminalize);
+
+        if (binding === undefined) {
+            throw new Error("A handled initial render binding aborted Renderer execution.");
+        }
+
+        bindings.push(binding);
     }
 }

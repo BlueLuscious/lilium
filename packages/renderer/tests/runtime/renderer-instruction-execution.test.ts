@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
+import { Runtime } from "@lilium/core";
 import { Template } from "@lilium/template";
 import { RendererInstructionExecutor } from "../../src/execution/runtime/renderer-instruction.executor.js";
 import { RendererSessionManager } from "../../src/session/runtime/renderer-session.manager.js";
@@ -22,7 +23,13 @@ function execute<State extends object>(
 ) {
     const session = new RendererSessionManager(fixture.host).open({ name: "execution" });
     session.preflightTemplate(definition);
-    return new RendererInstructionExecutor(session).executeTemplate(definition, state);
+    const runtime = Runtime.create();
+    const owner = runtime.scope();
+    return new RendererInstructionExecutor(session, runtime, () => undefined).executeTemplate(
+        definition,
+        state,
+        owner,
+    );
 }
 
 function rootChildren(fixture: TestHostFixtureType): readonly TestHandleType[] {
@@ -37,7 +44,7 @@ function writtenText(fixture: TestHostFixtureType, value: TestHandleType): unkno
     return fixture.writes.get(value)?.get(LabelText);
 }
 
-describe("renderer static instruction execution", () => {
+describe("renderer instruction execution", () => {
     test("executes an empty fragment without creating or placing host values", () => {
         const fixture = createTestHost([]);
         const definition = Template.define({ roots: [] });
@@ -131,7 +138,7 @@ describe("renderer static instruction execution", () => {
         assert.deepEqual(render(["First", "Second", "Third"]), ["First", "Second", "Third"]);
     });
 
-    test("leaves dynamic bindings unevaluated for reactive integration", () => {
+    test("evaluates and records dynamic bindings during initial execution", () => {
         const fixture = createTestHost([
             { requested: Label, properties: [{ requested: LabelText }] },
         ]);
@@ -149,13 +156,14 @@ describe("renderer static instruction execution", () => {
             ],
         });
 
-        execute(fixture, definition, {});
+        const occurrence = execute(fixture, definition, {});
 
-        assert.equal(evaluations, 0);
-        assert.equal(fixture.counters.write, 0);
+        assert.equal(evaluations, 1);
+        assert.equal(occurrence.bindingCount, 1);
+        assert.equal(fixture.counters.write, 1);
         assert.deepEqual(
             fixture.trace.map(({ operation }) => operation),
-            ["create", "place"],
+            ["create", "write", "place"],
         );
     });
 
@@ -188,10 +196,17 @@ describe("renderer static instruction execution", () => {
         const accepted = Template.define({ roots: [Template.node(Label)] });
         const different = Template.define({ roots: [Template.node(Label)] });
         const session = new RendererSessionManager(fixture.host).open({ name: "identity" });
+        const runtime = Runtime.create();
+        const owner = runtime.scope();
         session.preflightTemplate(accepted);
 
         assert.throws(
-            () => new RendererInstructionExecutor(session).executeTemplate(different, {}),
+            () =>
+                new RendererInstructionExecutor(session, runtime, () => undefined).executeTemplate(
+                    different,
+                    {},
+                    owner,
+                ),
             /exact identity accepted by preflight/i,
         );
         assert.equal(mutationCount(fixture.counters), 0);

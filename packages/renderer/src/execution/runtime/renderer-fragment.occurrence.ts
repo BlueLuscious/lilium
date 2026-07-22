@@ -1,4 +1,4 @@
-import type { RendererPrimitiveOccurrence } from "./renderer-primitive.occurrence.js";
+import type { IRendererPlaceableOccurrence } from "../contracts/internal/renderer-placeable-occurrence.contract.js";
 
 /**
  * @description Owns one ordered collection of primitive roots without a synthetic host wrapper.
@@ -7,13 +7,13 @@ import type { RendererPrimitiveOccurrence } from "./renderer-primitive.occurrenc
  */
 export class RendererFragmentOccurrence<Parent extends object, Value extends Parent> {
     /** @description Ordered primitive roots produced by this fragment. */
-    readonly #roots: readonly RendererPrimitiveOccurrence<Parent, Value>[];
+    readonly #roots: readonly IRendererPlaceableOccurrence<Parent, Value>[];
 
     /**
      * @description Creates one immutable ordered fragment occurrence.
      * @param roots - Primitive roots in declaration order.
      */
-    constructor(roots: readonly RendererPrimitiveOccurrence<Parent, Value>[]) {
+    constructor(roots: readonly IRendererPlaceableOccurrence<Parent, Value>[]) {
         this.#roots = Object.freeze([...roots]);
     }
 
@@ -22,7 +22,13 @@ export class RendererFragmentOccurrence<Parent extends object, Value extends Par
      * @returns Ordered primitive root count.
      */
     get size(): number {
-        return this.#roots.length;
+        let size = 0;
+
+        for (const root of this.#roots) {
+            size += root.size;
+        }
+
+        return size;
     }
 
     /**

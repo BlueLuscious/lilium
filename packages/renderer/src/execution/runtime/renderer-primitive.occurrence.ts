@@ -3,13 +3,16 @@ import type { RendererPrimitiveCapability } from "../../host/contracts/renderer-
 import type { RendererHostProtocolValidator } from "../../host/runtime/renderer-host-protocol.validator.js";
 import type { RendererAttachmentType } from "../../host/types/renderer-attachment.type.js";
 import type { RendererSession } from "../../session/runtime/renderer-session.js";
+import type { IRendererPlaceableOccurrence } from "../contracts/internal/renderer-placeable-occurrence.contract.js";
 
 /**
  * @description Owns one created opaque host value and its current Renderer attachment metadata.
  * @typeParam Parent - Host value shape that can contain rendered values.
  * @typeParam Value - Concrete opaque host value shape owned by this occurrence.
  */
-export class RendererPrimitiveOccurrence<Parent extends object, Value extends Parent> {
+export class RendererPrimitiveOccurrence<Parent extends object, Value extends Parent>
+    implements IRendererPlaceableOccurrence<Parent, Value>
+{
     /** @description Normalized definition-local identity of the represented primitive node. */
     readonly #reference: number;
     /** @description Session that exclusively owns every operation for this host value. */
@@ -67,6 +70,14 @@ export class RendererPrimitiveOccurrence<Parent extends object, Value extends Pa
      */
     get attached(): boolean {
         return this.#attachment !== undefined;
+    }
+
+    /**
+     * @description Returns the single host root represented by this primitive occurrence.
+     * @returns Always one.
+     */
+    get size(): number {
+        return 1;
     }
 
     /**

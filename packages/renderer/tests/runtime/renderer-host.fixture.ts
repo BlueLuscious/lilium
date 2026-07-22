@@ -14,6 +14,7 @@ export type TestHandleType = {
 export type TestPropertySupportType = {
     readonly requested: TemplateProperty;
     readonly provided?: TemplateProperty;
+    readonly onWrite?: (value: TestHandleType, candidate: unknown) => void;
 };
 
 export type TestPrimitiveSupportType = {
@@ -122,6 +123,7 @@ export function createTestHost(support: readonly TestPrimitiveSupportType[]): Te
             > = {
                 property: propertySupport.provided ?? propertySupport.requested,
                 write(value, candidate) {
+                    propertySupport.onWrite?.(value, candidate);
                     counters.write += 1;
                     let valueWrites = writes.get(value);
 
