@@ -25,10 +25,11 @@ closure. It is package-private because applications construct sessions through t
 1. The manager claims the exact host-root pair before calling `host.open(root)`.
 2. Invalid asynchronous or malformed open results release the claim and produce a
    `RendererProtocolError`.
-3. An open wrapper accepts exactly one Template or Component preflight.
+3. An open wrapper accepts exactly one Template or Component preflight and retains that identity.
 4. Successful preflight moves the wrapper to `ready` and enables host and capability access.
-5. Failed preflight closes the host and releases the claim before propagating the failure.
-6. Explicit closure marks the wrapper terminal before host cleanup and always releases the claim.
+5. Execution rejects a different definition identity before host-value creation.
+6. Failed preflight closes the host and releases the claim before propagating the failure.
+7. Explicit closure marks the wrapper terminal before host cleanup and always releases the claim.
 
 Repeated closure is idempotent. A closed wrapper cannot be reopened, preflighted, or used for host
 execution. The external root remains borrowed and is never released by Renderer. See the canonical

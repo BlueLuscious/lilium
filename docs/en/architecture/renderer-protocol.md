@@ -1,6 +1,6 @@
 # Renderer Protocol
 
-Status: **Foundation accepted; sessions and preflight implemented**
+Status: **Foundation accepted; static instruction execution implemented**
 
 This document defines the universal Renderer and host protocol that executes the accepted
 [Template ABI](template-abi.md). The protocol is synchronous, target-independent, instruction-
@@ -206,6 +206,18 @@ During initial instantiation Renderer:
 6. Creates nested rendered components, projections, or fallbacks in declaration order.
 7. Places the completed root values into the external root in declaration order.
 8. Publishes the rendered application only after all root values are attached successfully.
+
+The implemented static subset accepts the exact Template identity retained by session preflight,
+creates each primitive while detached, applies only `TemplateStaticValue` declarations, constructs
+child fragments, and then places children and roots in declaration order. Dynamic bindings remain
+unevaluated until Core integration is installed. Component and outlet execution is rejected before
+host creation until their Phase 03 ownership model is available.
+
+Each private primitive occurrence owns one stable handle, its creating capability, and its current
+attachment metadata. Fragment occurrences own ordered primitive roots without synthetic host
+wrappers. A Template occurrence retains the application state and a definition-local
+reference-to-occurrence map for later binding target resolution. None of these objects is exported
+from the package root.
 
 Fragments, templates, components, and slots do not require synthetic host wrapper values. A
 rendered occurrence owns an ordered set of top-level host handles that can be placed into its

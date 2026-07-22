@@ -29,4 +29,6 @@ component identities, scopes, or ownership objects. See
 
 The private [Session](../session/index.md) feature now validates `open()` and `close()` results and
 owns exclusive root claims. The private [Preflight](../preflight/index.md) feature uses only
-capability resolution operations before execution begins.
+capability resolution operations before execution begins. `RendererHostProtocolValidator`
+validates created object handles and the required undefined results of static write and placement
+operations before private occurrence state is committed.

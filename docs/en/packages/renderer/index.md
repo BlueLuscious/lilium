@@ -1,15 +1,16 @@
 # `@lilium/renderer`
 
-Status: **Public protocol declared; sessions and preflight implemented**
+Status: **Static instruction execution implemented privately**
 
 `@lilium/renderer` defines the universal execution boundary between immutable Template programs,
 Core scheduling and ownership, Component occurrences, and target-specific host adapters. It
 depends on `@lilium/core`, `@lilium/component`, and `@lilium/template` without depending on any
 browser, console, server, or native implementation.
 
-The package currently publishes type-only protocol surfaces. Phase 01 implements private session
-ownership and capability preflight; the concrete frozen `Renderer` facade remains intentionally
-absent until instruction execution, integration, and terminal cleanup have real implementations.
+The package currently publishes type-only protocol surfaces. Private runtime foundations now own
+sessions, capability preflight, detached static construction, and explicit placement. The concrete
+frozen `Renderer` facade remains intentionally absent until reactive and Component integration and
+terminal cleanup have real implementations.
 
 ## Features
 
@@ -18,6 +19,7 @@ absent until instruction execution, integration, and terminal cleanup have real 
 - [Host](host/index.md) defines adapters, sessions, capabilities, and opaque placement metadata.
 - [Session](session/index.md) implements exclusive root claims and terminal host-session ownership.
 - [Preflight](preflight/index.md) implements projection-aware requirement collection and validation.
+- [Execution](execution/index.md) implements static primitive and fragment occurrences.
 - [Runtime](runtime/index.md) defines standalone Template and templated Component mount operations.
 - [Error](error/index.md) defines compatibility and synchronous protocol failure representations.
 
@@ -31,6 +33,7 @@ src/
     contracts/
   host/
     contracts/
+    runtime/
     types/
   session/
     runtime/
@@ -38,6 +41,8 @@ src/
   preflight/
     runtime/
     types/internal/
+  execution/
+    runtime/
   runtime/
     contracts/
     types/
@@ -48,10 +53,10 @@ src/
   index.ts
 ```
 
-The package root currently exposes contracts and types only. Session and preflight classes are
-private implementation details and no public runtime value exists yet. The package has no host
-implementation, mutable virtual tree, DOM type, or compiler behavior. Canonical execution and
-lifecycle semantics are defined once by the
+The package root currently exposes contracts and types only. Session, preflight, and execution
+classes are private implementation details and no public runtime value exists yet. The package has
+no host implementation, mutable virtual tree, DOM type, or compiler behavior. Canonical execution
+and lifecycle semantics are defined once by the
 [Renderer Protocol](../../architecture/renderer-protocol.md).
 
 ## Dependency boundary
