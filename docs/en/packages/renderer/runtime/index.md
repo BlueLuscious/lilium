@@ -1,6 +1,6 @@
 # Renderer Runtime
 
-Status: **Contracts and mount option types declared; implementation pending**
+Status: **Contracts declared; mount orchestration pending**
 
 `RendererRuntime<Root>` is reusable and bound to one Core runtime and one host adapter. Each mount
 creates independent application ownership and an exclusive host session. The runtime owns neither
@@ -16,6 +16,7 @@ The two operations remain distinct so state replacement and component input upda
 confused. Standalone Template state is retained by reference and exposed read-only; Component root
 inputs may later be replaced only through the returned `RenderedComponent` handle.
 
-No runtime class exists in Phase 00. Session opening, capability preflight, instruction execution,
-reactive integration, and terminal cleanup are implemented by the ordered later phases. See
+No public runtime class exists yet. Private session opening and capability preflight are
+implemented foundations; instruction execution, reactive integration, and complete terminal
+cleanup remain ordered later phases. See
 [Mount boundaries](../../../architecture/renderer-protocol.md#mount-boundaries).

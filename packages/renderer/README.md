@@ -2,7 +2,7 @@
 
 Target-independent Template execution and host rendering protocol for Lilium.
 
-Status: **Public protocol declared; runtime pending**
+Status: **Public protocol declared; sessions and preflight implemented**
 
 Renderer depends on `@lilium/core`, `@lilium/component`, and `@lilium/template`. It defines universal application, host, capability, placement, runtime, and error boundaries without depending on DOM, console, server, or native APIs.
 

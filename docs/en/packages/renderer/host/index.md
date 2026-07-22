@@ -1,6 +1,6 @@
 # Renderer Host Protocol
 
-Status: **Contracts and types declared**
+Status: **Contracts declared; session negotiation implemented**
 
 The host feature is the extension boundary implemented by future DOM, console, server, or native
 adapters. Generic parent and value handles are opaque objects: Renderer stores identity and
@@ -26,3 +26,7 @@ All operations are synchronous and operation-level atomic. Capability support us
 identity rather than diagnostic names. The host never receives complete definitions, bindings,
 component identities, scopes, or ownership objects. See
 [Host adapter and session](../../../architecture/renderer-protocol.md#host-adapter-and-session).
+
+The private [Session](../session/index.md) feature now validates `open()` and `close()` results and
+owns exclusive root claims. The private [Preflight](../preflight/index.md) feature uses only
+capability resolution operations before execution begins.

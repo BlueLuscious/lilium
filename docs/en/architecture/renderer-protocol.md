@@ -1,6 +1,6 @@
 # Renderer Protocol
 
-Status: **Foundation accepted; public contracts declared**
+Status: **Foundation accepted; sessions and preflight implemented**
 
 This document defines the universal Renderer and host protocol that executes the accepted
 [Template ABI](template-abi.md). The protocol is synchronous, target-independent, instruction-
@@ -121,6 +121,12 @@ Property support is based on capability-object identity, never a diagnostic stri
 preflights every reachable primitive, property, and parent-child requirement before component
 setup. Missing primitive support, missing property support, and children beneath a non-parent
 primitive are deterministic compatibility failures.
+
+Requirement collection follows the normalized reachable branch for each component occurrence. A
+provided projection replaces its matching outlet fallback during collection; the fallback is
+visited only when that projection is absent. Primitive and property requirements are deduplicated
+by exact object identity in first-reachable-declaration order. Capability resolution may execute
+during preflight, but creation, property writing, placement, removal, and release cannot.
 
 The host does not receive a complete `TemplateDefinition`, binding evaluator, component
 definition, slot, or ownership object. It receives only resolved primitive operations, candidate
@@ -279,6 +285,11 @@ Definition-shape errors occur before mount through Template APIs. Host-session o
 compatibility preflight run with the application scope as semantic owner but before Component setup
 or host mutation. A handled opening or preflight failure closes any opened session and returns
 `undefined`; a propagated failure closes the session when present and throws.
+
+The implemented private session wrapper becomes permanently terminal before invoking host
+`close()`, releases its process-local host-and-root claim even when closing fails, and rejects all
+later preflight or host access. If preflight and close both fail, it throws an `AggregateError` with
+the compatibility or protocol failure first.
 
 ### Initial mount failure
 
