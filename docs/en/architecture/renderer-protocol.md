@@ -383,7 +383,7 @@ terminal handles, and absence of later binding execution.
 
 ## Console conformance adapter
 
-The console adapter must implement the universal protocol without special Renderer branches. Its
+The private Console adapter implements the universal protocol without special Renderer branches. Its
 minimum conformance surface contains:
 
 - opaque root and value handles with deterministic diagnostic identifiers;
@@ -398,9 +398,11 @@ Tests use the trace to verify exact mount, update, movement, failure, and unmoun
 `@lilium/renderer-console` is private conformance infrastructure for the first milestone; its
 protocol obligations are fixed here, while publication would require a later explicit API decision.
 
-The package-level [conformance suite](../packages/renderer/conformance/index.md) currently proves
-the universal protocol with an internal recording host. A concrete console adapter remains a
-separate package concern and must pass the same scenarios without Renderer-specific branches.
+The package-level [conformance suite](../packages/renderer/conformance/index.md) proves the
+universal protocol with an internal recording host. The private
+[Renderer Console adapter](../packages/renderer-console/index.md) now implements the external host
+lifecycle solely through public Renderer contracts; structured failure injection and shared
+scenario execution complete in its following phases.
 
 ## Browser adapter proof
 

@@ -43,3 +43,6 @@ generic relationship, mount option, and host capability boundary.
 No DOM, browser, server, console, or native concept appears in production Renderer code or in the
 universal scenarios. A concrete adapter must implement the public host contracts and pass these
 same observable requirements without changing Renderer.
+
+The private [Renderer Console package](../../renderer-console/index.md) is the first external
+adapter used to prove this boundary outside Renderer tests.
