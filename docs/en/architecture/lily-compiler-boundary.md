@@ -1,6 +1,6 @@
 # Lily Compiler Boundary
 
-Status: **Foundation accepted and public package boundary declared**
+Status: **Foundation accepted; lexer and recoverable parser implemented**
 
 This document defines the first `.lily` source boundary and deterministic compiler output. The
 compiler targets the accepted Component and [Template ABI](template-abi.md) package roots and never
@@ -230,6 +230,10 @@ Compilation has explicit stages:
    expression restrictions.
 4. Lower valid source into a normalized compiler IR that mirrors Template ABI concepts.
 5. Generate deterministic ESM and a source map from that IR.
+
+The internal token and concrete syntax models, recovery boundaries, and parser/analyzer separation
+are documented under the [Compiler Lexer](../packages/compiler/lexer/index.md) and
+[Compiler Parser](../packages/compiler/parser/index.md) features.
 
 The parser synchronizes after semicolons, closing braces, and recognized top-level declaration
 keywords so one malformed declaration does not suppress independent later diagnostics.

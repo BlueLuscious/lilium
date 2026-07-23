@@ -1,6 +1,6 @@
 # Compiler Source
 
-Status: **Contracts declared**
+Status: **Contracts and internal location mapping implemented**
 
 | Contract | Responsibility | Relationships |
 | --- | --- | --- |
@@ -12,3 +12,10 @@ and `end` is exclusive, allowing empty insertion ranges and deterministic diagno
 
 The source text itself remains the first direct argument to `CompilerApi.compile()` rather than a
 filesystem-backed source object.
+
+## Runtime
+
+`CompilerSourceLocator` indexes logical line starts once and maps original UTF-16 offsets into
+immutable positions and spans. It treats CRLF as one break without rewriting source text, so
+diagnostic offsets continue to address the caller's exact input while line and column semantics
+remain equivalent across LF and CRLF files.
