@@ -403,7 +403,9 @@ universal protocol with an internal recording host. The private
 [Renderer Console adapter](../packages/renderer-console/index.md) implements the external host
 lifecycle solely through public Renderer contracts. It now records deterministic structured
 traces, omits exact capabilities, and injects every host-operation failure without Renderer
-implementation imports. Shared scenario execution completes in its following phase.
+implementation imports. Both adapters execute the exact same scenarios through the supported
+`@lilium/renderer/conformance` developer boundary, proving external host independence without
+changing Renderer semantics.
 
 ## Browser adapter proof
 

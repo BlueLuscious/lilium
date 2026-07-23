@@ -1,6 +1,6 @@
 # `@lilium/renderer-console`
 
-Status: **Deterministic tracing and failure injection implemented**
+Status: **Shared Renderer conformance verified**
 
 `@lilium/renderer-console` is workspace-only conformance infrastructure. It implements the public
 Renderer host protocol with logical object handles and deterministic in-memory state, proving that
@@ -44,11 +44,13 @@ src/
 ```
 
 Production sources import only the public `@lilium/renderer` package root. Core and Template are
-development-only dependencies used to execute integration tests. Package metadata sets
+development-only dependencies used to execute integration tests. Tests additionally consume the
+supported `@lilium/renderer/conformance` developer subpath. Package metadata sets
 `private: true`, and architecture tooling rejects publication, extra package subpaths, host ambient
 types, or production dependencies other than Renderer.
 
 The accepted universal behavior remains documented by the
 [Renderer Protocol](../../architecture/renderer-protocol.md). This package observes that protocol
-without adding target-specific branches to Renderer. Shared scenario reuse remains the next
-conformance phase.
+without adding target-specific branches to Renderer. The same six
+[shared conformance scenarios](../renderer/conformance/index.md) now pass against both the internal
+recording fixture and this external adapter.
