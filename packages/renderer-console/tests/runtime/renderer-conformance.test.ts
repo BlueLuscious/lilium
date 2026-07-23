@@ -3,8 +3,8 @@ import { describe, test } from "node:test";
 import {
     RendererConformance,
     type RendererConformanceAssertions,
-} from "../../src/conformance/index.js";
-import { rendererConformanceAdapter } from "./renderer-conformance.adapter.js";
+} from "@lilium/renderer/conformance";
+import { rendererConsoleConformanceAdapter } from "./renderer-conformance.adapter.js";
 
 const assertions: RendererConformanceAssertions = {
     deepEqual(actual, expected) {
@@ -21,8 +21,8 @@ const assertions: RendererConformanceAssertions = {
     },
 };
 
-describe("renderer host-neutral conformance", () => {
-    for (const scenario of RendererConformance.scenarios(rendererConformanceAdapter)) {
+describe("Renderer Console shared conformance", () => {
+    for (const scenario of RendererConformance.scenarios(rendererConsoleConformanceAdapter)) {
         test(scenario.name, () => scenario.run(assertions));
     }
 });

@@ -52,9 +52,18 @@ test("the compiled public API mounts and disposes one empty Template", () => {
     runtime.dispose();
 });
 
+test("the compiled conformance subpath exposes only its frozen developer facade", async () => {
+    const conformancePackage = await import("@lilium/renderer/conformance");
+
+    assert.deepEqual(Object.keys(conformancePackage), ["RendererConformance"]);
+    assert.deepEqual(Object.keys(conformancePackage.RendererConformance), ["scenarios"]);
+    assert.equal(Object.isFrozen(conformancePackage.RendererConformance), true);
+});
+
 test("the package exports map rejects Renderer implementation subpaths", async () => {
     const implementationPaths = [
         "@lilium/renderer/api/renderer.api.js",
+        "@lilium/renderer/conformance/runtime/renderer-conformance.scenario-factory.js",
         "@lilium/renderer/runtime/renderer-runtime.js",
         "@lilium/renderer/execution/runtime/renderer-instruction.executor.js",
         "@lilium/renderer/shared/runtime/renderer-cleanup.collector.js",
