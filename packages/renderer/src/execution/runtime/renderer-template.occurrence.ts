@@ -1,5 +1,6 @@
 import type { ComponentOccurrence } from "@lilium/component/integration";
 import type { RenderBinding } from "@lilium/core/integration";
+import { RendererCleanupCollector } from "../../shared/runtime/renderer-cleanup.collector.js";
 import type { IRendererPlaceableOccurrence } from "../contracts/internal/renderer-placeable-occurrence.contract.js";
 import type { RendererFragmentOccurrence } from "./renderer-fragment.occurrence.js";
 import type { RendererPrimitiveOccurrence } from "./renderer-primitive.occurrence.js";
@@ -26,6 +27,8 @@ export class RendererTemplateOccurrence<
     readonly #components: ReadonlyMap<number, ComponentOccurrence<object, object>>;
     /** @description Reactive bindings created directly by this Template definition occurrence. */
     readonly #bindings: readonly RenderBinding[];
+    /** @description Whether this Template occurrence has entered terminal cleanup. */
+    #disposed = false;
 
     /**
      * @description Creates one private Template execution identity.
@@ -82,6 +85,47 @@ export class RendererTemplateOccurrence<
     }
 
     /**
+     * @description Returns whether this complete Template occurrence is terminal.
+     * @returns Whether binding and nested occurrence cleanup has begun.
+     */
+    get disposed(): boolean {
+        return this.#disposed;
+    }
+
+    /**
+     * @description Cancels bindings and releases nested occurrences in reverse ownership order.
+     * @returns Nothing after all cleanup is attempted, or throws collected failures.
+     */
+    dispose(): void {
+        if (this.#disposed) {
+            return;
+        }
+
+        this.#disposed = true;
+        const cleanup = new RendererCleanupCollector();
+
+        for (let index = this.#bindings.length - 1; index >= 0; index -= 1) {
+            cleanup.attempt(() => this.#bindings[index]?.dispose());
+        }
+
+        const components = [...this.#components.values()];
+        for (let index = components.length - 1; index >= 0; index -= 1) {
+            cleanup.attempt(() => components[index]?.dispose());
+        }
+
+        const primitives = [...this.#primitives.values()];
+        for (let index = primitives.length - 1; index >= 0; index -= 1) {
+            cleanup.attempt(() => primitives[index]?.detach());
+        }
+
+        for (let index = primitives.length - 1; index >= 0; index -= 1) {
+            cleanup.attempt(() => primitives[index]?.release());
+        }
+
+        cleanup.throwIfAny("Renderer Template occurrence cleanup failed.");
+    }
+
+    /**
      * @description Resolves one primitive occurrence by normalized definition-local reference.
      * @param reference - Primitive node reference assigned during Template normalization.
      * @returns The exact occurrence and its privately owned host handle.
@@ -122,6 +166,10 @@ export class RendererTemplateOccurrence<
      * @returns Nothing after every ordered root placement succeeds.
      */
     place(parent: Parent, before: Value | null): void {
+        if (this.#disposed) {
+            throw new Error("Cannot place a disposed Renderer Template occurrence.");
+        }
+
         this.#roots.place(parent, before);
     }
 }

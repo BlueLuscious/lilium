@@ -1,4 +1,6 @@
 import type { ComponentOccurrence } from "@lilium/component/integration";
+import type { RenderBinding } from "@lilium/core/integration";
+import { RendererCleanupCollector } from "../../shared/runtime/renderer-cleanup.collector.js";
 import type { IRendererPlaceableOccurrence } from "../contracts/internal/renderer-placeable-occurrence.contract.js";
 import type { RendererTemplateOccurrence } from "./renderer-template.occurrence.js";
 
@@ -20,18 +22,25 @@ export class RendererComponentOccurrence<
     readonly #component: ComponentOccurrence<Inputs, Controller>;
     /** @description Visual Template occurrence owned beneath the Component attachment. */
     readonly #template: RendererTemplateOccurrence<object, Parent, Value>;
+    /** @description Parent-owned input bindings that must stop with this nested Component. */
+    readonly #inputBindings: readonly RenderBinding[];
+    /** @description Whether this composed occurrence has entered terminal cleanup. */
+    #disposed = false;
 
     /**
      * @description Creates one nested rendered Component composition.
      * @param component - Initialized protected headless Component occurrence.
      * @param template - Instantiated visual Template under the Component attachment.
+     * @param inputBindings - Parent bindings dedicated exclusively to this Component occurrence.
      */
     constructor(
         component: ComponentOccurrence<Inputs, Controller>,
         template: RendererTemplateOccurrence<object, Parent, Value>,
+        inputBindings: readonly RenderBinding[] = [],
     ) {
         this.#component = component;
         this.#template = template;
+        this.#inputBindings = Object.freeze([...inputBindings]);
     }
 
     /**
@@ -43,11 +52,40 @@ export class RendererComponentOccurrence<
     }
 
     /**
+     * @description Returns whether visual and headless cleanup has begun.
+     * @returns Whether this rendered Component occurrence is terminal.
+     */
+    get disposed(): boolean {
+        return this.#disposed;
+    }
+
+    /**
      * @description Returns the protected Component occurrence for updates and later disposal.
      * @returns Component integration occurrence connected to this visual composition.
      */
     get component(): ComponentOccurrence<Inputs, Controller> {
         return this.#component;
+    }
+
+    /**
+     * @description Releases visual resources before the complete headless Component occurrence.
+     * @returns Nothing after both cleanup stages are attempted, or throws collected failures.
+     */
+    dispose(): void {
+        if (this.#disposed) {
+            return;
+        }
+
+        this.#disposed = true;
+        const cleanup = new RendererCleanupCollector();
+
+        for (let index = this.#inputBindings.length - 1; index >= 0; index -= 1) {
+            cleanup.attempt(() => this.#inputBindings[index]?.dispose());
+        }
+
+        cleanup.attempt(() => this.#template.dispose());
+        cleanup.attempt(() => this.#component.dispose());
+        cleanup.throwIfAny("Rendered Component occurrence cleanup failed.");
     }
 
     /**
@@ -57,6 +95,10 @@ export class RendererComponentOccurrence<
      * @returns Nothing after nested Template placement succeeds.
      */
     place(parent: Parent, before: Value | null): void {
+        if (this.#disposed) {
+            throw new Error("Cannot place a disposed Renderer Component occurrence.");
+        }
+
         this.#template.place(parent, before);
     }
 }

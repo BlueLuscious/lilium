@@ -24,6 +24,19 @@ export type TestPrimitiveSupportType = {
     readonly properties?: readonly TestPropertySupportType[];
 };
 
+export type TestHostHooksType = {
+    readonly onClose?: () => void;
+    readonly onCreate?: (primitive: TemplatePrimitive<object>) => void;
+    readonly onOpen?: (root: TestRootType) => void;
+    readonly onPlace?: (
+        value: TestHandleType,
+        parent: TestHandleType,
+        before: TestHandleType | null,
+    ) => void;
+    readonly onRelease?: (value: TestHandleType) => void;
+    readonly onRemove?: (value: TestHandleType, parent: TestHandleType) => void;
+};
+
 export type TestHostCountersType = {
     open: number;
     close: number;
@@ -62,6 +75,9 @@ export type TestHostTraceEntryType =
     | Readonly<{
           operation: "release";
           value: TestHandleType;
+      }>
+    | Readonly<{
+          operation: "close";
       }>;
 
 export type TestHostFixtureType = {
@@ -82,7 +98,10 @@ export type TestHostFixtureType = {
     readonly trace: readonly TestHostTraceEntryType[];
 };
 
-export function createTestHost(support: readonly TestPrimitiveSupportType[]): TestHostFixtureType {
+export function createTestHost(
+    support: readonly TestPrimitiveSupportType[],
+    hooks: TestHostHooksType = {},
+): TestHostFixtureType {
     const counters: TestHostCountersType = {
         open: 0,
         close: 0,
@@ -154,6 +173,7 @@ export function createTestHost(support: readonly TestPrimitiveSupportType[]): Te
             primitive: primitiveSupport.provided ?? primitiveSupport.requested,
             acceptsChildren: primitiveSupport.acceptsChildren ?? false,
             create() {
+                hooks.onCreate?.(primitiveSupport.requested);
                 counters.create += 1;
                 const value = { id: nextHandle++ };
                 primitivesByValue.set(value, primitiveSupport.requested);
@@ -171,6 +191,7 @@ export function createTestHost(support: readonly TestPrimitiveSupportType[]): Te
             release(value) {
                 counters.release += 1;
                 trace.push({ operation: "release", value });
+                hooks.onRelease?.(value);
             },
         };
 
@@ -178,7 +199,8 @@ export function createTestHost(support: readonly TestPrimitiveSupportType[]): Te
     }
 
     const host: RendererHost<TestRootType, TestHandleType, TestHandleType> = {
-        open() {
+        open(rootValue) {
+            hooks.onOpen?.(rootValue);
             counters.open += 1;
             const root = { id: 0 };
             roots.push(root);
@@ -210,6 +232,8 @@ export function createTestHost(support: readonly TestPrimitiveSupportType[]): Te
                     if (destination.before === value) {
                         throw new TypeError("The test host cannot place a value before itself.");
                     }
+
+                    hooks.onPlace?.(value, destination.parent, destination.before);
 
                     if (current !== undefined) {
                         const currentChildren = children.get(current.parent);
@@ -243,12 +267,16 @@ export function createTestHost(support: readonly TestPrimitiveSupportType[]): Te
                         throw new TypeError("The test host current attachment is invalid.");
                     }
 
+                    hooks.onRemove?.(value, current.parent);
+
                     currentChildren.splice(currentIndex, 1);
                     counters.remove += 1;
                     trace.push({ operation: "remove", value, parent: current.parent });
                 },
                 close() {
                     counters.close += 1;
+                    trace.push({ operation: "close" });
+                    hooks.onClose?.();
                 },
             };
         },

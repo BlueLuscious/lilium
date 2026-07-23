@@ -1,4 +1,5 @@
 export type { RendererApi } from "./api/index.js";
+export { Renderer } from "./api/index.js";
 export type {
     RenderedApplication,
     RenderedComponent,

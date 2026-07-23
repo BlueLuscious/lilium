@@ -25,11 +25,13 @@ function execute<State extends object>(
     session.preflightTemplate(definition);
     const runtime = Runtime.create();
     const owner = runtime.scope();
-    return new RendererInstructionExecutor(session, runtime, () => undefined).executeTemplate(
-        definition,
-        state,
-        owner,
-    );
+    const occurrence = new RendererInstructionExecutor(
+        session,
+        runtime,
+        () => undefined,
+    ).executeTemplate(definition, state, owner);
+    assert.ok(occurrence);
+    return occurrence;
 }
 
 function rootChildren(fixture: TestHostFixtureType): readonly TestHandleType[] {

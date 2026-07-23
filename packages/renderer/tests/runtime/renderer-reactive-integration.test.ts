@@ -153,6 +153,7 @@ describe("renderer reactive and Component integration", () => {
         const executor = createExecutor(runtime, fixture, definition);
 
         const occurrence = executor.executeTemplate(definition, { value: source }, owner);
+        assert.ok(occurrence);
         const component = occurrence.component<ChildInputsType, ChildControllerType>(0);
         order.length = 0;
 
@@ -198,6 +199,7 @@ describe("renderer reactive and Component integration", () => {
         });
 
         const rendered = executor.executeComponent(definition, { value: 4 }, owner);
+        assert.ok(rendered);
 
         assert.equal(rendered.component.instance.controller.read(), 4);
         assert.equal([...fixture.writes.values()][0]?.get(LabelText), "4");
@@ -262,6 +264,7 @@ describe("renderer reactive and Component integration", () => {
         ]);
         const executor = createExecutor(runtime, fixture, definition);
         const occurrence = executor.executeTemplate(definition, { prefix }, owner);
+        assert.ok(occurrence);
         const component = occurrence.component(0);
 
         assert.equal(fixture.counters.create, 1);

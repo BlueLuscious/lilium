@@ -4,8 +4,8 @@ import type { RendererRuntime } from "../../runtime/contracts/renderer-runtime.c
 
 /**
  * @description Stateless object API for creating target-independent Renderer runtimes.
- * @remarks The concrete frozen `Renderer` value will implement this contract once runtime
- * behavior exists. Runtime creation retains but does not own the supplied Core runtime or host.
+ * @remarks The concrete frozen `Renderer` value implements this contract. Runtime creation
+ * retains but does not own the supplied Core runtime or host.
  */
 export interface RendererApi {
     /**

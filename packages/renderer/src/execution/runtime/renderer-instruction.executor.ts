@@ -25,6 +25,7 @@ import type {
 } from "@lilium/template";
 import { RendererHostProtocolValidator } from "../../host/runtime/renderer-host-protocol.validator.js";
 import type { RendererSession } from "../../session/runtime/renderer-session.js";
+import { RendererCleanupCollector } from "../../shared/runtime/renderer-cleanup.collector.js";
 import type { IRendererPlaceableOccurrence } from "../contracts/internal/renderer-placeable-occurrence.contract.js";
 import type { TRendererProjectionRequest } from "../types/internal/renderer-projection-request.type.js";
 import { RendererComponentOccurrence } from "./renderer-component.occurrence.js";
@@ -80,26 +81,28 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
      * @param definition - Exact normalized Template identity accepted during preflight.
      * @param state - Exact application state used by dynamic declarations.
      * @param owner - Attachment scope owning bindings, nested occurrences, and host resources.
-     * @returns Private Template occurrence owning every created instruction occurrence.
+     * @returns Private Template occurrence, or undefined after a handled initial failure.
      */
     executeTemplate<State extends object>(
         definition: TemplateDefinition<State>,
         state: State,
         owner: Scope,
-    ): RendererTemplateOccurrence<State, Parent, Value> {
+    ): RendererTemplateOccurrence<State, Parent, Value> | undefined {
         this.#session.assertPreflighted(definition);
         let occurrence: RendererTemplateOccurrence<State, Parent, Value> | undefined;
 
         this.#runtime.batch(() => {
             owner.run(() => {
-                occurrence = this.#constructDefinition(definition, state, owner, new Map());
-                occurrence.place(this.#session.host.root, null);
+                occurrence = this.#constructDefinition(
+                    definition,
+                    state,
+                    owner,
+                    new Map(),
+                    this.#terminalize,
+                );
+                occurrence?.place(this.#session.host.root, null);
             });
         });
-
-        if (occurrence === undefined) {
-            throw new Error("Renderer Template execution did not produce an occurrence.");
-        }
 
         return occurrence;
     }
@@ -111,13 +114,13 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
      * @param definition - Exact templated Component identity accepted during preflight.
      * @param inputs - Complete initial root Component input snapshot.
      * @param owner - Application scope owning Component setup and its visual attachment.
-     * @returns Private rendered Component occurrence with a typed protected bridge capability.
+     * @returns Private rendered Component occurrence, or undefined after handled setup failure.
      */
     executeComponent<Inputs extends object, Controller extends object>(
         definition: TemplatedComponentDefinition<Inputs, Controller>,
         inputs: ComponentInputValuesType<Inputs>,
         owner: Scope,
-    ): RendererComponentOccurrence<Parent, Value, Inputs, Controller> {
+    ): RendererComponentOccurrence<Parent, Value, Inputs, Controller> | undefined {
         this.#session.assertPreflighted(definition);
         let rendered: RendererComponentOccurrence<Parent, Value, Inputs, Controller> | undefined;
 
@@ -126,7 +129,7 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
                 const component = this.#components.create(definition.component, { inputs, owner });
 
                 if (component === undefined) {
-                    throw new Error("Root Component setup was handled before visual execution.");
+                    return;
                 }
 
                 const state: ComponentTemplateStateType<Inputs, Controller> = Object.freeze({
@@ -146,21 +149,18 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
                         state,
                         component.attachment,
                         new Map(),
+                        this.#terminalize,
                     );
                 });
 
                 if (visual === undefined) {
-                    throw new Error("Root Component visual execution produced no occurrence.");
+                    return;
                 }
 
                 rendered = new RendererComponentOccurrence(component, visual);
                 rendered.place(this.#session.host.root, null);
             });
         });
-
-        if (rendered === undefined) {
-            throw new Error("Renderer root Component execution did not produce an occurrence.");
-        }
 
         return rendered;
     }
@@ -172,14 +172,16 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
      * @param state - Exact state object evaluated by declarations in this definition.
      * @param owner - Semantic attachment owner active for this definition.
      * @param projections - Parent-supplied projections available to this Component visual.
-     * @returns Detached Template occurrence with complete local reference indexes.
+     * @param terminalize - Finalizer for a dynamic binding owned by this Template occurrence.
+     * @returns Detached occurrence, or undefined after a handled initial failure.
      */
     #constructDefinition<State extends object>(
         definition: TemplateDefinition<State>,
         state: State,
         owner: Scope,
         projections: ReadonlyMap<object, TRendererProjectionRequest>,
-    ): RendererTemplateOccurrence<State, Parent, Value> {
+        terminalize: RenderBindingTerminalFunctionType,
+    ): RendererTemplateOccurrence<State, Parent, Value> | undefined {
         const primitives = new Map<number, RendererPrimitiveOccurrence<Parent, Value>>();
         const components = new Map<number, ComponentOccurrence<object, object>>();
         const bindings: RenderBinding[] = [];
@@ -191,7 +193,12 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
             primitives,
             components,
             bindings,
+            terminalize,
         );
+
+        if (roots === undefined) {
+            return undefined;
+        }
 
         return new RendererTemplateOccurrence(state, roots, primitives, components, bindings);
     }
@@ -206,7 +213,8 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
      * @param primitives - Mutable primitive index for the enclosing Template occurrence.
      * @param components - Mutable Component index for the enclosing Template occurrence.
      * @param bindings - Mutable direct-binding ledger for the enclosing Template occurrence.
-     * @returns Ordered detached fragment occurrence.
+     * @param terminalize - Finalizer for dynamic bindings owned by this fragment.
+     * @returns Ordered detached fragment, or undefined after a handled initial failure.
      */
     #constructFragment<State extends object>(
         fragment: TemplateFragmentType<State>,
@@ -216,39 +224,51 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
         primitives: Map<number, RendererPrimitiveOccurrence<Parent, Value>>,
         components: Map<number, ComponentOccurrence<object, object>>,
         bindings: RenderBinding[],
-    ): RendererFragmentOccurrence<Parent, Value> {
+        terminalize: RenderBindingTerminalFunctionType,
+    ): RendererFragmentOccurrence<Parent, Value> | undefined {
         const roots: IRendererPlaceableOccurrence<Parent, Value>[] = [];
 
         for (const instruction of fragment) {
+            let occurrence: IRendererPlaceableOccurrence<Parent, Value> | undefined;
+
             if (instruction.kind === "node") {
-                roots.push(
-                    this.#constructNode(
-                        instruction,
-                        state,
-                        owner,
-                        projections,
-                        primitives,
-                        components,
-                        bindings,
-                    ),
+                occurrence = this.#constructNode(
+                    instruction,
+                    state,
+                    owner,
+                    projections,
+                    primitives,
+                    components,
+                    bindings,
+                    terminalize,
                 );
             } else if (instruction.kind === "component") {
-                roots.push(
-                    this.#constructComponent(instruction, state, owner, components, bindings),
+                occurrence = this.#constructComponent(
+                    instruction,
+                    state,
+                    owner,
+                    components,
+                    bindings,
+                    terminalize,
                 );
             } else {
-                roots.push(
-                    this.#constructOutlet(
-                        instruction,
-                        state,
-                        owner,
-                        projections,
-                        primitives,
-                        components,
-                        bindings,
-                    ),
+                occurrence = this.#constructOutlet(
+                    instruction,
+                    state,
+                    owner,
+                    projections,
+                    primitives,
+                    components,
+                    bindings,
+                    terminalize,
                 );
             }
+
+            if (occurrence === undefined) {
+                return undefined;
+            }
+
+            roots.push(occurrence);
         }
 
         return new RendererFragmentOccurrence(roots);
@@ -264,7 +284,8 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
      * @param primitives - Mutable primitive index for the enclosing Template occurrence.
      * @param components - Mutable Component index for the enclosing Template occurrence.
      * @param bindings - Mutable direct-binding ledger for the enclosing Template occurrence.
-     * @returns Primitive occurrence owning the created host handle.
+     * @param terminalize - Finalizer for dynamic properties owned by this node.
+     * @returns Primitive occurrence, or undefined after a handled initial binding failure.
      */
     #constructNode<State extends object>(
         node: TemplateNode<State, TemplatePrimitive<object>, number>,
@@ -274,7 +295,8 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
         primitives: Map<number, RendererPrimitiveOccurrence<Parent, Value>>,
         components: Map<number, ComponentOccurrence<object, object>>,
         bindings: RenderBinding[],
-    ): RendererPrimitiveOccurrence<Parent, Value> {
+        terminalize: RenderBindingTerminalFunctionType,
+    ): RendererPrimitiveOccurrence<Parent, Value> | undefined {
         if (primitives.has(node.reference)) {
             throw new TypeError("A Template primitive reference can be instantiated only once.");
         }
@@ -289,6 +311,7 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
             this.#protocol,
             capability,
             candidate,
+            owner,
         );
         primitives.set(node.reference, occurrence);
 
@@ -303,18 +326,29 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
 
             let initialized = false;
             let committed: unknown;
-            this.#createBinding(() => {
-                const next = property.evaluate(state);
+            const binding = this.#createBinding(
+                () => {
+                    const next = property.evaluate(state);
 
-                if (initialized && this.#bindings.untrack(() => property.equal(committed, next))) {
-                    return;
-                }
+                    if (
+                        initialized &&
+                        this.#bindings.untrack(() => property.equal(committed, next))
+                    ) {
+                        return;
+                    }
 
-                const result: unknown = propertyCapability.write(candidate, next);
-                this.#protocol.assertVoid("write", result);
-                committed = next;
-                initialized = true;
-            }, bindings);
+                    const result: unknown = propertyCapability.write(candidate, next);
+                    this.#protocol.assertVoid("write", result);
+                    committed = next;
+                    initialized = true;
+                },
+                bindings,
+                terminalize,
+            );
+
+            if (binding === undefined) {
+                return undefined;
+            }
         }
 
         const children = this.#constructFragment(
@@ -325,7 +359,13 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
             primitives,
             components,
             bindings,
+            terminalize,
         );
+
+        if (children === undefined) {
+            return undefined;
+        }
+
         children.place(candidate, null);
         return occurrence;
     }
@@ -338,7 +378,8 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
      * @param owner - Parent attachment owning this nested Component occurrence.
      * @param components - Mutable Component index for the parent Template occurrence.
      * @param bindings - Mutable direct-binding ledger for the parent Template occurrence.
-     * @returns Placeable nested Component visual occurrence.
+     * @param terminalize - Finalizer for parent-owned Component input binding failures.
+     * @returns Nested Component occurrence, or undefined after a handled initial failure.
      */
     #constructComponent<State extends object>(
         instruction: TemplateComponent<State, number>,
@@ -346,7 +387,8 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
         owner: Scope,
         components: Map<number, ComponentOccurrence<object, object>>,
         bindings: RenderBinding[],
-    ): RendererComponentOccurrence<Parent, Value> {
+        terminalize: RenderBindingTerminalFunctionType,
+    ): RendererComponentOccurrence<Parent, Value> | undefined {
         if (components.has(instruction.reference)) {
             throw new TypeError("A nested Component reference can be instantiated only once.");
         }
@@ -354,20 +396,31 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
         const composition = instruction.component as TemplatedComponentDefinition<object, object>;
         let initialInputs: ComponentInputValuesType<object> | undefined;
         let component: ComponentOccurrence<object, object> | undefined;
+        let inputBinding: RenderBinding | undefined;
 
         if (instruction.inputs.kind === "value") {
             initialInputs = instruction.inputs.value as ComponentInputValuesType<object>;
         } else {
-            const inputBinding = instruction.inputs;
-            this.#createBinding(() => {
-                const next = inputBinding.evaluate(state) as ComponentInputValuesType<object>;
+            const inputDeclaration = instruction.inputs;
+            inputBinding = this.#createBinding(
+                () => {
+                    const next = inputDeclaration.evaluate(
+                        state,
+                    ) as ComponentInputValuesType<object>;
 
-                if (component === undefined) {
-                    initialInputs = next;
-                } else {
-                    component.updateInputs(next);
-                }
-            }, bindings);
+                    if (component === undefined) {
+                        initialInputs = next;
+                    } else {
+                        component.updateInputs(next);
+                    }
+                },
+                bindings,
+                terminalize,
+            );
+
+            if (inputBinding === undefined) {
+                return undefined;
+            }
         }
 
         if (initialInputs === undefined) {
@@ -380,7 +433,7 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
         });
 
         if (component === undefined) {
-            throw new Error("Nested Component setup was handled before visual execution.");
+            return undefined;
         }
 
         const activeComponent = component;
@@ -401,21 +454,35 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
         let visual:
             | RendererTemplateOccurrence<ComponentTemplateStateType<object, object>, Parent, Value>
             | undefined;
+        let rendered: RendererComponentOccurrence<Parent, Value> | undefined;
+        const terminalizeComponent = () => {
+            if (rendered === undefined) {
+                activeComponent.dispose();
+            } else {
+                rendered.dispose();
+            }
+        };
         activeComponent.attachment.run(() => {
             visual = this.#constructDefinition(
                 composition.template,
                 childState,
                 activeComponent.attachment,
                 childProjections,
+                terminalizeComponent,
             );
         });
 
         if (visual === undefined) {
-            throw new Error("Nested Component visual execution produced no occurrence.");
+            return undefined;
         }
 
         components.set(instruction.reference, activeComponent);
-        return new RendererComponentOccurrence(activeComponent, visual);
+        rendered = new RendererComponentOccurrence(
+            activeComponent,
+            visual,
+            inputBinding === undefined ? [] : [inputBinding],
+        );
+        return rendered;
     }
 
     /**
@@ -428,7 +495,8 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
      * @param primitives - Mutable primitive index for fallback declarations in this definition.
      * @param components - Mutable Component index for fallback declarations in this definition.
      * @param bindings - Mutable direct-binding ledger for this receiving Template occurrence.
-     * @returns Placeable projected Template or child-owned fallback fragment.
+     * @param terminalize - Finalizer for receiving child-owned binding failures.
+     * @returns Selected content, or undefined after a handled initial failure.
      */
     #constructOutlet<State extends object>(
         instruction: TemplateOutlet<State, object, number>,
@@ -438,7 +506,8 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
         primitives: Map<number, RendererPrimitiveOccurrence<Parent, Value>>,
         components: Map<number, ComponentOccurrence<object, object>>,
         bindings: RenderBinding[],
-    ): IRendererPlaceableOccurrence<Parent, Value> {
+        terminalize: RenderBindingTerminalFunctionType,
+    ): IRendererPlaceableOccurrence<Parent, Value> | undefined {
         const request = projections.get(instruction.slot);
 
         if (request === undefined) {
@@ -450,6 +519,7 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
                 primitives,
                 components,
                 bindings,
+                terminalize,
             );
         }
 
@@ -460,15 +530,23 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
         });
         let initialInputs: TemplateSlotInputValuesType<object> | undefined;
         let store: RendererSlotInputStore<object> | undefined;
-        this.#createBinding(() => {
-            const next = instruction.inputs(state) as TemplateSlotInputValuesType<object>;
+        const slotBinding = this.#createBinding(
+            () => {
+                const next = instruction.inputs(state) as TemplateSlotInputValuesType<object>;
 
-            if (store === undefined) {
-                initialInputs = next;
-            } else {
-                store.update(next);
-            }
-        }, bindings);
+                if (store === undefined) {
+                    initialInputs = next;
+                } else {
+                    store.update(next);
+                }
+            },
+            bindings,
+            terminalize,
+        );
+
+        if (slotBinding === undefined) {
+            return undefined;
+        }
 
         if (initialInputs === undefined) {
             throw new Error("A slot-input binding produced no initial snapshot.");
@@ -478,6 +556,13 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
         let projection:
             | RendererTemplateOccurrence<TemplateProjectionStateType<object, object>, Parent, Value>
             | undefined;
+        const terminalizeProjection = () => {
+            const cleanup = new RendererCleanupCollector();
+            cleanup.attempt(() => slotBinding.dispose());
+            cleanup.attempt(() => projection?.dispose());
+            cleanup.attempt(() => projectionOwner.dispose());
+            cleanup.throwIfAny("Projected Template terminal cleanup failed.");
+        };
         projectionOwner.run(() => {
             store = new RendererSlotInputStore(this.#runtime, activeInitialInputs);
             const projectionState: TemplateProjectionStateType<object, object> = Object.freeze({
@@ -489,12 +574,9 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
                 projectionState,
                 projectionOwner,
                 new Map(),
+                terminalizeProjection,
             );
         });
-
-        if (projection === undefined) {
-            throw new Error("Projected Template execution produced no occurrence.");
-        }
 
         return projection;
     }
@@ -503,15 +585,21 @@ export class RendererInstructionExecutor<Parent extends object, Value extends Pa
      * @description Creates one owned Core render binding and records its protected handle.
      * @param operation - Tracked synchronous Renderer operation.
      * @param bindings - Mutable direct-binding ledger for the active Template occurrence.
-     * @returns Nothing after successful initial binding evaluation.
+     * @param terminalize - Finalizer for the complete occurrence owning the binding.
+     * @returns The initialized binding, or undefined after a handled initial failure.
      */
-    #createBinding(operation: () => void, bindings: RenderBinding[]): void {
-        const binding = this.#bindings.create(operation, this.#terminalize);
+    #createBinding(
+        operation: () => void,
+        bindings: RenderBinding[],
+        terminalize: RenderBindingTerminalFunctionType,
+    ): RenderBinding | undefined {
+        const binding = this.#bindings.create(operation, terminalize);
 
         if (binding === undefined) {
-            throw new Error("A handled initial render binding aborted Renderer execution.");
+            return undefined;
         }
 
         bindings.push(binding);
+        return binding;
     }
 }

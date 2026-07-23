@@ -18,6 +18,7 @@ import type {
     RendererRuntime,
     RendererTemplateMountOptionsType,
 } from "../../src/index.js";
+import { Renderer } from "../../src/index.js";
 
 type RootType = {
     readonly name: string;
@@ -44,7 +45,7 @@ type CardControllerType = {
     reveal(): void;
 };
 
-declare const api: RendererApi;
+const api: RendererApi = Renderer;
 declare const component: ComponentDefinition<CardInputsType, CardControllerType>;
 declare const componentView: TemplateDefinition<
     ComponentTemplateStateType<CardInputsType, CardControllerType>
