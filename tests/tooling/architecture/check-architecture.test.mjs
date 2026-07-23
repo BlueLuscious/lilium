@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, test } from "node:test";
@@ -9,7 +9,7 @@ function writeJson(path, value) {
     writeFileSync(path, JSON.stringify(value));
 }
 
-function createPackage(root, name, dependencies = {}, integration = true) {
+function createPackage(root, name, dependencies = {}, integration = true, privatePackage = false) {
     const packageRoot = join(root, "packages", name);
     mkdirSync(join(packageRoot, "src"), { recursive: true });
     writeFileSync(join(packageRoot, "src", "index.ts"), "export {};\n");
@@ -30,6 +30,7 @@ function createPackage(root, name, dependencies = {}, integration = true) {
     writeJson(join(packageRoot, "package.json"), {
         dependencies,
         exports,
+        private: privatePackage,
     });
     writeJson(join(packageRoot, "tsconfig.json"), {
         compilerOptions: { lib: ["ES2022"], noEmitOnError: true, types: [] },
@@ -62,6 +63,15 @@ function createRepository(context) {
             "@lilium/template": "workspace:*",
         },
         false,
+    );
+    createPackage(
+        root,
+        "renderer-console",
+        {
+            "@lilium/renderer": "workspace:*",
+        },
+        false,
+        true,
     );
     return root;
 }
@@ -126,6 +136,28 @@ describe("architecture checker", () => {
         );
 
         assert.deepEqual(checkArchitecture(root), []);
+    });
+
+    test("keeps Renderer Console private and dependent only on public Renderer", (context) => {
+        const root = createRepository(context);
+        const packageRoot = join(root, "packages", "renderer-console");
+        writeFileSync(
+            join(packageRoot, "src", "index.ts"),
+            'import { Template } from "@lilium/template";\nvoid Template;\n',
+        );
+        const manifest = JSON.parse(readFileSync(join(packageRoot, "package.json"), "utf8"));
+        manifest.private = false;
+        writeJson(join(packageRoot, "package.json"), manifest);
+
+        const violations = checkArchitecture(root);
+        assert.equal(
+            violations.some((violation) => violation.includes("cannot depend on @lilium/template")),
+            true,
+        );
+        assert.equal(
+            violations.some((violation) => violation.includes("private workspace package")),
+            true,
+        );
     });
 
     test("reports invalid compiler and export boundaries", (context) => {
