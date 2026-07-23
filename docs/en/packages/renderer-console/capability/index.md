@@ -22,4 +22,6 @@ rejects foreign declaration lookalikes and duplicate primitive identities.
 
 Concrete session-bound `RendererPrimitiveCapability` and `RendererPropertyCapability` objects are
 created only during capability resolution. They delegate state mutation to the owning logical host
-session and never expose its registries or handles.
+session and never expose its registries or handles. A host may deliberately resolve one configured
+primitive or property as unsupported for [preflight failure scenarios](../failure/index.md);
+omission does not alter or duplicate the nominal declaration.

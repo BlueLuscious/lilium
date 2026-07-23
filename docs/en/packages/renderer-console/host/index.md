@@ -1,16 +1,16 @@
 # Renderer Console Host
 
-Status: **Private host lifecycle implemented**
+Status: **Private host lifecycle and observations implemented**
 
 ## Contracts And Types
 
 | Contract or type | Responsibility | Relationships |
 | --- | --- | --- |
-| `ConsoleHost` | Extend public `RendererHost` with read-only snapshot and trace observations for workspace tests. | Opens `ConsoleHostSession`; returned by `RendererConsole.createHost()`. |
+| `ConsoleHost` | Extend public `RendererHost` with read-only snapshot and structured trace observations for workspace tests. | Opens `ConsoleHostSession`; returned by `RendererConsole.createHost()`; links to [Trace](../trace/index.md). |
 | `ConsoleRootSnapshot` | Observe one active external root and its ordered logical children. | Contains recursive `ConsoleValueSnapshot` values. |
 | `ConsoleValueSnapshot` | Observe one value identifier, primitive, properties, and descendants. | Built from private handle records without exposing mutation authority. |
 | `ConsoleHandleType` | Represent one opaque nominal parent/value identity. | Used as both Renderer `Parent` and `Value`. |
-| `ConsoleHostOptionsType` | Supply a complete primitive declaration set. | Consumed by `RendererConsole.createHost()`. |
+| `ConsoleHostOptionsType` | Supply primitive declarations, optional capability omissions, and optional operation failures. | Consumed by `RendererConsole.createHost()`; references [Failure](../failure/index.md). |
 | `ConsolePrimitiveType` | Derive the accepted primitive identity from public Renderer session contracts. | Avoids a production Template dependency. |
 | `ConsolePropertyType<Primitive>` | Represent the structural public property identity for one primitive. | Used by declarations, capabilities, and snapshots. |
 | `ConsolePropertySnapshotType` | Observe the latest candidate for one exact property identity. | Contained by `ConsoleValueSnapshot`. |
@@ -39,7 +39,8 @@ Status: **Private host lifecycle implemented**
 8. Closure requires every value to be released, becomes idempotently terminal, and releases the
    host-root claim.
 
-Snapshots recursively copy only active logical state and freeze every returned collection. The
-initial trace records completed operation names and remains available after closure. Phase 01 will
-replace this minimal observation with deterministic structured attempted/completed entries and
-operation-specific failure injection.
+Snapshots recursively copy only active logical state and freeze every returned collection.
+Structured traces remain available after closure and distinguish attempted from completed
+operations. Their identity and serialization rules are defined by [Trace](../trace/index.md).
+Failure configuration and terminal cleanup exceptions are defined by
+[Failure](../failure/index.md).

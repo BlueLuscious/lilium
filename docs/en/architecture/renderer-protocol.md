@@ -389,7 +389,7 @@ minimum conformance surface contains:
 - opaque root and value handles with deterministic diagnostic identifiers;
 - group and value primitive capabilities with object-identity property registration;
 - one ordered child list per parent strictly inside the adapter;
-- an operation trace for create, write, place, remove, release, and session close;
+- structured attempted/completed traces for every host operation with normalized logical identities;
 - configurable failure injection for every host operation;
 - assertions that reject invalid anchors, released handles, duplicate release, and unsupported
   capabilities.
@@ -400,9 +400,10 @@ protocol obligations are fixed here, while publication would require a later exp
 
 The package-level [conformance suite](../packages/renderer/conformance/index.md) proves the
 universal protocol with an internal recording host. The private
-[Renderer Console adapter](../packages/renderer-console/index.md) now implements the external host
-lifecycle solely through public Renderer contracts; structured failure injection and shared
-scenario execution complete in its following phases.
+[Renderer Console adapter](../packages/renderer-console/index.md) implements the external host
+lifecycle solely through public Renderer contracts. It now records deterministic structured
+traces, omits exact capabilities, and injects every host-operation failure without Renderer
+implementation imports. Shared scenario execution completes in its following phase.
 
 ## Browser adapter proof
 
