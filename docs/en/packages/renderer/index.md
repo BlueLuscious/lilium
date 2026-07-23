@@ -1,16 +1,15 @@
 # `@lilium/renderer`
 
-Status: **Reactive and Component instruction execution implemented privately**
+Status: **Public runtime and terminal lifecycle implemented**
 
 `@lilium/renderer` defines the universal execution boundary between immutable Template programs,
 Core scheduling and ownership, Component occurrences, and target-specific host adapters. It
 depends on `@lilium/core`, `@lilium/component`, and `@lilium/template` without depending on any
 browser, console, server, or native implementation.
 
-The package currently publishes type-only protocol surfaces. Private runtime foundations now own
-sessions, capability preflight, detached construction, reactive bindings, Components, slots, and
-explicit placement. The concrete frozen `Renderer` facade remains intentionally absent until
-terminal cleanup and public runtime orchestration have real implementations.
+The package publishes the frozen `Renderer` facade together with host, runtime, and mounted
+application contracts. Private runtime foundations own sessions, capability preflight, detached
+construction, reactive bindings, Components, slots, explicit placement, and terminal cleanup.
 
 ## Features
 
@@ -22,6 +21,7 @@ terminal cleanup and public runtime orchestration have real implementations.
 - [Execution](execution/index.md) implements primitives, bindings, Components, slots, and occurrences.
 - [Runtime](runtime/index.md) defines standalone Template and templated Component mount operations.
 - [Error](error/index.md) defines compatibility and synchronous protocol failure representations.
+- [Shared](shared/index.md) documents the internal cross-feature cleanup collector.
 
 ## Source structure
 
@@ -29,8 +29,10 @@ terminal cleanup and public runtime orchestration have real implementations.
 src/
   api/
     contracts/
+    renderer.api.ts
   application/
     contracts/
+    runtime/
   host/
     contracts/
     runtime/
@@ -48,6 +50,9 @@ src/
   runtime/
     contracts/
     types/
+    renderer-runtime.ts
+  shared/
+    runtime/
   error/
     contracts/
     runtime/
@@ -55,10 +60,10 @@ src/
   index.ts
 ```
 
-The package root currently exposes contracts and types only. Session, preflight, and execution
-classes are private implementation details and no public runtime value exists yet. The package has
-no host implementation, mutable virtual tree, DOM type, or compiler behavior. Canonical execution
-and lifecycle semantics are defined once by the
+The package root exposes `Renderer` plus its supported contracts and types. Concrete runtime,
+mounted-handle, session, preflight, execution, and cleanup classes remain private implementation
+details. The package has no host implementation, mutable virtual tree, DOM type, or compiler
+behavior. Canonical execution and lifecycle semantics are defined once by the
 [Renderer Protocol](../../architecture/renderer-protocol.md).
 
 ## Dependency boundary

@@ -2,7 +2,7 @@
 
 Target-independent Template execution and host rendering protocol for Lilium.
 
-Status: **Reactive and Component instruction execution implemented privately**
+Status: **Public runtime and terminal lifecycle implemented**
 
 Renderer depends on `@lilium/core`, `@lilium/component`, and `@lilium/template`. It defines universal application, host, capability, placement, runtime, and error boundaries without depending on DOM, console, server, or native APIs.
 

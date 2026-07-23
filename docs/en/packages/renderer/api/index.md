@@ -1,9 +1,9 @@
 # Renderer API
 
-Status: **Contract declared; facade pending**
+Status: **Implemented and exported**
 
-`RendererApi` defines the stateless object API that the future frozen `Renderer` value will
-implement. It has one construction operation:
+`RendererApi` defines the stateless object API implemented by the frozen `Renderer` package-root
+value. It has one construction operation:
 
 | Contract | Responsibility | Relationships |
 | --- | --- | --- |
@@ -13,7 +13,7 @@ implement. It has one construction operation:
 only the external `Root` type through the resulting runtime. Parent and value handles remain
 private to execution and never appear in mounted application handles.
 
-The concrete `Renderer` value is intentionally not exported during the contract-only phase. This
-avoids publishing an incomplete facade whose mount operations cannot yet satisfy the accepted
-preflight, cleanup, and failure guarantees. See the
-[public object model](../../../architecture/renderer-protocol.md#public-object-model).
+`Renderer.createRuntime()` validates one genuine live Core runtime and one synchronous host object.
+The returned frozen runtime retains but does not own either dependency. See the
+[public object model](../../../architecture/renderer-protocol.md#public-object-model) and
+[Renderer Runtime](../runtime/index.md).

@@ -1,6 +1,6 @@
 # Renderer Instruction Execution
 
-Status: **Private reactive and Component runtime implemented**
+Status: **Private execution and terminal occurrences implemented**
 
 The execution feature interprets normalized Template declarations directly. It owns host handles
 through private occurrence objects and creates no mutable virtual tree, synthetic fragment host
@@ -11,10 +11,10 @@ value, or public execution handle.
 | Concept | Responsibility | Relationships |
 | --- | --- | --- |
 | `RendererInstructionExecutor<Parent, Value>` | Execute root Templates or templated Components inside one Core batch. | Uses `RendererSession`, Core integration, Component integration, and semantic owners. |
-| `RendererPrimitiveOccurrence<Parent, Value>` | Own one stable host value, capability, node reference, and attachment metadata. | Commits attachment state only after successful `place()`. |
+| `RendererPrimitiveOccurrence<Parent, Value>` | Own one stable host value, capability, attachment metadata, and idempotent detach/release state. | Registers cleanup immediately after creation so partial construction can roll back. |
 | `RendererFragmentOccurrence<Parent, Value>` | Own ordered placeable roots without creating a host wrapper. | May contain primitives, Components, projections, fallbacks, or empty occurrences. |
-| `RendererTemplateOccurrence<State, Parent, Value>` | Retain exact state, roots, direct bindings, and local primitive and Component indexes. | Resolves normalized references without exposing host handles publicly. |
-| `RendererComponentOccurrence<Parent, Value, Inputs, Controller>` | Connect a protected headless occurrence to its attachment-owned visual Template. | Delegates setup and inputs to Component integration. |
+| `RendererTemplateOccurrence<State, Parent, Value>` | Retain exact state, roots, direct bindings, local indexes, and terminal cleanup authority. | Cancels bindings, disposes Components, detaches primitives, then releases primitives. |
+| `RendererComponentOccurrence<Parent, Value, Inputs, Controller>` | Connect a protected headless occurrence, dedicated input bindings, and its visual Template. | Cancels parent input work before visual and Component disposal. |
 | `RendererSlotInputStore<Inputs>` | Own mutable Core slot signals behind one stable frozen read-only object. | Applies complete snapshots in one Core batch. |
 | `RendererSlotInputSignal<T>` | Erase slot-input mutation authority at runtime. | Delegates only tracked `get()` to one private Core signal. |
 | `RendererHostProtocolValidator` | Validate created object handles and undefined mutation results. | Produces `RendererProtocolError` for invalid host results. |
@@ -23,7 +23,7 @@ value, or public execution handle.
 
 | Contract or type | Responsibility | Relationships |
 | --- | --- | --- |
-| `IRendererPlaceableOccurrence<Parent, Value>` | Represent any private occurrence producing zero or more ordered host roots. | Implemented by primitive, fragment, Template, and Component occurrences. |
+| `IRendererPlaceableOccurrence<Parent, Value>` | Represent any private occurrence producing ordered host roots with terminal observation and disposal. | Implemented by primitive, fragment, Template, and Component occurrences. |
 | `TRendererProjectionRequest` | Retain a genuine projection, supplying parent state, and parent attachment owner. | Selected by exact slot identity during child visual execution. |
 
 ## Execution Flow
@@ -60,6 +60,18 @@ Projected content executes under a scope owned by the supplying parent attachmen
 child attachment owns an idempotent cleanup lease for that scope. Consequently projected bindings
 resolve contexts and errors through the parent while child disposal still ends the projection.
 
-Terminal rollback, host removal, release, and public mounted handles remain Phase 04 work. See
+## Terminal Execution
+
+Every primitive registers ownership cleanup immediately after successful creation. Completed
+Template disposal cancels direct bindings, disposes nested Components in reverse order, detaches
+all local primitives in reverse creation order, and then releases them in the same reverse order.
+Partial construction relies on the same idempotent primitive cleanup through the active scope.
+
+A failed root binding terminalizes the complete mounted application. A failed nested Component
+visual terminalizes that Component and its dedicated parent input binding without disposing the
+otherwise consistent parent application. Projection terminalization also cancels its slot-input
+lease before releasing projected resources.
+
+See
 [instruction-driven execution](../../../architecture/renderer-protocol.md#instruction-driven-execution)
 for the canonical complete flow.

@@ -1,6 +1,6 @@
 # Renderer Protocol
 
-Status: **Foundation accepted; reactive and Component execution implemented**
+Status: **Foundation accepted; public runtime and terminal lifecycle implemented**
 
 This document defines the universal Renderer and host protocol that executes the accepted
 [Template ABI](template-abi.md). The protocol is synchronous, target-independent, instruction-
@@ -284,11 +284,10 @@ Normal occurrence disposal is idempotent and performs these stages:
 1. Mark the occurrence disposing and reject new updates.
 2. Cancel all pending and connected render bindings.
 3. Dispose projected content and nested rendered occurrences in reverse ownership order.
-4. Remove occurrence root values from their external parent.
-5. Remove remaining descendant relationships from detached primitive values.
-6. Release every primitive value in reverse creation order.
-7. Complete attachment and component ownership disposal.
-8. Close the host session after every application occurrence has completed cleanup.
+4. Remove primitive values in reverse creation order, from descendants toward roots.
+5. Release every detached primitive value in reverse creation order.
+6. Complete attachment and component ownership disposal.
+7. Close the host session after every application occurrence has completed cleanup.
 
 Every registered cleanup is attempted even after a failure. Handles become terminal before their
 release operation, so later disposal paths remain idempotent.
