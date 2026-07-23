@@ -38,6 +38,7 @@ const packagePolicies = Object.freeze([
         ]),
         exports: Object.freeze({
             ".": "./dist/index",
+            "./conformance": "./dist/conformance/index",
         }),
     }),
     Object.freeze({

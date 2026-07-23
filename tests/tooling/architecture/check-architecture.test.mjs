@@ -9,7 +9,14 @@ function writeJson(path, value) {
     writeFileSync(path, JSON.stringify(value));
 }
 
-function createPackage(root, name, dependencies = {}, integration = true, privatePackage = false) {
+function createPackage(
+    root,
+    name,
+    dependencies = {},
+    integration = true,
+    privatePackage = false,
+    conformance = false,
+) {
     const packageRoot = join(root, "packages", name);
     mkdirSync(join(packageRoot, "src"), { recursive: true });
     writeFileSync(join(packageRoot, "src", "index.ts"), "export {};\n");
@@ -24,6 +31,13 @@ function createPackage(root, name, dependencies = {}, integration = true, privat
         exports["./integration"] = {
             import: "./dist/integration/index.js",
             types: "./dist/integration/index.d.ts",
+        };
+    }
+
+    if (conformance) {
+        exports["./conformance"] = {
+            import: "./dist/conformance/index.js",
+            types: "./dist/conformance/index.d.ts",
         };
     }
 
@@ -63,6 +77,8 @@ function createRepository(context) {
             "@lilium/template": "workspace:*",
         },
         false,
+        false,
+        true,
     );
     createPackage(
         root,
