@@ -360,7 +360,8 @@ export class LilyParser {
                 delimiters.length === 0 &&
                 (lilyNodeKeywords.includes(token.lexeme) ||
                     Object.hasOwn(lilyUnsupportedKeywords, token.lexeme)) &&
-                this.#previous().lexeme !== "."
+                this.#previous().lexeme !== "." &&
+                token.span.start.line > this.#previous().span.end.line
             ) {
                 break;
             }

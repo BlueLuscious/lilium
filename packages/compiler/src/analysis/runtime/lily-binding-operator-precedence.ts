@@ -1,0 +1,27 @@
+/** @description Immutable binary binding operator precedence used by semantic expression validation. */
+export const lilyBindingOperatorPrecedence: Readonly<Record<string, number | undefined>> =
+    Object.freeze({
+        "??": 1,
+        "||": 2,
+        "&&": 3,
+        "|": 4,
+        "^": 5,
+        "&": 6,
+        "==": 7,
+        "!=": 7,
+        "===": 7,
+        "!==": 7,
+        "<": 8,
+        "<=": 8,
+        ">": 8,
+        ">=": 8,
+        "<<": 9,
+        ">>": 9,
+        ">>>": 9,
+        "+": 10,
+        "-": 10,
+        "*": 11,
+        "/": 11,
+        "%": 11,
+        "**": 12,
+    });
