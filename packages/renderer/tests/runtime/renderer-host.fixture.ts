@@ -35,6 +35,16 @@ export type TestHostHooksType = {
     ) => void;
     readonly onRelease?: (value: TestHandleType) => void;
     readonly onRemove?: (value: TestHandleType, parent: TestHandleType) => void;
+    readonly onResolvePrimitive?: (primitive: TemplatePrimitive<object>) => void;
+    readonly onResolveProperty?: (
+        primitive: TemplatePrimitive<object>,
+        property: TemplateProperty,
+    ) => void;
+    readonly onWrite?: (
+        value: TestHandleType,
+        property: TemplateProperty,
+        candidate: unknown,
+    ) => void;
 };
 
 export type TestHostCountersType = {
@@ -80,6 +90,49 @@ export type TestHostTraceEntryType =
           operation: "close";
       }>;
 
+export type TestHostCallType =
+    | Readonly<{
+          operation: "open";
+          root: TestRootType;
+      }>
+    | Readonly<{
+          operation: "resolve-primitive";
+          primitive: TemplatePrimitive<object>;
+      }>
+    | Readonly<{
+          operation: "resolve-property";
+          primitive: TemplatePrimitive<object>;
+          property: TemplateProperty;
+      }>
+    | Readonly<{
+          operation: "create";
+          primitive: TemplatePrimitive<object>;
+      }>
+    | Readonly<{
+          operation: "write";
+          property: TemplateProperty;
+          value: TestHandleType;
+          candidate: unknown;
+      }>
+    | Readonly<{
+          operation: "place";
+          value: TestHandleType;
+          parent: TestHandleType;
+          before: TestHandleType | null;
+      }>
+    | Readonly<{
+          operation: "remove";
+          value: TestHandleType;
+          parent: TestHandleType;
+      }>
+    | Readonly<{
+          operation: "release";
+          value: TestHandleType;
+      }>
+    | Readonly<{
+          operation: "close";
+      }>;
+
 export type TestHostFixtureType = {
     readonly host: RendererHost<TestRootType, TestHandleType, TestHandleType>;
     readonly counters: TestHostCountersType;
@@ -95,6 +148,7 @@ export type TestHostFixtureType = {
     readonly children: ReadonlyMap<TestHandleType, readonly TestHandleType[]>;
     readonly primitivesByValue: ReadonlyMap<TestHandleType, TemplatePrimitive<object>>;
     readonly writes: ReadonlyMap<TestHandleType, ReadonlyMap<TemplateProperty, unknown>>;
+    readonly calls: readonly TestHostCallType[];
     readonly trace: readonly TestHostTraceEntryType[];
 };
 
@@ -125,6 +179,7 @@ export function createTestHost(
     const children = new Map<TestHandleType, TestHandleType[]>();
     const primitivesByValue = new Map<TestHandleType, TemplatePrimitive<object>>();
     const writes = new Map<TestHandleType, Map<TemplateProperty, unknown>>();
+    const calls: TestHostCallType[] = [];
     const trace: TestHostTraceEntryType[] = [];
     let nextHandle = 1;
 
@@ -142,6 +197,13 @@ export function createTestHost(
             > = {
                 property: propertySupport.provided ?? propertySupport.requested,
                 write(value, candidate) {
+                    calls.push({
+                        operation: "write",
+                        property: propertySupport.requested,
+                        value,
+                        candidate,
+                    });
+                    hooks.onWrite?.(value, propertySupport.requested, candidate);
                     propertySupport.onWrite?.(value, candidate);
                     counters.write += 1;
                     let valueWrites = writes.get(value);
@@ -173,6 +235,7 @@ export function createTestHost(
             primitive: primitiveSupport.provided ?? primitiveSupport.requested,
             acceptsChildren: primitiveSupport.acceptsChildren ?? false,
             create() {
+                calls.push({ operation: "create", primitive: primitiveSupport.requested });
                 hooks.onCreate?.(primitiveSupport.requested);
                 counters.create += 1;
                 const value = { id: nextHandle++ };
@@ -182,6 +245,12 @@ export function createTestHost(
                 return value;
             },
             resolveProperty(property) {
+                calls.push({
+                    operation: "resolve-property",
+                    primitive: primitiveSupport.requested,
+                    property,
+                });
+                hooks.onResolveProperty?.(primitiveSupport.requested, property);
                 counters.propertyResolutions.set(
                     property,
                     (counters.propertyResolutions.get(property) ?? 0) + 1,
@@ -189,6 +258,7 @@ export function createTestHost(
                 return propertyCapabilities.get(property) as never;
             },
             release(value) {
+                calls.push({ operation: "release", value });
                 counters.release += 1;
                 trace.push({ operation: "release", value });
                 hooks.onRelease?.(value);
@@ -200,6 +270,7 @@ export function createTestHost(
 
     const host: RendererHost<TestRootType, TestHandleType, TestHandleType> = {
         open(rootValue) {
+            calls.push({ operation: "open", root: rootValue });
             hooks.onOpen?.(rootValue);
             counters.open += 1;
             const root = { id: 0 };
@@ -209,6 +280,8 @@ export function createTestHost(
             return {
                 root,
                 resolvePrimitive(primitive) {
+                    calls.push({ operation: "resolve-primitive", primitive });
+                    hooks.onResolvePrimitive?.(primitive);
                     counters.primitiveResolutions.set(
                         primitive,
                         (counters.primitiveResolutions.get(primitive) ?? 0) + 1,
@@ -233,6 +306,12 @@ export function createTestHost(
                         throw new TypeError("The test host cannot place a value before itself.");
                     }
 
+                    calls.push({
+                        operation: "place",
+                        value,
+                        parent: destination.parent,
+                        before: destination.before,
+                    });
                     hooks.onPlace?.(value, destination.parent, destination.before);
 
                     if (current !== undefined) {
@@ -267,6 +346,7 @@ export function createTestHost(
                         throw new TypeError("The test host current attachment is invalid.");
                     }
 
+                    calls.push({ operation: "remove", value, parent: current.parent });
                     hooks.onRemove?.(value, current.parent);
 
                     currentChildren.splice(currentIndex, 1);
@@ -274,6 +354,7 @@ export function createTestHost(
                     trace.push({ operation: "remove", value, parent: current.parent });
                 },
                 close() {
+                    calls.push({ operation: "close" });
                     counters.close += 1;
                     trace.push({ operation: "close" });
                     hooks.onClose?.();
@@ -291,6 +372,7 @@ export function createTestHost(
         children,
         primitivesByValue,
         writes,
+        calls,
         trace,
     };
 }
