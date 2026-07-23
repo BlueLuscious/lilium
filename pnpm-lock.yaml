@@ -29,6 +29,18 @@ importers:
 
   packages/core: {}
 
+  packages/renderer:
+    dependencies:
+      '@lilium/component':
+        specifier: workspace:*
+        version: link:../component
+      '@lilium/core':
+        specifier: workspace:*
+        version: link:../core
+      '@lilium/template':
+        specifier: workspace:*
+        version: link:../template
+
   packages/template:
     dependencies:
       '@lilium/component':

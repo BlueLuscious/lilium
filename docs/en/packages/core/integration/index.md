@@ -3,7 +3,8 @@
 Status: **Bridge verified**
 
 `@lilium/core/integration` is a supported adapter-facing subpath for Renderer. It is intentionally
-absent from the `@lilium/core` package root and grants only render-binding creation authority.
+absent from the `@lilium/core` package root and grants only render-binding creation and narrowly
+scoped untracked-execution authority.
 
 ## Contracts
 
@@ -21,8 +22,10 @@ absent from the `@lilium/core` package root and grants only render-binding creat
 - [`RenderBindingFunctionType`](types/render-binding-function.md) is synchronous tracked render work.
 - [`RenderBindingTerminalFunctionType`](types/render-binding-terminal-function.md) finalizes the occurrence after binding failure.
 
-The subpath exposes no scheduler phase, queue, flush, tracker, graph mutation, ownership manager, or
-runtime implementation. The accepted authority and lifecycle are defined by
+The runtime capability also executes equality and explicit integration callbacks with dependency
+collection suspended. It exposes no tracker object or graph operation. The subpath exposes no
+scheduler phase, queue, flush, graph mutation, ownership manager, or runtime implementation. The
+accepted authority and lifecycle are defined by
 [Rendering Integration](../../../architecture/rendering-integration.md).
 
 ## Boundary verification

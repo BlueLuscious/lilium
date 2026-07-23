@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { extname, join, relative } from "node:path";
 import { walkFiles } from "../shared/walk-files.mjs";
 
-/** @description Architecture policies for the target-independent foundation packages. */
+/** @description Architecture policies for target-independent framework packages. */
 const packagePolicies = Object.freeze([
     Object.freeze({
         name: "core",
@@ -23,6 +23,19 @@ const packagePolicies = Object.freeze([
     Object.freeze({
         name: "template",
         allowedLiliumDependencies: Object.freeze(["@lilium/core", "@lilium/component"]),
+        exports: Object.freeze({
+            ".": "./dist/index",
+        }),
+    }),
+    Object.freeze({
+        name: "renderer",
+        allowedLiliumDependencies: Object.freeze([
+            "@lilium/core",
+            "@lilium/core/integration",
+            "@lilium/component",
+            "@lilium/component/integration",
+            "@lilium/template",
+        ]),
         exports: Object.freeze({
             ".": "./dist/index",
         }),
@@ -91,6 +104,7 @@ export function checkArchitecture(root) {
                 }
 
                 if (
+                    policy.name === "component" &&
                     dependency === "@lilium/core/integration" &&
                     !normalizedPath.includes("/src/integration/")
                 ) {

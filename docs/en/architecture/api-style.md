@@ -1,6 +1,6 @@
 # API Style
 
-Status: **Foundation accepted**
+Status: **Foundation accepted; Renderer contracts declared**
 
 ## Decision rule
 
@@ -47,10 +47,10 @@ The immutable `Runtime`, `Context`, `Component`, and `Template` facade objects a
 construction boundaries. Core and Component concrete values are exported only with their runtime
 implementations; Template exports immutable declaration behavior without an execution runtime.
 
-The implemented Template object model is defined in [Template ABI](template-abi.md). The future
-Renderer object model remains accepted in [Renderer Protocol](renderer-protocol.md). A higher-level
-browser-oriented `Application` facade remains a future package concept and does not belong to
-`@lilium/core`.
+The implemented Template object model is defined in [Template ABI](template-abi.md). The declared
+Renderer object model and its pending runtime behavior are defined in
+[Renderer Protocol](renderer-protocol.md). A higher-level browser-oriented `Application` facade
+remains a future package concept and does not belong to `@lilium/core`.
 
 ## Encapsulation
 
@@ -84,7 +84,8 @@ Signals are created by a `ReactiveRuntime`; their concrete implementation classe
 - `Component.define()` and `Component.createRuntime()` define and execute headless components.
 - `Template` creates immutable primitive, property, slot, template, and component-template
   definitions without capturing runtime state.
-- `Renderer.createRuntime()` creates a configured `RendererRuntime`; its mount operations return
-  owned rendered-application handles.
+- The declared `Renderer.createRuntime()` contract creates a configured `RendererRuntime`; the
+  concrete facade remains unavailable until its mount operations can return fully owned rendered-
+  application handles.
 - Convenience composables are deferred until concrete authoring repetition justifies them.
 - Public contracts are extension protocols only when third-party implementation is intentional; otherwise concrete implementations remain opaque.

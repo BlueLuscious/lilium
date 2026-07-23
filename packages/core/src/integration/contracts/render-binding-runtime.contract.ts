@@ -20,4 +20,14 @@ export interface RenderBindingRuntime {
         operation: RenderBindingFunctionType,
         terminalize: RenderBindingTerminalFunctionType,
     ): RenderBinding | undefined;
+
+    /**
+     * @description Executes one synchronous integration operation without collecting dependencies.
+     * @remarks Renderer uses this narrow authority for binding equality and explicit mutation
+     * callbacks that must not become reactive dependencies.
+     * @typeParam T - Value returned by the untracked operation.
+     * @param operation - Synchronous operation executed with dependency collection suspended.
+     * @returns The exact operation result.
+     */
+    untrack<T>(operation: () => T): T;
 }

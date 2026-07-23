@@ -23,8 +23,10 @@ Lazy computed values may reevaluate while either phase reads them. Cleanup execu
 - Work for a completed phase enters the next cycle.
 - During `render`, a new effect job may join the current `effect` phase.
 - During `effect`, both new render and effect work enter the next cycle.
+- If `render` schedules another render cycle, eligible effects wait until no earlier render remains.
 
-These rules prevent phase reentry and preserve `render -> effect` ordering across reactive writes.
+These rules prevent phase reentry and preserve global `render -> effect` ordering across chained
+render work such as nested Component input propagation.
 
 ## Ordering and deduplication
 

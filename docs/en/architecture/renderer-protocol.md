@@ -1,6 +1,6 @@
 # Renderer Protocol
 
-Status: **Foundation accepted**
+Status: **First universal ABI implemented and verified by host-neutral conformance**
 
 This document defines the universal Renderer and host protocol that executes the accepted
 [Template ABI](template-abi.md). The protocol is synchronous, target-independent, instruction-
@@ -25,7 +25,7 @@ add APIs around the protocol, but they cannot alter its observable ownership or 
 
 ## Public object model
 
-`@lilium/renderer` will follow the existing package construction pattern:
+`@lilium/renderer` follows the existing package construction pattern:
 
 - the frozen stateless `Renderer` facade implements `RendererApi`;
 - `Renderer.createRuntime(runtime, host)` creates one `RendererRuntime` bound to an existing
@@ -122,6 +122,12 @@ preflights every reachable primitive, property, and parent-child requirement bef
 setup. Missing primitive support, missing property support, and children beneath a non-parent
 primitive are deterministic compatibility failures.
 
+Requirement collection follows the normalized reachable branch for each component occurrence. A
+provided projection replaces its matching outlet fallback during collection; the fallback is
+visited only when that projection is absent. Primitive and property requirements are deduplicated
+by exact object identity in first-reachable-declaration order. Capability resolution may execute
+during preflight, but creation, property writing, placement, removal, and release cannot.
+
 The host does not receive a complete `TemplateDefinition`, binding evaluator, component
 definition, slot, or ownership object. It receives only resolved primitive operations, candidate
 property values, and structural placement commands.
@@ -201,6 +207,25 @@ During initial instantiation Renderer:
 7. Places the completed root values into the external root in declaration order.
 8. Publishes the rendered application only after all root values are attached successfully.
 
+The implemented executor accepts the exact Template or templated Component identity retained by
+session preflight, creates each primitive while detached, applies `TemplateStaticValue`
+declarations, creates Core render bindings for dynamic values, constructs child fragments, and
+then places children and roots in declaration order. Template equality executes through Core's
+untracked integration authority and suppresses equal host writes.
+
+Nested and root Components are created only through Component integration. Their visual Template
+work executes under the dedicated attachment scope, while complete dynamic input snapshots flow
+through one parent render binding. Outlets choose the supplied projection or child-owned fallback.
+Projected content owns a parent attachment child scope plus an idempotent receiving-child lease,
+and slot-input snapshots update stable private Core signals in one batch.
+
+Each private primitive occurrence owns one stable handle, its creating capability, and its current
+attachment metadata. Fragment occurrences own ordered primitive roots without synthetic host
+wrappers. A Template occurrence retains the application state and a definition-local
+reference-to-occurrence maps for primitive and Component lookup. Fragment roots may be primitives,
+nested Components, projected Templates, or fallbacks through one private placeable contract. None
+of these objects is exported from the package root.
+
 Fragments, templates, components, and slots do not require synthetic host wrapper values. A
 rendered occurrence owns an ordered set of top-level host handles that can be placed into its
 requesting parent. Empty static fragments own no position. Future dynamic empty regions require a
@@ -259,11 +284,10 @@ Normal occurrence disposal is idempotent and performs these stages:
 1. Mark the occurrence disposing and reject new updates.
 2. Cancel all pending and connected render bindings.
 3. Dispose projected content and nested rendered occurrences in reverse ownership order.
-4. Remove occurrence root values from their external parent.
-5. Remove remaining descendant relationships from detached primitive values.
-6. Release every primitive value in reverse creation order.
-7. Complete attachment and component ownership disposal.
-8. Close the host session after every application occurrence has completed cleanup.
+4. Remove primitive values in reverse creation order, from descendants toward roots.
+5. Release every detached primitive value in reverse creation order.
+6. Complete attachment and component ownership disposal.
+7. Close the host session after every application occurrence has completed cleanup.
 
 Every registered cleanup is attempted even after a failure. Handles become terminal before their
 release operation, so later disposal paths remain idempotent.
@@ -279,6 +303,11 @@ Definition-shape errors occur before mount through Template APIs. Host-session o
 compatibility preflight run with the application scope as semantic owner but before Component setup
 or host mutation. A handled opening or preflight failure closes any opened session and returns
 `undefined`; a propagated failure closes the session when present and throws.
+
+The implemented private session wrapper becomes permanently terminal before invoking host
+`close()`, releases its process-local host-and-root claim even when closing fails, and rejects all
+later preflight or host access. If preflight and close both fail, it throws an `AggregateError` with
+the compatibility or protocol failure first.
 
 ### Initial mount failure
 
@@ -368,6 +397,10 @@ minimum conformance surface contains:
 Tests use the trace to verify exact mount, update, movement, failure, and unmount sequences.
 `@lilium/renderer-console` is private conformance infrastructure for the first milestone; its
 protocol obligations are fixed here, while publication would require a later explicit API decision.
+
+The package-level [conformance suite](../packages/renderer/conformance/index.md) currently proves
+the universal protocol with an internal recording host. A concrete console adapter remains a
+separate package concern and must pass the same scenarios without Renderer-specific branches.
 
 ## Browser adapter proof
 
