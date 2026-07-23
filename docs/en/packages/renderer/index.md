@@ -1,6 +1,6 @@
 # `@lilium/renderer`
 
-Status: **Public runtime and terminal lifecycle implemented**
+Status: **First public ABI complete and verified**
 
 `@lilium/renderer` defines the universal execution boundary between immutable Template programs,
 Core scheduling and ownership, Component occurrences, and target-specific host adapters. It
@@ -22,6 +22,7 @@ construction, reactive bindings, Components, slots, explicit placement, and term
 - [Runtime](runtime/index.md) defines standalone Template and templated Component mount operations.
 - [Error](error/index.md) defines compatibility and synchronous protocol failure representations.
 - [Shared](shared/index.md) documents the internal cross-feature cleanup collector.
+- [Conformance](conformance/index.md) verifies the complete protocol against a recording test host.
 
 ## Source structure
 
@@ -65,6 +66,9 @@ mounted-handle, session, preflight, execution, and cleanup classes remain privat
 details. The package has no host implementation, mutable virtual tree, DOM type, or compiler
 behavior. Canonical execution and lifecycle semantics are defined once by the
 [Renderer Protocol](../../architecture/renderer-protocol.md).
+
+The compiled package is tested through its declared export map. Only the frozen `Renderer` value
+exists at runtime at the package root; public contracts and types remain erased TypeScript API.
 
 ## Dependency boundary
 

@@ -74,4 +74,5 @@ lease before releasing projected resources.
 
 See
 [instruction-driven execution](../../../architecture/renderer-protocol.md#instruction-driven-execution)
-for the canonical complete flow.
+for the canonical complete flow and [Conformance](../conformance/index.md) for its observable host
+trace verification.

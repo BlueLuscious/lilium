@@ -1,6 +1,6 @@
 # Renderer Protocol
 
-Status: **Foundation accepted; public runtime and terminal lifecycle implemented**
+Status: **First universal ABI implemented and verified by host-neutral conformance**
 
 This document defines the universal Renderer and host protocol that executes the accepted
 [Template ABI](template-abi.md). The protocol is synchronous, target-independent, instruction-
@@ -25,7 +25,7 @@ add APIs around the protocol, but they cannot alter its observable ownership or 
 
 ## Public object model
 
-`@lilium/renderer` will follow the existing package construction pattern:
+`@lilium/renderer` follows the existing package construction pattern:
 
 - the frozen stateless `Renderer` facade implements `RendererApi`;
 - `Renderer.createRuntime(runtime, host)` creates one `RendererRuntime` bound to an existing
@@ -397,6 +397,10 @@ minimum conformance surface contains:
 Tests use the trace to verify exact mount, update, movement, failure, and unmount sequences.
 `@lilium/renderer-console` is private conformance infrastructure for the first milestone; its
 protocol obligations are fixed here, while publication would require a later explicit API decision.
+
+The package-level [conformance suite](../packages/renderer/conformance/index.md) currently proves
+the universal protocol with an internal recording host. A concrete console adapter remains a
+separate package concern and must pass the same scenarios without Renderer-specific branches.
 
 ## Browser adapter proof
 

@@ -3,8 +3,8 @@
 Status: **Private runtime implemented**
 
 The session feature owns one synchronous host session from successful opening through terminal
-closure. It is package-private because applications construct sessions through the future
-`RendererRuntime`, not as independent public resources.
+closure. It is package-private because applications construct sessions through `RendererRuntime`,
+not as independent public resources.
 
 ## Runtime Concepts
 

@@ -1,8 +1,8 @@
 # Renderer Host Protocol
 
-Status: **Contracts declared; session negotiation implemented**
+Status: **Protocol implemented and conformance verified**
 
-The host feature is the extension boundary implemented by future DOM, console, server, or native
+The host feature is the extension boundary implemented by concrete DOM, console, server, or native
 adapters. Generic parent and value handles are opaque objects: Renderer stores identity and
 placement metadata but never reads target state from them.
 
@@ -32,3 +32,7 @@ owns exclusive root claims. The private [Preflight](../preflight/index.md) featu
 capability resolution operations before execution begins. `RendererHostProtocolValidator`
 validates created object handles and the required undefined results of static write and placement
 operations before private occurrence state is committed.
+
+The internal [Conformance](../conformance/index.md) host records every protocol call and supports
+capability configuration plus independent operation failure injection. Production adapters must
+preserve the same observable ordering and atomicity without reusing test-only concepts.

@@ -17,3 +17,7 @@ private to execution and never appear in mounted application handles.
 The returned frozen runtime retains but does not own either dependency. See the
 [public object model](../../../architecture/renderer-protocol.md#public-object-model) and
 [Renderer Runtime](../runtime/index.md).
+
+The built-package snapshot fixes `Renderer` as the only runtime package-root export and
+`createRuntime` as its only own operation. Implementation subpaths are intentionally rejected by
+the package export map.
