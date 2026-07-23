@@ -1,6 +1,6 @@
 # `@lilium/renderer`
 
-Status: **First public ABI complete and verified**
+Status: **First public ABI and shared conformance boundary complete**
 
 `@lilium/renderer` defines the universal execution boundary between immutable Template programs,
 Core scheduling and ownership, Component occurrences, and target-specific host adapters. It
@@ -22,7 +22,7 @@ construction, reactive bindings, Components, slots, explicit placement, and term
 - [Runtime](runtime/index.md) defines standalone Template and templated Component mount operations.
 - [Error](error/index.md) defines compatibility and synchronous protocol failure representations.
 - [Shared](shared/index.md) documents the internal cross-feature cleanup collector.
-- [Conformance](conformance/index.md) verifies the complete protocol against a recording test host.
+- [Conformance](conformance/index.md) exposes reusable host-neutral scenarios through a developer subpath.
 
 ## Source structure
 
@@ -34,6 +34,10 @@ src/
   application/
     contracts/
     runtime/
+  conformance/
+    contracts/
+    runtime/
+    types/
   host/
     contracts/
     runtime/
@@ -61,14 +65,17 @@ src/
   index.ts
 ```
 
-The package root exposes `Renderer` plus its supported contracts and types. Concrete runtime,
+The package root exposes `Renderer` plus its supported contracts and types. The separate
+`@lilium/renderer/conformance` developer subpath exposes reusable scenario contracts and the frozen
+`RendererConformance` facade without adding values to the root. Concrete runtime,
 mounted-handle, session, preflight, execution, and cleanup classes remain private implementation
 details. The package has no host implementation, mutable virtual tree, DOM type, or compiler
 behavior. Canonical execution and lifecycle semantics are defined once by the
 [Renderer Protocol](../../architecture/renderer-protocol.md).
 
 The compiled package is tested through its declared export map. Only the frozen `Renderer` value
-exists at runtime at the package root; public contracts and types remain erased TypeScript API.
+exists at runtime at the package root; only `RendererConformance` exists at the conformance
+subpath. Public contracts and types remain erased TypeScript API.
 
 ## Dependency boundary
 

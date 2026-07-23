@@ -383,13 +383,13 @@ terminal handles, and absence of later binding execution.
 
 ## Console conformance adapter
 
-The console adapter must implement the universal protocol without special Renderer branches. Its
+The private Console adapter implements the universal protocol without special Renderer branches. Its
 minimum conformance surface contains:
 
 - opaque root and value handles with deterministic diagnostic identifiers;
 - group and value primitive capabilities with object-identity property registration;
 - one ordered child list per parent strictly inside the adapter;
-- an operation trace for create, write, place, remove, release, and session close;
+- structured attempted/completed traces for every host operation with normalized logical identities;
 - configurable failure injection for every host operation;
 - assertions that reject invalid anchors, released handles, duplicate release, and unsupported
   capabilities.
@@ -398,9 +398,14 @@ Tests use the trace to verify exact mount, update, movement, failure, and unmoun
 `@lilium/renderer-console` is private conformance infrastructure for the first milestone; its
 protocol obligations are fixed here, while publication would require a later explicit API decision.
 
-The package-level [conformance suite](../packages/renderer/conformance/index.md) currently proves
-the universal protocol with an internal recording host. A concrete console adapter remains a
-separate package concern and must pass the same scenarios without Renderer-specific branches.
+The package-level [conformance suite](../packages/renderer/conformance/index.md) proves the
+universal protocol with an internal recording host. The private
+[Renderer Console adapter](../packages/renderer-console/index.md) implements the external host
+lifecycle solely through public Renderer contracts. It now records deterministic structured
+traces, omits exact capabilities, and injects every host-operation failure without Renderer
+implementation imports. Both adapters execute the exact same scenarios through the supported
+`@lilium/renderer/conformance` developer boundary, proving external host independence without
+changing Renderer semantics.
 
 ## Browser adapter proof
 

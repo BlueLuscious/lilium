@@ -38,7 +38,16 @@ const packagePolicies = Object.freeze([
         ]),
         exports: Object.freeze({
             ".": "./dist/index",
+            "./conformance": "./dist/conformance/index",
         }),
+    }),
+    Object.freeze({
+        name: "renderer-console",
+        allowedLiliumDependencies: Object.freeze(["@lilium/renderer"]),
+        exports: Object.freeze({
+            ".": "./dist/index",
+        }),
+        private: true,
     }),
 ]);
 
@@ -143,6 +152,10 @@ export function checkArchitecture(root) {
         const libraries = productionCompiler.lib ?? [];
         const productionTypes = productionCompiler.types ?? [];
         const testTypes = testCompiler.types ?? [];
+
+        if (policy.private === true && manifest.private !== true) {
+            report(manifestPath, `${policy.name} must remain a private workspace package`);
+        }
 
         if (libraries.length !== 1 || libraries[0] !== "ES2022") {
             report(
