@@ -1,6 +1,6 @@
 # `@lilium/compiler`
 
-Status: **Lexer and recoverable parser implemented**
+Status: **Analysis and normalized IR implemented**
 
 `@lilium/compiler` is a pure source-to-source package for explicit `.lily` source text. It will
 produce deterministic readable ES2022 ESM targeting only public Component and Template ABIs,
@@ -13,10 +13,12 @@ plugins remain external adapters around this pure boundary.
 ## Features
 
 - [API](api/index.md) declares the stateless object-based compilation operation.
+- [Analysis](analysis/index.md) resolves source semantics and validates expressions.
 - [Compilation](compilation/index.md) defines explicit options and atomic result/output contracts.
 - [Diagnostic](diagnostic/index.md) defines stable codes, severity, primary spans, and related information.
 - [Lexer](lexer/index.md) performs deterministic tokenization while retaining comment trivia.
 - [Parser](parser/index.md) builds the private recoverable concrete syntax representation.
+- [IR](ir/index.md) defines the private generator-oriented normalized module representation.
 - [Source](source/index.md) defines offset and human-facing source positions and spans.
 - [Source Map](source-map/index.md) defines deterministic version 3 source-map output.
 
@@ -24,6 +26,10 @@ plugins remain external adapters around this pure boundary.
 
 ```text
 src/
+  analysis/
+    contracts/internal/
+    types/internal/
+    runtime/
   api/
     contracts/
   compilation/
@@ -33,6 +39,8 @@ src/
     contracts/
     types/
     runtime/
+  ir/
+    contracts/internal/
   lexer/
     contracts/internal/
     types/internal/
@@ -51,8 +59,8 @@ src/
 
 The package root still exports erased public contracts and types only. It deliberately does not
 expose a temporary `Compiler` runtime value: the frozen facade will appear when the complete
-compilation pipeline can satisfy `CompilerApi`. Lexer tokens and parser declarations are private
-package internals; semantic symbols, compiler IR, and generator internals will follow the same
+compilation pipeline can satisfy `CompilerApi`. Lexer tokens, parser declarations, semantic
+symbols, and compiler IR are private package internals; generator internals will follow the same
 boundary.
 
 The canonical grammar, output rules, diagnostics, and deferred features are defined by the
