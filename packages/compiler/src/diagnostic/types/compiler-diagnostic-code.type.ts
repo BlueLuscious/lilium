@@ -1,0 +1,40 @@
+/**
+ * @description Stable diagnostic identities reserved by the first Lily compiler milestone.
+ * @remarks `LILY1xxx` covers lexing/parsing, `LILY2xxx` covers local semantics, and `LILY3xxx`
+ * covers explicitly unsupported source features. API misuse throws and does not use these codes.
+ */
+export type CompilerDiagnosticCodeType =
+    | "LILY1001"
+    | "LILY1002"
+    | "LILY1003"
+    | "LILY1004"
+    | "LILY1005"
+    | "LILY1006"
+    | "LILY1007"
+    | "LILY1008"
+    | "LILY1009"
+    | "LILY2001"
+    | "LILY2002"
+    | "LILY2003"
+    | "LILY2004"
+    | "LILY2005"
+    | "LILY2006"
+    | "LILY2007"
+    | "LILY2008"
+    | "LILY2009"
+    | "LILY2010"
+    | "LILY2011"
+    | "LILY2012"
+    | "LILY3001"
+    | "LILY3002"
+    | "LILY3003"
+    | "LILY3004"
+    | "LILY3005"
+    | "LILY3006"
+    | "LILY3007"
+    | "LILY3008"
+    | "LILY3009"
+    | "LILY3010"
+    | "LILY3011"
+    | "LILY3012"
+    | "LILY3013";

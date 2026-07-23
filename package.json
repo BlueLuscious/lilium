@@ -22,6 +22,7 @@
   "scripts": {
     "build": "pnpm --recursive --if-present run build",
     "build:component": "pnpm --filter @lilium/component... run build",
+    "build:compiler": "pnpm --filter @lilium/compiler run build",
     "build:core": "pnpm --filter @lilium/core run build",
     "build:renderer": "pnpm --filter @lilium/renderer... run build",
     "build:template": "pnpm --filter @lilium/template... run build",
@@ -39,6 +40,7 @@
     "test:types": "pnpm --recursive --if-present run test:types",
     "verify": "pnpm run check && pnpm run test",
     "watch:component": "pnpm --filter @lilium/component run watch",
+    "watch:compiler": "pnpm --filter @lilium/compiler run watch",
     "watch:core": "pnpm --filter @lilium/core run watch",
     "watch:renderer": "pnpm --filter @lilium/renderer run watch",
     "watch:template": "pnpm --filter @lilium/template run watch"
