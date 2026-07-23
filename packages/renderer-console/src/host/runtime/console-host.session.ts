@@ -1,12 +1,14 @@
 import type {
     RendererAttachmentType,
-    RendererHostOperationType,
     RendererHostSession,
     RendererPlacementType,
     RendererPrimitiveCapability,
     RendererPropertyCapability,
 } from "@lilium/renderer";
 import type { ConsolePrimitiveDefinition } from "../../capability/contracts/console-primitive-definition.contract.js";
+import type { ConsoleFailureInjector } from "../../failure/runtime/console-failure.injector.js";
+import { ConsoleIdentityRegistry } from "../../trace/runtime/console-identity.registry.js";
+import type { ConsoleTraceRecorder } from "../../trace/runtime/console-trace.recorder.js";
 import type { ConsoleRootSnapshot } from "../contracts/console-root-snapshot.contract.js";
 import type { ConsoleValueSnapshot } from "../contracts/console-value-snapshot.contract.js";
 import type { ConsoleHandleType } from "../types/console-handle.type.js";
@@ -28,10 +30,18 @@ export class ConsoleHostSession
     readonly #root: ConsoleHandleType;
     /** @description Configured primitive definitions keyed by exact Template identity. */
     readonly #definitions: ReadonlyMap<ConsolePrimitiveType, ConsolePrimitiveDefinition>;
+    /** @description Configured primitive identities deliberately resolved as unsupported. */
+    readonly #omittedPrimitives: ReadonlySet<ConsolePrimitiveType>;
+    /** @description Configured property identities deliberately resolved as unsupported. */
+    readonly #omittedProperties: ReadonlySet<ConsolePropertyType>;
     /** @description Mutable records keyed by opaque session-local handle identity. */
     readonly #records = new Map<ConsoleHandleType, TConsoleHandleRecord>();
-    /** @description Shared successful-operation ledger retained by the owning host. */
-    readonly #trace: RendererHostOperationType[];
+    /** @description Session-local deterministic capability identity normalizer. */
+    readonly #identities: ConsoleIdentityRegistry;
+    /** @description Shared structured operation recorder retained by the owning host. */
+    readonly #trace: ConsoleTraceRecorder;
+    /** @description Fresh operation failure injector with session-local occurrence counters. */
+    readonly #failures: ConsoleFailureInjector;
     /** @description Callback releasing the owning host's external-root claim. */
     readonly #releaseClaim: () => void;
     /** @description Irreversible session lifecycle. */
@@ -42,19 +52,31 @@ export class ConsoleHostSession
     /**
      * @description Creates one open session with an opaque logical root handle.
      * @param rootValue - Exact externally owned root identity claimed by the host.
+     * @param orderedDefinitions - Capability declarations preserving host configuration order.
      * @param definitions - Complete immutable capability lookup for this host.
-     * @param trace - Host-owned successful-operation ledger beginning with open.
+     * @param omittedPrimitives - Primitive identities deliberately resolved as unsupported.
+     * @param omittedProperties - Property identities deliberately resolved as unsupported.
+     * @param trace - Host-owned deterministic structured operation recorder.
+     * @param failures - Fresh operation failure injector for this opening attempt.
      * @param releaseClaim - Callback releasing the exact host-root claim on closure.
      */
     constructor(
         rootValue: ConsoleRootType,
+        orderedDefinitions: readonly ConsolePrimitiveDefinition[],
         definitions: ReadonlyMap<ConsolePrimitiveType, ConsolePrimitiveDefinition>,
-        trace: RendererHostOperationType[],
+        omittedPrimitives: ReadonlySet<ConsolePrimitiveType>,
+        omittedProperties: ReadonlySet<ConsolePropertyType>,
+        trace: ConsoleTraceRecorder,
+        failures: ConsoleFailureInjector,
         releaseClaim: () => void,
     ) {
         this.#rootValue = rootValue;
         this.#definitions = definitions;
+        this.#omittedPrimitives = omittedPrimitives;
+        this.#omittedProperties = omittedProperties;
+        this.#identities = new ConsoleIdentityRegistry(orderedDefinitions);
         this.#trace = trace;
+        this.#failures = failures;
         this.#releaseClaim = releaseClaim;
         this.#root = this.#createHandle({
             id: 0,
@@ -84,10 +106,14 @@ export class ConsoleHostSession
         primitive: Primitive,
     ): RendererPrimitiveCapability<ConsoleHandleType, ConsoleHandleType, Primitive> | undefined {
         this.#assertOpen();
+        const primitiveIdentifier = this.#identities.primitive(primitive);
+        const payload = { operation: "resolve-primitive" as const, primitive: primitiveIdentifier };
+        this.#trace.record("attempted", payload);
+        this.#failures.throwIfScheduled("resolve-primitive");
         const definition = this.#definitions.get(primitive);
-        this.#trace.push("resolve-primitive");
+        this.#trace.record("completed", payload);
 
-        if (definition === undefined) {
+        if (definition === undefined || this.#omittedPrimitives.has(primitive)) {
             return undefined;
         }
 
@@ -101,10 +127,18 @@ export class ConsoleHostSession
             create: () => this.#createValue(definition),
             resolveProperty: (property) => {
                 this.#assertOpen();
+                const propertyIdentifier = this.#identities.property(property);
+                const propertyPayload = {
+                    operation: "resolve-property" as const,
+                    primitive: primitiveIdentifier,
+                    property: propertyIdentifier,
+                };
+                this.#trace.record("attempted", propertyPayload);
+                this.#failures.throwIfScheduled("resolve-property");
                 const supported = definition.properties.some((candidate) => candidate === property);
-                this.#trace.push("resolve-property");
+                this.#trace.record("completed", propertyPayload);
 
-                if (!supported) {
+                if (!supported || this.#omittedProperties.has(property)) {
                     return undefined;
                 }
 
@@ -154,12 +188,15 @@ export class ConsoleHostSession
             throw new TypeError("A Console value cannot be placed before itself.");
         }
 
+        let beforeIdentifier: number | null = null;
         if (destination.before !== null) {
             const beforeRecord = this.#valueRecord(destination.before);
 
             if (beforeRecord.parent !== destination.parent) {
                 throw new TypeError("Console placement anchor is not a child of its destination.");
             }
+
+            beforeIdentifier = beforeRecord.id;
         }
 
         for (
@@ -172,6 +209,17 @@ export class ConsoleHostSession
             }
         }
 
+        const payload = {
+            operation: "place" as const,
+            value: valueRecord.id,
+            parent: parentRecord.id,
+            before: beforeIdentifier,
+            currentParent:
+                valueRecord.parent === undefined ? null : this.#record(valueRecord.parent).id,
+        };
+        this.#trace.record("attempted", payload);
+        this.#failures.throwIfScheduled("place");
+
         if (valueRecord.parent !== undefined) {
             const previousChildren = this.#record(valueRecord.parent).children;
             previousChildren.splice(previousChildren.indexOf(value), 1);
@@ -183,7 +231,7 @@ export class ConsoleHostSession
                 : parentRecord.children.indexOf(destination.before);
         parentRecord.children.splice(insertionIndex, 0, value);
         valueRecord.parent = destination.parent;
-        this.#trace.push("place");
+        this.#trace.record("completed", payload);
     }
 
     /**
@@ -207,9 +255,16 @@ export class ConsoleHostSession
             throw new TypeError("Console removal value is not an immediate parent child.");
         }
 
+        const payload = {
+            operation: "remove" as const,
+            value: valueRecord.id,
+            parent: parentRecord.id,
+        };
+        this.#trace.record("attempted", payload);
+        this.#failures.throwIfScheduled("remove");
         parentRecord.children.splice(index, 1);
         valueRecord.parent = undefined;
-        this.#trace.push("remove");
+        this.#trace.record("completed", payload);
     }
 
     /**
@@ -221,6 +276,8 @@ export class ConsoleHostSession
             return;
         }
 
+        const payload = { operation: "close" as const, root: 0 };
+        this.#trace.record("attempted", payload);
         const live = [...this.#records.values()].some(
             (record) => record.primitive !== undefined && !record.released,
         );
@@ -230,8 +287,9 @@ export class ConsoleHostSession
         }
 
         this.#state = "closed";
-        this.#trace.push("close");
         this.#releaseClaim();
+        this.#failures.throwIfScheduled("close");
+        this.#trace.record("completed", payload);
     }
 
     /**
@@ -255,16 +313,24 @@ export class ConsoleHostSession
      */
     #createValue(primitive: ConsolePrimitiveDefinition): ConsoleHandleType {
         this.#assertOpen();
+        const identifier = this.#nextId;
+        this.#nextId += 1;
+        const payload = {
+            operation: "create" as const,
+            primitive: this.#identities.primitive(primitive.primitive),
+            value: identifier,
+        };
+        this.#trace.record("attempted", payload);
+        this.#failures.throwIfScheduled("create");
         const value = this.#createHandle({
-            id: this.#nextId,
+            id: identifier,
             primitive,
             children: [],
             properties: new Map(),
             parent: undefined,
             released: false,
         });
-        this.#nextId += 1;
-        this.#trace.push("create");
+        this.#trace.record("completed", payload);
         return value;
     }
 
@@ -291,8 +357,16 @@ export class ConsoleHostSession
             );
         }
 
+        const payload = {
+            operation: "write" as const,
+            primitive: this.#identities.primitive(primitive.primitive),
+            property: this.#identities.property(property),
+            value: record.id,
+        };
+        this.#trace.record("attempted", payload);
+        this.#failures.throwIfScheduled("write");
         record.properties.set(property, candidate);
-        this.#trace.push("write");
+        this.#trace.record("completed", payload);
     }
 
     /**
@@ -313,8 +387,15 @@ export class ConsoleHostSession
             throw new Error("A Console value must be detached and empty before release.");
         }
 
+        const payload = {
+            operation: "release" as const,
+            primitive: this.#identities.primitive(primitive.primitive),
+            value: record.id,
+        };
+        this.#trace.record("attempted", payload);
         record.released = true;
-        this.#trace.push("release");
+        this.#failures.throwIfScheduled("release");
+        this.#trace.record("completed", payload);
     }
 
     /**

@@ -1,4 +1,5 @@
-import type { RendererHost, RendererHostOperationType } from "@lilium/renderer";
+import type { RendererHost } from "@lilium/renderer";
+import type { ConsoleTraceEntryType } from "../../trace/types/console-trace-entry.type.js";
 import type { ConsoleHandleType } from "../types/console-handle.type.js";
 import type { ConsoleRootType } from "../types/console-root.type.js";
 import type { ConsoleRootSnapshot } from "./console-root-snapshot.contract.js";
@@ -18,9 +19,9 @@ export interface ConsoleHost
     snapshot(root: ConsoleRootType): ConsoleRootSnapshot;
 
     /**
-     * @description Captures successful protocol operations for one current or completed root.
+     * @description Captures deterministic protocol stages for one current or completed root.
      * @param root - Exact external root identity previously supplied to this host.
-     * @returns Immutable ordered operation names.
+     * @returns Immutable ordered attempted and completed operation entries.
      */
-    trace(root: ConsoleRootType): readonly RendererHostOperationType[];
+    trace(root: ConsoleRootType): readonly ConsoleTraceEntryType[];
 }

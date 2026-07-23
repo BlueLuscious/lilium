@@ -23,6 +23,10 @@ function createHost() {
     };
 }
 
+function traceStages(host: ReturnType<typeof createHost>["host"], root: { name: string }) {
+    return host.trace(root).map(({ operation, status }) => `${operation}:${status}`);
+}
+
 describe("Renderer Console private host adapter", () => {
     test("normalizes nominal immutable capability declarations", () => {
         const group = RendererConsole.primitive(Group, {
@@ -108,30 +112,51 @@ describe("Renderer Console private host adapter", () => {
         session.close();
         session.close();
 
-        assert.deepEqual(host.trace(root), [
-            "open",
-            "resolve-primitive",
-            "resolve-primitive",
-            "resolve-property",
-            "resolve-property",
-            "create",
-            "create",
-            "write",
-            "write",
-            "place",
-            "place",
-            "remove",
-            "remove",
-            "release",
-            "release",
-            "close",
+        assert.deepEqual(traceStages(host, root), [
+            "open:attempted",
+            "open:completed",
+            "resolve-primitive:attempted",
+            "resolve-primitive:completed",
+            "resolve-primitive:attempted",
+            "resolve-primitive:completed",
+            "resolve-property:attempted",
+            "resolve-property:completed",
+            "resolve-property:attempted",
+            "resolve-property:completed",
+            "create:attempted",
+            "create:completed",
+            "create:attempted",
+            "create:completed",
+            "write:attempted",
+            "write:completed",
+            "write:attempted",
+            "write:completed",
+            "place:attempted",
+            "place:completed",
+            "place:attempted",
+            "place:completed",
+            "remove:attempted",
+            "remove:completed",
+            "remove:attempted",
+            "remove:completed",
+            "release:attempted",
+            "release:completed",
+            "release:attempted",
+            "release:completed",
+            "close:attempted",
+            "close:completed",
         ]);
         assert.throws(() => host.snapshot(root), /no active host session/i);
         assert.throws(() => group.create(), /closed/i);
 
         const reopened = host.open(root);
         reopened.close();
-        assert.deepEqual(host.trace(root), ["open", "close"]);
+        assert.deepEqual(traceStages(host, root), [
+            "open:attempted",
+            "open:completed",
+            "close:attempted",
+            "close:completed",
+        ]);
     });
 
     test("composes with the public Renderer runtime without implementation imports", () => {
@@ -161,12 +186,17 @@ describe("Renderer Console private host adapter", () => {
         assert.equal(host.snapshot(root).children[0]?.children[0]?.properties[0]?.value, "Second");
 
         rendered.dispose();
-        assert.deepEqual(host.trace(root).slice(-5), [
-            "remove",
-            "remove",
-            "release",
-            "release",
-            "close",
+        assert.deepEqual(traceStages(host, root).slice(-10), [
+            "remove:attempted",
+            "remove:completed",
+            "remove:attempted",
+            "remove:completed",
+            "release:attempted",
+            "release:completed",
+            "release:attempted",
+            "release:completed",
+            "close:attempted",
+            "close:completed",
         ]);
         runtime.dispose();
     });
