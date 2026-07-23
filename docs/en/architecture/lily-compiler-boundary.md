@@ -1,6 +1,6 @@
 # Lily Compiler Boundary
 
-Status: **Foundation accepted**
+Status: **Foundation accepted and public package boundary declared**
 
 This document defines the first `.lily` source boundary and deterministic compiler output. The
 compiler targets the accepted Component and [Template ABI](template-abi.md) package roots and never
@@ -32,8 +32,8 @@ Compiler.compile(source, { filename });
 
 The result contains:
 
-- `code`, generated JavaScript when no error diagnostic exists;
-- `map`, a version 3 source map when code exists;
+- `output`, an atomic generated JavaScript and version 3 source-map pair when no error diagnostic
+  exists;
 - `diagnostics`, an immutable ordered collection of compiler diagnostics.
 
 Build tools, CLIs, editors, and future bundler integrations own file I/O, module resolution,
