@@ -33,6 +33,13 @@ describe("Compiler golden conformance", () => {
         assert.deepEqual(fixtures, requiredFixtures);
     });
 
+    it("preserves the exact CRLF source fixture", () => {
+        const source = readFileSync(join(fixtureRoot, "comments-and-crlf", "input.lily"), "utf8");
+
+        assert.match(source, /\r\n/u);
+        assert.doesNotMatch(source.replaceAll("\r\n", ""), /\n/u);
+    });
+
     for (const fixture of fixtures) {
         it(`matches ${fixture}`, () => {
             const directory = join(fixtureRoot, fixture);
