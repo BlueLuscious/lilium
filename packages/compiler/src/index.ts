@@ -1,4 +1,5 @@
 export type { CompilerApi } from "./api/index.js";
+export { Compiler } from "./api/index.js";
 export type { CompilerOptionsType, CompilerOutput, CompilerResult } from "./compilation/index.js";
 export type {
     CompilerDiagnostic,

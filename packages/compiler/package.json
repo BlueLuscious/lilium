@@ -29,7 +29,8 @@
   "scripts": {
     "build": "pnpm run clean && tsc",
     "clean": "node ../../tooling/cli/clean-package-distribution.mjs",
-    "test": "pnpm run build && pnpm run test:types && pnpm run test:runtime",
+    "test": "pnpm run build && pnpm run test:types && pnpm run test:runtime && pnpm run test:package",
+    "test:package": "node --test tests/package/**/*.test.mjs",
     "test:runtime": "tsx --test tests/runtime/**/*.test.ts",
     "test:types": "tsc -p tsconfig.test.json",
     "watch": "tsc -w"

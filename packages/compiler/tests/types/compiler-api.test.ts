@@ -1,16 +1,17 @@
-import type {
-    CompilerApi,
-    CompilerDiagnostic,
-    CompilerDiagnosticCodeType,
-    CompilerOptionsType,
-    CompilerOutput,
-    CompilerResult,
-    CompilerSourceMap,
-    CompilerSourcePosition,
-    CompilerSourceSpan,
+import {
+    Compiler,
+    type CompilerApi,
+    type CompilerDiagnostic,
+    type CompilerDiagnosticCodeType,
+    type CompilerOptionsType,
+    type CompilerOutput,
+    type CompilerResult,
+    type CompilerSourceMap,
+    type CompilerSourcePosition,
+    type CompilerSourceSpan,
 } from "../../src/index.js";
 
-declare const compiler: CompilerApi;
+const compiler: CompilerApi = Compiler;
 declare const diagnostic: CompilerDiagnostic;
 declare const output: CompilerOutput;
 declare const result: CompilerResult;
