@@ -19,11 +19,13 @@ Generation classes remain internal and absent from `@lilium/compiler`.
 1. Emit the fixed public `Template` import.
 2. Merge user imports by exact module specifier in first source-appearance order.
 3. Sort each merged named-specifier list lexically.
-4. Emit one `$template` definition containing normalized roots, properties, and children.
-5. Emit static properties through `Template.value()`.
-6. Emit bindings through `Template.binding()` and qualify executable roots through `$state`.
-7. Compose the imported behavior and generated template as the default export.
-8. Finish with exactly one LF and no environment-dependent metadata.
+4. Derive the exact visual state from the imported behavior through the public
+   `ComponentTemplateStateFromDefinitionType`.
+5. Emit one typed `$template` definition containing normalized roots, properties, and children.
+6. Emit static properties through `Template.value()`.
+7. Emit bindings through `Template.binding()` and qualify executable roots through `$state`.
+8. Compose the imported behavior and generated template as the default export.
+9. Finish with exactly one LF and no environment-dependent metadata.
 
 `LilyBindingEmitter` rewrites only executable `inputs` and `controller` roots. It preserves strings,
 comments, member names, object keys, and template text, while recursively rewriting expressions
@@ -34,4 +36,5 @@ are recorded at user imports, primitive names, property names, expression starts
 behavior composition.
 
 The generator imports no Component implementation, Renderer, Core, compiler helper, integration
-subpath, or host adapter.
+subpath, or host adapter. Its JSDoc state annotation is erased runtime metadata that allows the
+generated JavaScript itself to pass strict `checkJs` validation against public package contracts.

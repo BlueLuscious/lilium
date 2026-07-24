@@ -1,6 +1,6 @@
 # Compiler Compilation
 
-Status: **Contracts declared**
+Status: **Implemented**
 
 | Contract or type | Responsibility | Relationships |
 | --- | --- | --- |
@@ -14,3 +14,14 @@ source error produces `output: undefined`. Diagnostics remain available on every
 
 The filename is caller-owned source identity. The compiler may normalize separators for generated
 metadata but never resolves the path or reads it.
+
+The implemented `Compiler.compile()` flow is pure and ordered:
+
+1. Validate explicit API arguments.
+2. Lex and recoverably parse the complete source.
+3. Analyze semantics and lower valid syntax to normalized IR.
+4. Return ordered diagnostics without partial output after any source error.
+5. Generate one atomic JavaScript and source-map pair from error-free IR.
+
+Committed output and diagnostic compatibility is verified by
+[Compiler Conformance](../conformance/index.md).

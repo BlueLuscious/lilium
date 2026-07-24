@@ -1,6 +1,6 @@
 # Lily Compiler Boundary
 
-Status: **Foundation accepted; complete public compilation pipeline implemented**
+Status: **First compiler milestone implemented and conformant**
 
 This document defines the first `.lily` source boundary and deterministic compiler output. The
 compiler targets the accepted Component and [Template ABI](template-abi.md) package roots and never
@@ -385,6 +385,11 @@ Minimum golden fixtures cover:
 Every fixture compiles twice in one test and compares code, map, and diagnostics byte-for-byte.
 Golden updates require an intentional review because generated output is a public compatibility
 boundary for build integrations and debugging.
+
+The implemented conformance suite additionally checks successful generated JavaScript against the
+built public Component and Template types and executes the smallest useful module through Renderer
+and the Renderer Console host. The package-local test dependencies do not alter Compiler runtime
+purity. See [Compiler Conformance](../packages/compiler/conformance/index.md).
 
 ## Explicitly deferred source features
 

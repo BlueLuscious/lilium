@@ -1,6 +1,6 @@
 # Compiler Diagnostics
 
-Status: **Contracts and first-milestone codes declared**
+Status: **Implemented and covered by golden diagnostics**
 
 ## Contracts And Types
 
@@ -53,5 +53,7 @@ no terminal formatting. API misuse throws rather than producing a source diagnos
 | `LILY3012` | Transition, animation, portal, hydration, or streaming syntax. |
 | `LILY3013` | Preprocessor, macro, plugin, or HMR directive. |
 
-The lexer, parser, and analyzer phases must use these identities consistently. Adding or changing a
-code is a compatibility decision rather than an implementation detail.
+The lexer, parser, and analyzer phases use these identities consistently. Every explicitly
+unsupported structural keyword and the accepted malformed expression families are frozen by
+[Compiler Conformance](../conformance/index.md). Adding or changing a code is a compatibility
+decision rather than an implementation detail.
