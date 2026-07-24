@@ -1,6 +1,6 @@
 # API Style
 
-Status: **Foundation accepted; Renderer contracts declared**
+Status: **Foundation object model implemented**
 
 ## Decision rule
 
@@ -43,12 +43,13 @@ Functions are used for:
 | `RenderedComponent<Inputs, Controller>` | Exposes one mounted component and complete root-input updates. |
 | `RenderedTemplate<State>` | Exposes one mounted standalone template and its stable state. |
 
-The immutable `Runtime`, `Context`, `Component`, and `Template` facade objects are the canonical
-construction boundaries. Core and Component concrete values are exported only with their runtime
-implementations; Template exports immutable declaration behavior without an execution runtime.
+The immutable `Runtime`, `Context`, `Component`, `Template`, `Renderer`, and `Compiler` facade
+objects are the canonical construction boundaries. Core, Component, and Renderer concrete values
+are exported only with their runtime implementations; Template exports immutable declaration
+behavior without an execution runtime, while Compiler exposes a pure transformation boundary.
 
-The implemented Template object model is defined in [Template ABI](template-abi.md). The declared
-Renderer object model and its pending runtime behavior are defined in
+The implemented Template object model is defined in [Template ABI](template-abi.md). The
+implemented Renderer object model and runtime behavior are defined in
 [Renderer Protocol](renderer-protocol.md). A higher-level browser-oriented `Application` facade
 remains a future package concept and does not belong to `@lilium/core`.
 

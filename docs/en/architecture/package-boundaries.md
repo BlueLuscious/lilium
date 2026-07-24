@@ -1,6 +1,6 @@
 # Package Boundaries
 
-Status: **Compiler implementation milestone active**
+Status: **Foundation through Compiler complete; Renderer DOM approved**
 
 ## Package boundaries
 
@@ -21,9 +21,9 @@ in [Renderer Protocol](renderer-protocol.md). Host-specific packages implement t
 never become dependencies of universal Renderer.
 
 The first source grammar, diagnostics, deterministic ESM, and source-map boundary are accepted in
-[Lily Compiler Boundary](lily-compiler-boundary.md). The Compiler package now exists with its
-public Phase 00 contract boundary; lexer, parser, analysis, and generation remain implementation
-phases.
+[Lily Compiler Boundary](lily-compiler-boundary.md). The Compiler package implements its complete
+first public pipeline while keeping lexer, parser, analysis, IR, generation, and source-map
+encoding private.
 
 ## Approved implementation milestones
 
