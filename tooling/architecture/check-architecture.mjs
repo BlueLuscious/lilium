@@ -28,6 +28,14 @@ const packagePolicies = Object.freeze([
         }),
     }),
     Object.freeze({
+        name: "compiler",
+        allowedLiliumDependencies: Object.freeze(["@lilium/component", "@lilium/template"]),
+        forbiddenImportPrefixes: Object.freeze(["node:"]),
+        exports: Object.freeze({
+            ".": "./dist/index",
+        }),
+    }),
+    Object.freeze({
         name: "renderer",
         allowedLiliumDependencies: Object.freeze([
             "@lilium/core",
@@ -105,6 +113,12 @@ export function checkArchitecture(root) {
             const normalizedPath = path.replaceAll("\\", "/");
 
             for (const dependency of importsOf(source)) {
+                if (
+                    policy.forbiddenImportPrefixes?.some((prefix) => dependency.startsWith(prefix))
+                ) {
+                    report(path, `${policy.name} cannot depend on host module ${dependency}`);
+                }
+
                 if (
                     dependency.startsWith("@lilium/") &&
                     !policy.allowedLiliumDependencies.includes(dependency)

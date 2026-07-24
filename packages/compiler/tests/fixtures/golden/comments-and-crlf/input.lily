@@ -1,0 +1,15 @@
+/* The source map must preserve this exact CRLF source. */
+behavior { CounterBehavior } from "../../support/counter.behavior.js";
+
+// Capability declarations may contain comments.
+primitives { Stack, Label } from "../../support/ui.capabilities.js";
+properties { StackGap, LabelValue } from "../../support/ui.capabilities.js";
+
+template {
+    node Stack {
+        value StackGap = 4;
+        node Label {
+            bind LabelValue = `Input: ${inputs.initial.get()}`;
+        }
+    }
+}

@@ -1,0 +1,10 @@
+primitives { Stack } from "../../support/ui.capabilities.js";
+properties { StackGap } from "../../support/ui.capabilities.js";
+
+template {
+    node Stack {}
+}
+
+template {
+    node Stack {}
+}

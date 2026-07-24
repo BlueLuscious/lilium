@@ -1,6 +1,6 @@
 # Execution Model
 
-Status: **Core and component foundation accepted**
+Status: **Core, Component, Template, and Renderer execution implemented**
 
 ## Component creation
 
@@ -8,7 +8,8 @@ A component definition is immutable and reusable. Creating it through a `Compone
 
 Component state changes do not execute the whole component again. They invalidate only consumers that tracked the changed state.
 
-Template instantiation and mounting are separate future compositions. They consume a successfully initialized headless instance but do not change its setup or ownership semantics.
+Template instantiation and mounting are separate compositions. They consume a successfully
+initialized headless instance without changing its setup or ownership semantics.
 
 ## Signal writes
 
@@ -147,7 +148,9 @@ definition. See [Renderer Protocol](renderer-protocol.md).
 
 Disposing a reactive runtime recursively disposes its root resources, scopes, effects, computations, component instances, and registered cleanups according to the ownership ledger. Repeated disposal is safe.
 
-A future mounted application will additionally own component attachments, renderer bindings, and host resources through the accepted [rendering ownership topology](rendering-integration.md#ownership-topology).
+A mounted application additionally owns component attachments, renderer bindings, and host
+resources through the accepted
+[rendering ownership topology](rendering-integration.md#ownership-topology).
 
 ## Error boundaries
 

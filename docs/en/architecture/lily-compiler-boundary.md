@@ -1,6 +1,6 @@
 # Lily Compiler Boundary
 
-Status: **Foundation accepted**
+Status: **First compiler milestone implemented and conformant**
 
 This document defines the first `.lily` source boundary and deterministic compiler output. The
 compiler targets the accepted Component and [Template ABI](template-abi.md) package roots and never
@@ -32,8 +32,8 @@ Compiler.compile(source, { filename });
 
 The result contains:
 
-- `code`, generated JavaScript when no error diagnostic exists;
-- `map`, a version 3 source map when code exists;
+- `output`, an atomic generated JavaScript and version 3 source-map pair when no error diagnostic
+  exists;
 - `diagnostics`, an immutable ordered collection of compiler diagnostics.
 
 Build tools, CLIs, editors, and future bundler integrations own file I/O, module resolution,
@@ -231,6 +231,18 @@ Compilation has explicit stages:
 4. Lower valid source into a normalized compiler IR that mirrors Template ABI concepts.
 5. Generate deterministic ESM and a source map from that IR.
 
+The internal token and concrete syntax models, recovery boundaries, and parser/analyzer separation
+are documented under the [Compiler Lexer](../packages/compiler/lexer/index.md) and
+[Compiler Parser](../packages/compiler/parser/index.md) features.
+
+Semantic resolution, expression restrictions, and the generator boundary are documented under
+[Compiler Analysis](../packages/compiler/analysis/index.md) and
+[Compiler IR](../packages/compiler/ir/index.md).
+
+Deterministic ESM emission and generated mapping behavior are documented under
+[Compiler Generator](../packages/compiler/generator/index.md) and
+[Compiler Source Map](../packages/compiler/source-map/index.md).
+
 The parser synchronizes after semicolons, closing braces, and recognized top-level declaration
 keywords so one malformed declaration does not suppress independent later diagnostics.
 
@@ -373,6 +385,11 @@ Minimum golden fixtures cover:
 Every fixture compiles twice in one test and compares code, map, and diagnostics byte-for-byte.
 Golden updates require an intentional review because generated output is a public compatibility
 boundary for build integrations and debugging.
+
+The implemented conformance suite additionally checks successful generated JavaScript against the
+built public Component and Template types and executes the smallest useful module through Renderer
+and the Renderer Console host. The package-local test dependencies do not alter Compiler runtime
+purity. See [Compiler Conformance](../packages/compiler/conformance/index.md).
 
 ## Explicitly deferred source features
 

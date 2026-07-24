@@ -4,13 +4,13 @@ This document records packages that do not currently exist. Moving a package int
 
 ## Approved implementation milestones
 
-- `@lilium/compiler`: `.lily` parser, analysis, and code generation.
 - `@lilium/renderer-dom`: browser host implementation.
 
 Creation order, prerequisites, and package gates are defined once in
 [Package Boundaries](../architecture/package-boundaries.md). These remaining packages stay outside
-the workspace until their respective implementation epic begins. Active Template, Renderer, and
-Renderer Console packages are documented under [Current Packages](../packages/index.md).
+the workspace until their respective implementation epic begins. Active Compiler, Template,
+Renderer, and Renderer Console packages are documented under
+[Current Packages](../packages/index.md).
 
 ## Post-MVP candidates
 

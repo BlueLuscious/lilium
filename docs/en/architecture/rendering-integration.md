@@ -107,8 +107,8 @@ Registration inside an attachment must preserve this observable disposal order:
 4. Complete attachment disposal.
 5. Release component setup resources when the component scope continues disposing.
 
-The Template and Renderer protocols will define the detailed ordering among multiple host values,
-but they may not invert the attachment-before-component guarantee.
+The Template and Renderer protocols define the detailed ordering among multiple host values
+without inverting the attachment-before-component guarantee.
 
 ## Scheduling ownership
 

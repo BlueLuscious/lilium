@@ -3,7 +3,7 @@
 Status: **First public ABI hardened**
 
 `@lilium/template` defines the target-independent immutable presentation protocol shared by
-programmatic authors, future `.lily` compiler output, and Renderer. It depends only on public Core
+programmatic authors, generated `.lily` compiler output, and Renderer. It depends only on public Core
 and Component package roots.
 
 The package exports a frozen `Template` value implementing the complete first-milestone

@@ -10,6 +10,7 @@ Component runtime implementation or creating a live component occurrence.
 | `TemplateComponentInputValue<Inputs>` | Static complete-input declaration. | Owns a copied frozen `ComponentInputValuesType<Inputs>` container while retaining application values by reference. |
 | `TemplateComponentInputBinding<ParentState, ChildInputs>` | Dynamic complete-input declaration. | Retains one unevaluated `TemplateComponentInputEvaluatorType`. |
 | `ComponentTemplateStateType<Inputs, Controller>` | Frozen visual state assembled by Renderer. | Contains exact stable Component inputs and controller. |
+| `ComponentTemplateStateFromDefinitionType<Definition>` | Derives exact visual state from a public headless definition. | Preserves Component input and controller relationships for JavaScript generators and typed adapters. |
 | `TemplateComponentInputType<ParentState, ChildInputs>` | Discriminated static-or-dynamic input declaration union. | Connects nested component instructions to their value or binding form. |
 | `TemplateComponentInputEvaluatorType<ParentState, ChildInputs>` | Pure complete child-input snapshot evaluator. | Produces `ComponentInputValuesType<ChildInputs>`. |
 | `TemplateComponentOptionsType<ParentState, ChildInputs>` | Caller input for `component()`. | Accepts complete static or dynamic inputs plus ordered validated projections. |

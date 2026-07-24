@@ -68,6 +68,7 @@ function createRepository(context) {
         },
         false,
     );
+    createPackage(root, "compiler", {}, false);
     createPackage(
         root,
         "renderer",
@@ -152,6 +153,26 @@ describe("architecture checker", () => {
         );
 
         assert.deepEqual(checkArchitecture(root), []);
+    });
+
+    test("keeps Compiler pure and independent from runtime and host modules", (context) => {
+        const root = createRepository(context);
+        writeFileSync(
+            join(root, "packages", "compiler", "src", "index.ts"),
+            'import { readFileSync } from "node:fs";\nimport { Renderer } from "@lilium/renderer";\nvoid readFileSync;\nvoid Renderer;\n',
+        );
+
+        const violations = checkArchitecture(root);
+        assert.equal(
+            violations.some((violation) => violation.includes("host module node:fs")),
+            true,
+        );
+        assert.equal(
+            violations.some((violation) =>
+                violation.includes("compiler cannot depend on @lilium/renderer"),
+            ),
+            true,
+        );
     });
 
     test("keeps Renderer Console private and dependent only on public Renderer", (context) => {

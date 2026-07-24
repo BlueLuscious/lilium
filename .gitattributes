@@ -1,1 +1,4 @@
 * text=auto eol=lf
+
+# Materialize the exact line endings exercised by the compiler CRLF conformance fixture.
+packages/compiler/tests/fixtures/golden/comments-and-crlf/input.lily text eol=crlf

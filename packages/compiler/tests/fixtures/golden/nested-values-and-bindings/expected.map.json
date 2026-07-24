@@ -1,0 +1,12 @@
+{
+    "version": 3,
+    "file": "fixtures/nested-values-and-bindings/input.lily.js",
+    "sources": [
+        "fixtures/nested-values-and-bindings/input.lily"
+    ],
+    "sourcesContent": [
+        "behavior { CounterBehavior } from \"../../support/counter.behavior.js\";\nprimitives { Stack, Label, Action } from \"../../support/ui.capabilities.js\";\nproperties { StackGap, LabelValue, ActionLabel, ActionActivate } from \"../../support/ui.capabilities.js\";\n\ntemplate {\n    node Stack {\n        value StackGap = +8;\n\n        node Label {\n            bind LabelValue = controller.count.get() > 0\n                ? `Count: ${controller.count.get()}`\n                : \"Empty\";\n        }\n\n        node Action {\n            value ActionLabel = `Increment`;\n            bind ActionActivate = controller.increment;\n        }\n    }\n}\n"
+    ],
+    "names": [],
+    "mappings": ";;AAAA;AACA;;;;;;;;;;;;;sBAIS;;+BACK,UAAW;;;8BAEZ;;yCACI,wBAAa;;;;;8BAKjB;;uCACK,aAAc;yCACf,4BAAiB;;;;;;;;gCAhBlC"
+}

@@ -1,0 +1,800 @@
+[
+    {
+        "code": "LILY3001",
+        "severity": "error",
+        "message": "Inline setup declarations are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 214,
+                "line": 6,
+                "column": 5
+            },
+            "end": {
+                "offset": 219,
+                "line": 6,
+                "column": 10
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3001",
+        "severity": "error",
+        "message": "Inline script declarations are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 225,
+                "line": 7,
+                "column": 5
+            },
+            "end": {
+                "offset": 231,
+                "line": 7,
+                "column": 11
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3001",
+        "severity": "error",
+        "message": "Inline state declarations are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 237,
+                "line": 8,
+                "column": 5
+            },
+            "end": {
+                "offset": 242,
+                "line": 8,
+                "column": 10
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3001",
+        "severity": "error",
+        "message": "Inline input declarations are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 248,
+                "line": 9,
+                "column": 5
+            },
+            "end": {
+                "offset": 253,
+                "line": 9,
+                "column": 10
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3001",
+        "severity": "error",
+        "message": "Inline inputs declarations are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 259,
+                "line": 10,
+                "column": 5
+            },
+            "end": {
+                "offset": 265,
+                "line": 10,
+                "column": 11
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3001",
+        "severity": "error",
+        "message": "Inline controller declarations are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 271,
+                "line": 11,
+                "column": 5
+            },
+            "end": {
+                "offset": 281,
+                "line": 11,
+                "column": 15
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3003",
+        "severity": "error",
+        "message": "TypeScript declarations are not supported in Lily source.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 287,
+                "line": 12,
+                "column": 5
+            },
+            "end": {
+                "offset": 296,
+                "line": 12,
+                "column": 14
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3003",
+        "severity": "error",
+        "message": "TypeScript declarations are not supported in Lily source.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 302,
+                "line": 13,
+                "column": 5
+            },
+            "end": {
+                "offset": 306,
+                "line": 13,
+                "column": 9
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3003",
+        "severity": "error",
+        "message": "TypeScript declarations are not supported in Lily source.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 312,
+                "line": 14,
+                "column": 5
+            },
+            "end": {
+                "offset": 316,
+                "line": 14,
+                "column": 9
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3003",
+        "severity": "error",
+        "message": "TypeScript declarations are not supported in Lily source.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 322,
+                "line": 15,
+                "column": 5
+            },
+            "end": {
+                "offset": 331,
+                "line": 15,
+                "column": 14
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3003",
+        "severity": "error",
+        "message": "TypeScript declarations are not supported in Lily source.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 337,
+                "line": 16,
+                "column": 5
+            },
+            "end": {
+                "offset": 344,
+                "line": 16,
+                "column": 12
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3004",
+        "severity": "error",
+        "message": "Nested component declarations are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 350,
+                "line": 17,
+                "column": 5
+            },
+            "end": {
+                "offset": 359,
+                "line": 17,
+                "column": 14
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3004",
+        "severity": "error",
+        "message": "Slot declarations are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 365,
+                "line": 18,
+                "column": 5
+            },
+            "end": {
+                "offset": 369,
+                "line": 18,
+                "column": 9
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3004",
+        "severity": "error",
+        "message": "Outlet declarations are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 375,
+                "line": 19,
+                "column": 5
+            },
+            "end": {
+                "offset": 381,
+                "line": 19,
+                "column": 11
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3004",
+        "severity": "error",
+        "message": "Projection declarations are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 387,
+                "line": 20,
+                "column": 5
+            },
+            "end": {
+                "offset": 397,
+                "line": 20,
+                "column": 15
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3004",
+        "severity": "error",
+        "message": "Projection declarations are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 403,
+                "line": 21,
+                "column": 5
+            },
+            "end": {
+                "offset": 410,
+                "line": 21,
+                "column": 12
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3005",
+        "severity": "error",
+        "message": "Conditional regions are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 416,
+                "line": 22,
+                "column": 5
+            },
+            "end": {
+                "offset": 418,
+                "line": 22,
+                "column": 7
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3005",
+        "severity": "error",
+        "message": "Conditional regions are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 424,
+                "line": 23,
+                "column": 5
+            },
+            "end": {
+                "offset": 428,
+                "line": 23,
+                "column": 9
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3005",
+        "severity": "error",
+        "message": "Conditional regions are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 434,
+                "line": 24,
+                "column": 5
+            },
+            "end": {
+                "offset": 440,
+                "line": 24,
+                "column": 11
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3006",
+        "severity": "error",
+        "message": "Repetition regions are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 446,
+                "line": 25,
+                "column": 5
+            },
+            "end": {
+                "offset": 450,
+                "line": 25,
+                "column": 9
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3006",
+        "severity": "error",
+        "message": "Repetition regions are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 456,
+                "line": 26,
+                "column": 5
+            },
+            "end": {
+                "offset": 459,
+                "line": 26,
+                "column": 8
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3006",
+        "severity": "error",
+        "message": "Repetition regions are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 465,
+                "line": 27,
+                "column": 5
+            },
+            "end": {
+                "offset": 471,
+                "line": 27,
+                "column": 11
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3007",
+        "severity": "error",
+        "message": "Dynamic fragments are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 477,
+                "line": 28,
+                "column": 5
+            },
+            "end": {
+                "offset": 485,
+                "line": 28,
+                "column": 13
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3007",
+        "severity": "error",
+        "message": "Explicit anchors are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 491,
+                "line": 29,
+                "column": 5
+            },
+            "end": {
+                "offset": 497,
+                "line": 29,
+                "column": 11
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3009",
+        "severity": "error",
+        "message": "Async declarations are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 503,
+                "line": 30,
+                "column": 5
+            },
+            "end": {
+                "offset": 508,
+                "line": 30,
+                "column": 10
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3009",
+        "severity": "error",
+        "message": "Resource declarations are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 514,
+                "line": 31,
+                "column": 5
+            },
+            "end": {
+                "offset": 522,
+                "line": 31,
+                "column": 13
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3010",
+        "severity": "error",
+        "message": "Markup syntax is not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 528,
+                "line": 32,
+                "column": 5
+            },
+            "end": {
+                "offset": 529,
+                "line": 32,
+                "column": 6
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3011",
+        "severity": "error",
+        "message": "Style declarations are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 535,
+                "line": 33,
+                "column": 5
+            },
+            "end": {
+                "offset": 540,
+                "line": 33,
+                "column": 10
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3011",
+        "severity": "error",
+        "message": "Style declarations are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 546,
+                "line": 34,
+                "column": 5
+            },
+            "end": {
+                "offset": 552,
+                "line": 34,
+                "column": 11
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3011",
+        "severity": "error",
+        "message": "CSS declarations are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 558,
+                "line": 35,
+                "column": 5
+            },
+            "end": {
+                "offset": 561,
+                "line": 35,
+                "column": 8
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3011",
+        "severity": "error",
+        "message": "Asset declarations are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 567,
+                "line": 36,
+                "column": 5
+            },
+            "end": {
+                "offset": 572,
+                "line": 36,
+                "column": 10
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3012",
+        "severity": "error",
+        "message": "Transition declarations are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 578,
+                "line": 37,
+                "column": 5
+            },
+            "end": {
+                "offset": 588,
+                "line": 37,
+                "column": 15
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3012",
+        "severity": "error",
+        "message": "Animation declarations are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 594,
+                "line": 38,
+                "column": 5
+            },
+            "end": {
+                "offset": 603,
+                "line": 38,
+                "column": 14
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3012",
+        "severity": "error",
+        "message": "Animation declarations are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 609,
+                "line": 39,
+                "column": 5
+            },
+            "end": {
+                "offset": 616,
+                "line": 39,
+                "column": 12
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3012",
+        "severity": "error",
+        "message": "Portal declarations are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 622,
+                "line": 40,
+                "column": 5
+            },
+            "end": {
+                "offset": 628,
+                "line": 40,
+                "column": 11
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3012",
+        "severity": "error",
+        "message": "Hydration declarations are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 634,
+                "line": 41,
+                "column": 5
+            },
+            "end": {
+                "offset": 643,
+                "line": 41,
+                "column": 14
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3012",
+        "severity": "error",
+        "message": "Hydration declarations are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 649,
+                "line": 42,
+                "column": 5
+            },
+            "end": {
+                "offset": 656,
+                "line": 42,
+                "column": 12
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3012",
+        "severity": "error",
+        "message": "Streaming declarations are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 662,
+                "line": 43,
+                "column": 5
+            },
+            "end": {
+                "offset": 668,
+                "line": 43,
+                "column": 11
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3013",
+        "severity": "error",
+        "message": "Preprocessor directives are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 674,
+                "line": 44,
+                "column": 5
+            },
+            "end": {
+                "offset": 684,
+                "line": 44,
+                "column": 15
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3013",
+        "severity": "error",
+        "message": "Macro directives are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 690,
+                "line": 45,
+                "column": 5
+            },
+            "end": {
+                "offset": 695,
+                "line": 45,
+                "column": 10
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3013",
+        "severity": "error",
+        "message": "Plugin directives are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 701,
+                "line": 46,
+                "column": 5
+            },
+            "end": {
+                "offset": 707,
+                "line": 46,
+                "column": 11
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3013",
+        "severity": "error",
+        "message": "HMR directives are not supported by the first compiler milestone.",
+        "filename": "fixtures/unsupported-structures/input.lily",
+        "span": {
+            "start": {
+                "offset": 713,
+                "line": 47,
+                "column": 5
+            },
+            "end": {
+                "offset": 716,
+                "line": 47,
+                "column": 8
+            }
+        },
+        "related": []
+    }
+]

@@ -1,0 +1,12 @@
+{
+  "extends": "../../../../tsconfig.base.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "declaration": false,
+    "lib": ["ES2022"],
+    "noEmit": true,
+    "types": []
+  },
+  "include": ["../fixtures/golden/*/expected.js", "../fixtures/support/**/*.js"]
+}

@@ -1,0 +1,40 @@
+[
+    {
+        "code": "LILY2006",
+        "severity": "error",
+        "message": "Only one template section is allowed.",
+        "filename": "fixtures/top-level-cardinality/input.lily",
+        "span": {
+            "start": {
+                "offset": 160,
+                "line": 8,
+                "column": 1
+            },
+            "end": {
+                "offset": 190,
+                "line": 10,
+                "column": 2
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY2001",
+        "severity": "error",
+        "message": "Expected exactly one behavior import.",
+        "filename": "fixtures/top-level-cardinality/input.lily",
+        "span": {
+            "start": {
+                "offset": 191,
+                "line": 11,
+                "column": 1
+            },
+            "end": {
+                "offset": 191,
+                "line": 11,
+                "column": 1
+            }
+        },
+        "related": []
+    }
+]

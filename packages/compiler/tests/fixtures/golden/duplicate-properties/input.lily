@@ -1,0 +1,10 @@
+behavior { CounterBehavior } from "../../support/counter.behavior.js";
+primitives { Stack } from "../../support/ui.capabilities.js";
+properties { StackGap } from "../../support/ui.capabilities.js";
+
+template {
+    node Stack {
+        value StackGap = 8;
+        bind StackGap = controller.count.get();
+    }
+}

@@ -7,6 +7,7 @@ export type {
     TemplateBindingOptionsType,
 } from "./binding/index.js";
 export type {
+    ComponentTemplateStateFromDefinitionType,
     ComponentTemplateStateType,
     TemplateComponent,
     TemplateComponentInputBinding,
