@@ -20,6 +20,12 @@ The universal execution, host-session, placement, failure, and conformance bound
 in [Renderer Protocol](renderer-protocol.md). Host-specific packages implement that protocol and
 never become dependencies of universal Renderer.
 
+The accepted browser specialization, callback execution bridge, and external semantic primitive
+registration model are defined in [DOM Renderer Boundary](dom-renderer-boundary.md). The
+framework-neutral, Lilium-specific, and target-specific layers of an external UI library are
+defined in [External UI Library Integration](external-ui-library-integration.md), using Lotus as a
+non-dependent reference.
+
 The first source grammar, diagnostics, deterministic ESM, and source-map boundary are accepted in
 [Lily Compiler Boundary](lily-compiler-boundary.md). The Compiler package implements its complete
 first public pipeline while keeping lexer, parser, analysis, IR, generation, and source-map
@@ -52,6 +58,11 @@ The template package defines target-independent visual structure, reactive bindi
 
 Libraries may export a headless component, one or more templates, and ready-to-render component-template compositions independently.
 
+An external library that must also support other frameworks keeps its framework-neutral behavior
+below the Lilium adapter. Its Lilium package may publish `ComponentDefinition`, `TemplateDefinition`,
+and ready composition values, while a separate target package maps the same semantic primitive
+identities to Renderer DOM. Lilium never imports that library.
+
 ## Dependency direction
 
 ```text
@@ -62,6 +73,9 @@ renderer-dom     --> renderer
 renderer-console --> renderer
 
 compiler --emits--> component and template ABIs
+
+external-ui-lilium     --> component, template
+external-ui-lilium-dom --> external-ui-lilium, renderer-dom
 ```
 
 Dependencies must not point upward around these boundaries. In particular, `core` must not import component, template, renderer, compiler, or DOM concepts, and `component` must not import template or renderer concepts.

@@ -10,3 +10,16 @@ The documentation is organized into four areas:
 - [Repository Tooling](tooling/index.md) documents local checks and workspace operations.
 
 Documents marked as **Draft** contain proposals that must be closed before their contracts or runtime are implemented.
+
+## Active architecture boundaries
+
+- [Package Boundaries](architecture/package-boundaries.md) defines package responsibilities and
+  dependency direction.
+- [Template ABI](architecture/template-abi.md) defines target-independent visual declarations.
+- [Renderer Protocol](architecture/renderer-protocol.md) defines universal host execution.
+- [DOM Renderer Boundary](architecture/dom-renderer-boundary.md) defines the accepted browser
+  specialization for Epic 009.
+- [External UI Library Integration](architecture/external-ui-library-integration.md) defines how
+  independent libraries such as Lotus integrate without reversing dependencies.
+- [Ecosystem Direction](future/ecosystem.md) records Lilium, Lotus, Aster, possible future
+  projects, and the replaceable external-tool policy.

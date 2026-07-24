@@ -136,6 +136,12 @@ Property adapters own target-specific replacement cleanup. For example, replacin
 valued property must release any listener or subscription represented by the previous committed
 value before the adapter reports success. Renderer still owns the binding and primitive lifetime.
 
+A callback invoked after its property write has returned requires a narrow Renderer-owned host
+execution capability. That accepted extension restores the occurrence owner, batching, failure
+terminalization, and error-boundary traversal without exposing Core or `Scope` to the host. Its
+canonical semantics are defined by
+[DOM Renderer Boundary](dom-renderer-boundary.md#owned-callback-execution).
+
 ## Host operations
 
 The minimum structural operations are `place` and `remove`.
@@ -416,8 +422,11 @@ both insertion and movement to the target's before-anchor insertion operation. `
 the value, while `release()` removes retained listener and adapter state.
 
 All browser-specific types and operations remain inside that adapter. Renderer sees only opaque
-objects, capability identities, candidate values, parent handles, and sibling anchors. Therefore a
-browser renderer needs no change to the universal protocol.
+objects, capability identities, candidate values, the narrow host execution capability, parent
+handles, and sibling anchors. Structural DOM execution requires no browser branch in Renderer.
+Later callback execution adds one target-independent host contract and Core integration bridge
+rather than a DOM-specific Renderer dependency. The complete accepted specialization is defined in
+[DOM Renderer Boundary](dom-renderer-boundary.md).
 
 ## Minimum concept families
 

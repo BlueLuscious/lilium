@@ -4,7 +4,8 @@ This document records packages that do not currently exist. Moving a package int
 
 ## Approved implementation milestones
 
-- `@lilium/renderer-dom`: browser host implementation.
+- `@lilium/renderer-dom`: configurable browser host implementation following the accepted
+  [DOM Renderer Boundary](../architecture/dom-renderer-boundary.md).
 
 Creation order, prerequisites, and package gates are defined once in
 [Package Boundaries](../architecture/package-boundaries.md). These remaining packages stay outside
@@ -17,7 +18,9 @@ Renderer, and Renderer Console packages are documented under
 - `@lilium/renderer-server`: server rendering and serialization.
 - `@lilium/cli`: optional project diagnostics and framework tooling, including a future `lilium check` command.
 - `@lilium/router`: routing primitives integrated with ownership.
-- `@lilium/testing`: public test utilities and renderer fixtures.
+- `@lilium/testing`: possible Lilium-specific test utilities and renderer fixtures; broader
+  headless testing infrastructure may instead become an independent
+  [ecosystem project](ecosystem.md).
 - `@lilium/devtools`: graph, scope, component, and update inspection.
 - `@lilium/compiler-vite`: Vite integration for `.lily` files.
 - `lilium`: optional browser-oriented facade package.

@@ -6,7 +6,10 @@ Lilium's accepted [Renderer Protocol](../architecture/renderer-protocol.md) rema
 
 ## Client-side rendering
 
-CSR belongs to a browser renderer such as `@lilium/renderer-dom`. It will own browser mounting, host updates, events, and unmounting without moving DOM contracts into Core, Component, Template, or the universal Renderer package.
+CSR belongs to a browser renderer such as `@lilium/renderer-dom`. It will own browser mounting,
+host updates, events, and unmounting without moving DOM contracts into Core, Component, Template,
+or universal Renderer. Its accepted first implementation boundary is defined in
+[DOM Renderer Boundary](../architecture/dom-renderer-boundary.md).
 
 ## Server-side rendering
 

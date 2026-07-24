@@ -42,3 +42,17 @@ The current tooling is a conservative repository implementation, not a permanent
 A check must be removed when its underlying policy is removed. A custom implementation should be replaced by a maintained standard tool when that tool can express the same policy without duplicated configuration or weaker diagnostics. Formatting, generic linting, Markdown style, and generic dependency analysis should not be reimplemented locally merely to keep them under `tooling/`.
 
 The tooling test suite verifies that repository enforcement does not silently accept invalid input or reject valid input. It is not framework behavior and must remain proportionate to the number and risk of local rules.
+
+## External adapters
+
+Repository tooling may use maintained external development tools without making them permanent
+architecture. Biome currently provides generic formatting and linting. Renderer DOM plans to use
+Playwright only as a transport adapter for Lilium-owned native-browser conformance scenarios.
+
+Tool-specific types and APIs must not enter published contracts. Stable repository commands,
+diagnostic models, and conformance scenarios remain owned by Lilium so an external tool can be
+upgraded or replaced without redefining framework behavior.
+
+Building an ecosystem alternative is a separate product decision. It requires independent
+consumers and a reusable domain rather than a desire to eliminate one development dependency. The
+broader direction is recorded in [Ecosystem Direction](../future/ecosystem.md).

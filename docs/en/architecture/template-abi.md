@@ -110,9 +110,16 @@ only to adapters that implement those capabilities.
 Unsupported primitives or properties are mount-time capability errors. Silent property omission
 or name-based fallback is not allowed.
 
+The complete split between a framework-neutral UI core, Lilium component and template exports,
+and target-specific mappings is defined by
+[External UI Library Integration](external-ui-library-integration.md).
+
 Events are not a special Template ABI concept. A primitive may define a callback-valued property,
 and its host adapter defines when and how that callback is invoked. Platform event objects cannot
 enter the universal Template contracts unless represented by a separately accepted portable type.
+Later host invocation restores Renderer ownership through the accepted
+[DOM Renderer Boundary](dom-renderer-boundary.md#owned-callback-execution); Template does not
+capture that execution capability.
 
 ## Template state
 
