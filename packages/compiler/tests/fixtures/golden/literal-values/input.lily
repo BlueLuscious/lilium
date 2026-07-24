@@ -1,0 +1,9 @@
+behavior { CounterBehavior } from "../../support/counter.behavior.js";
+primitives { Stack } from "../../support/ui.capabilities.js";
+properties { StackConfig } from "../../support/ui.capabilities.js";
+
+template {
+    node Stack {
+        value StackConfig = { compact: false, values: [-8, +12, null, "wide", `fixed`] };
+    }
+}

@@ -1,0 +1,12 @@
+behavior { CounterBehavior } from "../../support/counter.behavior.js";
+primitives { Stack } from "../../support/ui.capabilities.js";
+properties { First, Second, Third, Fourth } from "../../support/ui.capabilities.js";
+
+template {
+    node Stack {
+        bind First = controller.increment();
+        bind Second = (value) => value;
+        bind Third = controller.count as number;
+        bind Fourth = ;
+    }
+}

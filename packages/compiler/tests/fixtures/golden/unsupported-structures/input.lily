@@ -1,0 +1,48 @@
+behavior { CounterBehavior } from "../../support/counter.behavior.js";
+primitives { Stack } from "../../support/ui.capabilities.js";
+properties { StackGap } from "../../support/ui.capabilities.js";
+
+template {
+    setup;
+    script;
+    state;
+    input;
+    inputs;
+    controller;
+    interface;
+    type;
+    enum;
+    namespace;
+    declare;
+    component;
+    slot;
+    outlet;
+    projection;
+    project;
+    if;
+    when;
+    switch;
+    each;
+    for;
+    repeat;
+    fragment;
+    anchor;
+    async;
+    resource;
+    <;
+    style;
+    styles;
+    css;
+    asset;
+    transition;
+    animation;
+    animate;
+    portal;
+    hydration;
+    hydrate;
+    stream;
+    preprocess;
+    macro;
+    plugin;
+    hmr;
+}

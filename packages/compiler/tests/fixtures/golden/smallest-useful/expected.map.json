@@ -1,0 +1,12 @@
+{
+    "version": 3,
+    "file": "fixtures/smallest-useful/input.lily.js",
+    "sources": [
+        "fixtures/smallest-useful/input.lily"
+    ],
+    "sourcesContent": [
+        "behavior { CounterBehavior } from \"../../support/counter.behavior.js\";\n\nprimitives { Stack, Label, Action } from \"../../support/ui.capabilities.js\";\nproperties {\n    StackGap,\n    LabelValue,\n    ActionLabel,\n    ActionActivate,\n} from \"../../support/ui.capabilities.js\";\n\ntemplate {\n    node Stack {\n        value StackGap = 8;\n\n        node Label {\n            bind LabelValue = `Count: ${controller.count.get()}`;\n        }\n\n        node Action {\n            value ActionLabel = \"Increment\";\n            bind ActionActivate = controller.increment;\n        }\n    }\n}\n"
+    ],
+    "names": [],
+    "mappings": ";;AAAA;AAEA;;;;;;;;;;;;;sBASS;;+BACK,UAAW;;;8BAEZ;;yCACI,wBAAa;;;8BAGjB;;uCACK,aAAc;yCACf,4BAAiB;;;;;;;;gCApBlC"
+}

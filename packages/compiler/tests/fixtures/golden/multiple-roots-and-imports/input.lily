@@ -1,0 +1,17 @@
+behavior { CounterBehavior } from "../../support/counter.behavior.js";
+primitives { Panel } from "../../support/layout.capabilities.js";
+primitives { Button, Heading } from "../../support/content.capabilities.js";
+properties { ButtonLabel, HeadingText } from "../../support/content.capabilities.js";
+properties { PanelGap } from "../../support/layout.capabilities.js";
+
+template {
+    node Heading {
+        value HeadingText = "First";
+    }
+    node Panel {
+        value PanelGap = 12;
+    }
+    node Button {
+        value ButtonLabel = "Last";
+    }
+}

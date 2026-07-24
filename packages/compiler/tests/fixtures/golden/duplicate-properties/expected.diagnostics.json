@@ -1,0 +1,21 @@
+[
+    {
+        "code": "LILY2011",
+        "severity": "error",
+        "message": "Property 'StackGap' is already defined on this node.",
+        "filename": "fixtures/duplicate-properties/input.lily",
+        "span": {
+            "start": {
+                "offset": 268,
+                "line": 8,
+                "column": 14
+            },
+            "end": {
+                "offset": 276,
+                "line": 8,
+                "column": 22
+            }
+        },
+        "related": []
+    }
+]

@@ -1,0 +1,20 @@
+behavior { CounterBehavior } from "../../support/counter.behavior.js";
+primitives { Stack, Label, Action } from "../../support/ui.capabilities.js";
+properties { StackGap, LabelValue, ActionLabel, ActionActivate } from "../../support/ui.capabilities.js";
+
+template {
+    node Stack {
+        value StackGap = +8;
+
+        node Label {
+            bind LabelValue = controller.count.get() > 0
+                ? `Count: ${controller.count.get()}`
+                : "Empty";
+        }
+
+        node Action {
+            value ActionLabel = `Increment`;
+            bind ActionActivate = controller.increment;
+        }
+    }
+}

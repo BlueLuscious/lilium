@@ -1,0 +1,12 @@
+{
+    "version": 3,
+    "file": "fixtures/comments-and-crlf/input.lily.js",
+    "sources": [
+        "fixtures/comments-and-crlf/input.lily"
+    ],
+    "sourcesContent": [
+        "/* The source map must preserve this exact CRLF source. */\r\nbehavior { CounterBehavior } from \"../../support/counter.behavior.js\";\r\n\r\n// Capability declarations may contain comments.\r\nprimitives { Stack, Label } from \"../../support/ui.capabilities.js\";\r\nproperties { StackGap, LabelValue } from \"../../support/ui.capabilities.js\";\r\n\r\ntemplate {\r\n    node Stack {\r\n        value StackGap = 4;\r\n        node Label {\r\n            bind LabelValue = `Input: ${inputs.initial.get()}`;\r\n        }\r\n    }\r\n}\r\n"
+    ],
+    "names": [],
+    "mappings": ";;AACA;AAGA;;;;;;;;;;sBAIS;;+BACK,UAAW;;;8BACZ;;yCACI,wBAAa;;;;;;;;gCAV9B"
+}

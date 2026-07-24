@@ -1,0 +1,12 @@
+{
+    "version": 3,
+    "file": "fixtures/multiple-roots-and-imports/input.lily.js",
+    "sources": [
+        "fixtures/multiple-roots-and-imports/input.lily"
+    ],
+    "sourcesContent": [
+        "behavior { CounterBehavior } from \"../../support/counter.behavior.js\";\nprimitives { Panel } from \"../../support/layout.capabilities.js\";\nprimitives { Button, Heading } from \"../../support/content.capabilities.js\";\nproperties { ButtonLabel, HeadingText } from \"../../support/content.capabilities.js\";\nproperties { PanelGap } from \"../../support/layout.capabilities.js\";\n\ntemplate {\n    node Heading {\n        value HeadingText = \"First\";\n    }\n    node Panel {\n        value PanelGap = 12;\n    }\n    node Button {\n        value ButtonLabel = \"Last\";\n    }\n}\n"
+    ],
+    "names": [],
+    "mappings": ";;AAAA;AACA;;;;AACA;;;;;;;;;;sBAKS;;+BACK,aAAc;;;sBAEnB;;+BACK,UAAW;;;sBAEhB;;+BACK,aAAc;;;;;;gCAd5B"
+}

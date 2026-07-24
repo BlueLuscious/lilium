@@ -1,0 +1,78 @@
+[
+    {
+        "code": "LILY3002",
+        "severity": "error",
+        "message": "Binding expressions cannot invoke component commands or arbitrary calls.",
+        "filename": "fixtures/forbidden-bindings/input.lily",
+        "span": {
+            "start": {
+                "offset": 288,
+                "line": 7,
+                "column": 42
+            },
+            "end": {
+                "offset": 289,
+                "line": 7,
+                "column": 43
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3008",
+        "severity": "error",
+        "message": "Inline callback expressions are not supported by the first compiler milestone.",
+        "filename": "fixtures/forbidden-bindings/input.lily",
+        "span": {
+            "start": {
+                "offset": 322,
+                "line": 8,
+                "column": 31
+            },
+            "end": {
+                "offset": 324,
+                "line": 8,
+                "column": 33
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY3003",
+        "severity": "error",
+        "message": "TypeScript expression syntax is not supported in Lily source.",
+        "filename": "fixtures/forbidden-bindings/input.lily",
+        "span": {
+            "start": {
+                "offset": 370,
+                "line": 9,
+                "column": 39
+            },
+            "end": {
+                "offset": 372,
+                "line": 9,
+                "column": 41
+            }
+        },
+        "related": []
+    },
+    {
+        "code": "LILY1008",
+        "severity": "error",
+        "message": "Expected a binding expression.",
+        "filename": "fixtures/forbidden-bindings/input.lily",
+        "span": {
+            "start": {
+                "offset": 403,
+                "line": 10,
+                "column": 23
+            },
+            "end": {
+                "offset": 404,
+                "line": 10,
+                "column": 24
+            }
+        },
+        "related": []
+    }
+]

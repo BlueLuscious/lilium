@@ -1,0 +1,12 @@
+{
+    "version": 3,
+    "file": "fixtures/literal-values/input.lily.js",
+    "sources": [
+        "fixtures/literal-values/input.lily"
+    ],
+    "sourcesContent": [
+        "behavior { CounterBehavior } from \"../../support/counter.behavior.js\";\nprimitives { Stack } from \"../../support/ui.capabilities.js\";\nproperties { StackConfig } from \"../../support/ui.capabilities.js\";\n\ntemplate {\n    node Stack {\n        value StackConfig = { compact: false, values: [-8, +12, null, \"wide\", `fixed`] };\n    }\n}\n"
+    ],
+    "names": [],
+    "mappings": ";;AAAA;AACA;;;;;;;;sBAIS;;+BACK,aAAc;;;;;;gCAN5B"
+}

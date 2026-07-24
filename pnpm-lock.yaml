@@ -21,7 +21,23 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  packages/compiler: {}
+  packages/compiler:
+    devDependencies:
+      '@lilium/component':
+        specifier: workspace:*
+        version: link:../component
+      '@lilium/core':
+        specifier: workspace:*
+        version: link:../core
+      '@lilium/renderer':
+        specifier: workspace:*
+        version: link:../renderer
+      '@lilium/renderer-console':
+        specifier: workspace:*
+        version: link:../renderer-console
+      '@lilium/template':
+        specifier: workspace:*
+        version: link:../template
 
   packages/component:
     dependencies:

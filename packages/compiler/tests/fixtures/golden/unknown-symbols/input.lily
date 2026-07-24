@@ -1,0 +1,9 @@
+behavior { CounterBehavior } from "../../support/counter.behavior.js";
+primitives { Stack } from "../../support/ui.capabilities.js";
+properties { StackGap } from "../../support/ui.capabilities.js";
+
+template {
+    node MissingPrimitive {
+        value MissingProperty = 8;
+    }
+}
