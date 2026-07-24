@@ -19,6 +19,6 @@ Renderer, host, filesystem, or runtime objects.
 Every collection and record is frozen during lowering. Source order remains deterministic, while
 properties and children are separated only after analysis proves that no property follows a child.
 
-The IR retains local imported names rather than runtime capability objects. Phase 03 will use those
-names to emit calls to the public `Template` object API and use retained spans for source mappings.
-No IR is returned when any lexer, parser, or semantic error exists.
+The IR retains local imported names rather than runtime capability objects. `LilyGenerator` uses
+those names to emit calls to the public `Template` object API and uses retained spans for source
+mappings. No IR is returned when any lexer, parser, or semantic error exists.

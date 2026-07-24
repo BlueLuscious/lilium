@@ -2,7 +2,8 @@ import type { CompilerSourceSpan } from "../../../source/contracts/compiler-sour
 
 /**
  * @description One source-located expression retained for dedicated semantic analysis.
- * @remarks Phase 01 preserves exact spelling and balanced boundaries without validating expression purity.
+ * @remarks The parser preserves exact spelling and balanced boundaries, while semantic expression
+ * validation remains the analyzer's responsibility.
  */
 export interface ICompilerExpressionSyntax {
     /** @description Exact expression spelling excluding surrounding assignment and semicolon. */

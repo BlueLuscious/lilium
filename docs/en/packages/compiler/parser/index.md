@@ -17,7 +17,7 @@ and returns diagnostics rather than throwing for source errors.
 | `ICompilerTemplateSyntax` | Preserve one template block and ordered root nodes. | Contains `ICompilerNodeSyntax`. |
 | `ICompilerNodeSyntax` | Preserve one primitive name and ordered property or child declarations. | Recursively contains nodes and `ICompilerPropertySyntax`. |
 | `ICompilerPropertySyntax` | Preserve one `value` or `bind` declaration. | Uses `TCompilerPropertyKind` and `ICompilerExpressionSyntax`. |
-| `ICompilerExpressionSyntax` | Preserve exact balanced expression spelling and span. | Consumed by the Phase 02 analyzer. |
+| `ICompilerExpressionSyntax` | Preserve exact balanced expression spelling and span. | Consumed by semantic analysis and expression validation. |
 | `ICompilerParseResult` | Return recoverable syntax and combined lexer/parser diagnostics. | Produced by `LilyParser`. |
 | `TCompilerImportKind` | Distinguish behavior, primitive, and property imports. | Discriminates import semantics for later analysis. |
 | `TCompilerPropertyKind` | Distinguish static values and reactive bindings. | Discriminates `ICompilerPropertySyntax`. |
@@ -43,7 +43,7 @@ codes and do not prevent later valid nodes from being recovered.
 
 The concrete tree may contain duplicate, misplaced, or unresolved declarations. Import
 cardinality, symbol categories, property ordering and uniqueness, literal validity, and binding
-purity are Phase 02 semantic responsibilities. This keeps parsing recoverable and prevents its
+purity are semantic analyzer responsibilities. This keeps parsing recoverable and prevents its
 grammar from depending on runtime capability objects.
 
 The accepted and deferred syntax remains canonical in the
