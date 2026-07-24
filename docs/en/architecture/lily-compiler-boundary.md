@@ -1,6 +1,6 @@
 # Lily Compiler Boundary
 
-Status: **Foundation accepted; semantic analysis and normalized IR implemented**
+Status: **Foundation accepted; complete public compilation pipeline implemented**
 
 This document defines the first `.lily` source boundary and deterministic compiler output. The
 compiler targets the accepted Component and [Template ABI](template-abi.md) package roots and never
@@ -238,6 +238,10 @@ are documented under the [Compiler Lexer](../packages/compiler/lexer/index.md) a
 Semantic resolution, expression restrictions, and the generator boundary are documented under
 [Compiler Analysis](../packages/compiler/analysis/index.md) and
 [Compiler IR](../packages/compiler/ir/index.md).
+
+Deterministic ESM emission and generated mapping behavior are documented under
+[Compiler Generator](../packages/compiler/generator/index.md) and
+[Compiler Source Map](../packages/compiler/source-map/index.md).
 
 The parser synchronizes after semicolons, closing braces, and recognized top-level declaration
 keywords so one malformed declaration does not suppress independent later diagnostics.
