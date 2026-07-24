@@ -5,6 +5,7 @@ export type {
     TemplatedComponentDefinition,
 } from "./contracts/index.js";
 export type {
+    ComponentTemplateStateFromDefinitionType,
     ComponentTemplateStateType,
     TemplateComponentInputEvaluatorType,
     TemplateComponentInputType,

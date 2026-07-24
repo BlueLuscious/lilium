@@ -1,6 +1,7 @@
 import type { ComponentDefinition } from "@lilium/component";
 import type { ReadonlySignal } from "@lilium/core";
 import {
+    type ComponentTemplateStateFromDefinitionType,
     type ComponentTemplateStateType,
     Template,
     type TemplateApi,
@@ -39,6 +40,10 @@ type ParentStateType = {
 
 declare const CounterBehavior: ComponentDefinition<CounterInputsType, CounterControllerType>;
 declare const ActionBehavior: ComponentDefinition<ActionInputsType, ActionControllerType>;
+
+type CounterStateFromDefinitionType = ComponentTemplateStateFromDefinitionType<
+    typeof CounterBehavior
+>;
 
 const Stack = Template.primitive("Stack");
 const StackGap = Template.property<number>(Stack, "gap");
@@ -113,6 +118,10 @@ const primitive: TemplatePrimitive = Stack;
 const property: TemplateProperty<typeof Label, string> = LabelValue;
 const slot: TemplateSlot<ActionSlotInputsType> = ActionContent;
 const definition: TemplateDefinition<ParentStateType> = ParentView;
+const derivedState: CounterStateFromDefinitionType = {} as ComponentTemplateStateType<
+    CounterInputsType,
+    CounterControllerType
+>;
 const composition: TemplatedComponentDefinition<CounterInputsType, CounterControllerType> = Counter;
 const binding: TemplateBinding<ParentStateType, typeof Label, string, undefined> = Template.binding(
     LabelValue,
@@ -153,6 +162,7 @@ void api;
 void binding;
 void composition;
 void definition;
+void derivedState;
 void DefaultContent;
 void NestedCounter;
 void primitive;
