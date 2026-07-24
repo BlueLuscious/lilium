@@ -39,6 +39,9 @@ export class LilyGenerator {
         this.#writer.write('import { Template } from "@lilium/template";\n');
         this.#writeImports(ir.imports);
         this.#writer.write("\n");
+        this.#writer.write(
+            `/** @type {import("@lilium/template").TemplateDefinition<import("@lilium/template").ComponentTemplateStateFromDefinitionType<typeof ${ir.behavior}>>} */\n`,
+        );
         this.#writer.write("const $template = Template.define({\n");
         this.#writer.write("    roots: [\n");
 

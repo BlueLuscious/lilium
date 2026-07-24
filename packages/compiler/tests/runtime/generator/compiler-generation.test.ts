@@ -74,6 +74,7 @@ describe("Compiler generation", () => {
             "    Text,",
             '} from "./ui.js";',
             "",
+            '/** @type {import("@lilium/template").TemplateDefinition<import("@lilium/template").ComponentTemplateStateFromDefinitionType<typeof CounterBehavior>>} */',
             "const $template = Template.define({",
             "    roots: [",
             "        Template.node(Stack, {",
