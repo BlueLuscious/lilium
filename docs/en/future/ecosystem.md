@@ -24,6 +24,42 @@ The accepted Lotus direction is specified in
 [External UI Library Integration](../architecture/external-ui-library-integration.md). Aster
 contracts remain undefined until its independent requirements are reviewed.
 
+## Aster composition
+
+Aster must remain usable directly by a Lilium application, through an optional Lotus composition,
+or through another framework adapter. Its portable root owns icon definitions, metadata, and
+catalog behavior without importing Lilium or Lotus.
+
+A future Lilium adapter may translate those portable definitions into Lilium components and
+templates. The conceptual package name `@aster/lilium` describes the boundary but is not reserved
+until Aster contracts are designed.
+
+Lotus headless behavior must not require Aster. Lotus components and templates may expose generic
+icon inputs, slots, or semantic presentation ports that accept any compatible icon source. A
+Lotus-specific integration may then compose those ports with the Aster Lilium adapter:
+
+```text
+optional Lotus-Aster Lilium integration
+    |
+    +--> Lotus Lilium adapter
+    +--> Aster Lilium adapter
+```
+
+The integration should normally belong to Lotus because Lotus knows whether an icon represents a
+toggle, close action, disclosure state, navigation item, or another component role. Aster owns the
+icon asset and its portable representation but does not know Lotus component structure.
+
+Names such as `@lotus/aster-lilium` are conceptual examples, not approved package names. The stable
+boundary is that integration remains optional and neither portable root depends on the other.
+This permits:
+
+- Lilium with Aster and no Lotus;
+- Lilium with Lotus and no Aster;
+- Lilium with Lotus and Aster through explicit composition;
+- Lotus with another icon library;
+- Aster with another framework;
+- Lilium with neither external library.
+
 ## Potential projects
 
 Additional ecosystem projects may emerge when a reusable responsibility has independent consumers.
@@ -68,9 +104,15 @@ application
     +--> Lilium
     +--> Lotus adapters ----> Lilium public packages
     +--> Aster adapters ----> selected framework packages
+    +--> optional Lotus-Aster integration
+                  |                |
+                  v                v
+           Lotus adapter      Aster adapter
 
 Lotus headless core --------> no Lilium dependency
 Aster portable core --------> no Lilium dependency
+Lotus headless core --------X-> Aster portable core
+Aster portable core --------X-> Lotus headless core
 Lilium --------------------X-> Lotus or Aster
 ```
 

@@ -163,6 +163,16 @@ The first Lotus Lilium adapter does not need separate packages for component and
 One feature-organized package is sufficient until distribution or dependency evidence justifies a
 split.
 
+## Optional icon-library integration
+
+Lotus headless behavior and default templates cannot require one icon library. They expose generic
+icon inputs, slots, or semantic presentation ports so applications can supply Aster, another icon
+library, or application-owned icons.
+
+The optional Lotus and Aster composition, ownership direction, and permitted installation modes
+are defined once in [Ecosystem Direction](../future/ecosystem.md). This document does not duplicate
+or define Aster contracts.
+
 ## Semantic primitives
 
 Lotus Lilium templates declare semantic identities such as sidebar root, content, toggle, label,
@@ -276,4 +286,3 @@ Lilium application
 Lotus can replace Lilium adapters without changing its headless domain. Lilium can use another UI
 library without changing any framework package. The application remains the only composition root
 that intentionally knows both complete package families.
-
